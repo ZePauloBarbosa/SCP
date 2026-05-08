@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communal Bin Assignment — SmartCity</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+:root {
+  --navy:        #20315A;
+  --navy-hover:  #1a2a4e;
+  --green:       #33A542;
+  --green-light: #dcedeb;
+  --green-hover: #2a8f37;
+  --teal:        #00a599;
+  --dark:        #242833;
+  --dark-30:     rgba(36,40,51,0.30);
+  --page-bg:     #fafafc;
+  --surface:     #ffffff;
+  --surface-2:   #f2f2f5;
+  --surface-3:   #f3f3f5;
+  --border:      #d3d4d6;
+  --border-light:#dce6ed;
+  --text-primary:#000000;
+  --text-2:      #76768c;
+  --text-3:      #b4b4c4;
+  --text-4:      #bbbbca;
+  --error:       #ff5252;
+  --error-bg:    #fff0f0;
+  --warn-bg:     #fff8e1;
+  --warn-fg:     #b45309;
+  --parent-blue: #1a6b9a;
+  --parent-bg:   #e8f2f9;
+  --child-purple:#7b4fa6;
+  --child-bg:    #f2ecf9;
+  --unassigned:  #f2f2f5;
+  --status-active-bg:  #dcedeb;
+  --status-active-fg:  #1a6b3a;
+  --status-warn-bg:    #fff5ed;
+  --status-warn-fg:    #b45309;
+  --status-inactive-bg:#f2f2f5;
+  --status-inactive-fg:#76768c;
+  --font-main: 'Montserrat', sans-serif;
+  --font-eyebrow: 'Inter', sans-serif;
+  --shadow-sm: 0 1px 3px rgba(36,40,51,0.10);
+  --shadow-md: 0 4px 12px rgba(36,40,51,0.12);
+  --shadow-lg: 0 8px 24px rgba(36,40,51,0.16);
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-main);
+  background: var(--page-bg);
+  color: var(--text-primary);
+  font-size: 14px;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Nav ── */
+.nav {
+  height: 56px;
+  background: var(--dark);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 50;
+}
+.nav-logo { color: #fff; font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.nav-logo svg { color: var(--green); }
+.nav-breadcrumb { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.55); font-size: 12px; font-weight: 500; }
+.nav-breadcrumb span { color: rgba(255,255,255,0.85); }
+.nav-breadcrumb .sep { opacity: 0.4; }
+
+/* ── Feature flag banner ── */
+.feature-banner {
+  background: #eef6ff;
+  border-bottom: 1px solid #bfdbfe;
+  padding: 7px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1e40af;
+  flex-shrink: 0;
+}
+.feature-banner svg { flex-shrink: 0; color: #3b82f6; }
+.feature-banner-label { font-weight: 700; }
+.feature-banner-sep { color: #93c5fd; margin: 0 4px; }
+.feature-banner-action {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1e40af;
+  background: none;
+  border: 1px solid #93c5fd;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: var(--font-main);
+}
+.feature-banner-action:hover { background: #dbeafe; }
+
+/* ── Sub-header ── */
+.subheader {
+  height: 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.sub-title { font-size: 13px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.badge { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border-radius: 9px; font-size: 10px; font-weight: 700; }
+.badge-blue  { background: var(--parent-bg);   color: var(--parent-blue); }
+.badge-gray  { background: var(--unassigned);  color: var(--text-2); }
+.badge-green { background: var(--green-light); color: var(--green-hover); }
+.divider-v   { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+.chip {
+  height: 28px; padding: 0 10px; border-radius: 14px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text-2); font-family: var(--font-main);
+  font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center;
+  gap: 5px; transition: all .15s; white-space: nowrap;
+}
+.chip:hover  { border-color: var(--navy); color: var(--navy); }
+.chip.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+.chip.teal   { border-color: var(--teal); color: var(--teal); }
+.chip.teal:hover { background: var(--teal); color: #fff; }
+.search-wrap { position: relative; margin-left: auto; }
+.search-wrap svg { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; }
+.search-input { width: 200px; height: 30px; border: 1px solid var(--border); border-radius: var(--r-md); padding: 0 28px 0 28px; font-family: var(--font-main); font-size: 12px; color: var(--text-primary); background: var(--page-bg); outline: none; transition: border-color .15s; }
+.search-input:focus { border-color: var(--navy); background: #fff; }
+.search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-3); font-size: 14px; line-height: 1; padding: 0; }
+
+/* ── Main 3-col layout ── */
+.main { display: flex; flex: 1; overflow: hidden; }
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  width: 390px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.panel-hdr { padding: 10px 14px 8px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.eyebrow { font-family: var(--font-eyebrow); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-2); }
+.panel-tabs { display: flex; border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
+.panel-tab { flex: 1; height: 26px; border: none; background: transparent; font-family: var(--font-main); font-size: 11px; font-weight: 600; color: var(--text-2); cursor: pointer; transition: all .15s; }
+.panel-tab.active { background: var(--navy); color: #fff; }
+
+/* Distance filter row */
+.distance-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--page-bg);
+  flex-shrink: 0;
+}
+.distance-label { font-size: 11px; font-weight: 600; color: var(--text-2); white-space: nowrap; }
+.distance-chips { display: flex; gap: 4px; }
+.dist-chip {
+  height: 22px; padding: 0 8px; border-radius: 11px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-2); font-family: var(--font-main);
+  font-size: 10px; font-weight: 600; cursor: pointer; transition: all .12s;
+}
+.dist-chip:hover { border-color: var(--navy); color: var(--navy); }
+.dist-chip.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+.list-body { flex: 1; overflow-y: auto; padding: 8px; }
+.list-body::-webkit-scrollbar { width: 4px; }
+.list-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Mark as communal button — replaces "Create Parent" */
+.mark-communal-btn {
+  width: 100%; height: 34px;
+  background: var(--navy); color: #fff;
+  border: none; border-radius: var(--r-md);
+  font-family: var(--font-main); font-size: 12px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-bottom: 10px; transition: background .15s;
+}
+.mark-communal-btn:hover { background: var(--navy-hover); }
+
+/* ── Group Card ── */
+.group-card { border: 1px solid var(--parent-blue); border-radius: var(--r-lg); margin-bottom: 8px; overflow: hidden; background: var(--surface); transition: box-shadow .15s; }
+.group-card.drag-over { box-shadow: 0 0 0 2px var(--green); border-color: var(--green); }
+.group-hdr { padding: 10px 12px; background: linear-gradient(135deg, var(--parent-bg) 0%, #f0f6fb 100%); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background .15s; user-select: none; }
+.group-hdr:hover { background: linear-gradient(135deg, #ddedf6 0%, #e8f2f9 100%); }
+.group-hdr.selected { background: linear-gradient(135deg, #d0e5f5 0%, #ddedF7 100%); outline: 2px solid var(--navy); outline-offset: -2px; }
+.group-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--parent-blue); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.group-info { flex: 1; min-width: 0; }
+.group-name { font-size: 12px; font-weight: 700; color: var(--parent-blue); }
+.group-uprn { font-size: 10px; color: var(--text-2); font-weight: 500; }
+.group-count { font-size: 10px; font-weight: 700; color: var(--parent-blue); background: var(--parent-bg); padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
+.chevron { color: var(--parent-blue); transition: transform .2s; flex-shrink: 0; }
+.chevron.open { transform: rotate(180deg); }
+
+/* Child rows */
+.group-children { border-top: 1px solid rgba(26,107,154,0.15); }
+.child-row { padding: 8px 12px 8px 28px; border-bottom: 1px solid rgba(26,107,154,0.08); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background .12s; position: relative; }
+.child-row:last-of-type { border-bottom: none; }
+.child-row:hover  { background: #f8f4fd; }
+.child-row.selected { background: var(--child-bg); border-left: 3px solid var(--child-purple); padding-left: 25px; }
+.child-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--child-purple); flex-shrink: 0; }
+.child-addr { flex: 1; font-size: 11px; font-weight: 600; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.child-uprn-small { font-size: 10px; color: var(--text-3); }
+.child-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.svc-count { font-size: 10px; color: var(--text-2); font-weight: 600; background: var(--page-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1px 6px; }
+.child-chevron { color: var(--text-3); font-size: 11px; transition: transform .15s; }
+.child-row.selected .child-chevron { transform: rotate(90deg); color: var(--child-purple); }
+.remove-btn { width: 18px; height: 18px; border: none; background: transparent; border-radius: 3px; cursor: pointer; color: var(--text-3); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.remove-btn:hover { background: #fee2e2; color: var(--error); }
+
+/* Drop zone */
+.drop-zone { min-height: 32px; border: 1.5px dashed var(--border); border-radius: var(--r-md); margin: 8px 10px; display: flex; align-items: center; justify-content: center; color: var(--text-3); font-size: 11px; font-weight: 600; gap: 5px; transition: all .15s; }
+.drop-zone.over { border-color: var(--green); background: var(--green-light); color: var(--green-hover); }
+
+/* Section separator */
+.section-sep { padding: 6px 4px 4px; display: flex; align-items: center; gap: 8px; }
+.sep-label { font-family: var(--font-eyebrow); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); white-space: nowrap; }
+.sep-line  { flex: 1; height: 1px; background: var(--border); }
+
+/* Unassigned stop card */
+.stop-card { border: 1px solid var(--border); border-radius: var(--r-lg); padding: 10px 12px; margin-bottom: 6px; background: var(--surface); cursor: grab; user-select: none; transition: border-color .15s, box-shadow .15s; }
+.stop-card:hover  { border-color: var(--navy); box-shadow: var(--shadow-sm); }
+.stop-card.dragging { opacity: 0.35; cursor: grabbing; }
+.stop-card.highlighted { border-color: var(--text-2); box-shadow: 0 0 0 2px rgba(118,118,140,.2); }
+.sc-hdr { display: flex; align-items: flex-start; gap: 8px; }
+.drag-handle { color: var(--text-3); margin-top: 2px; flex-shrink: 0; opacity: 0.5; }
+.stop-info { flex: 1; min-width: 0; }
+.stop-addr { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stop-uprn-txt { font-size: 10px; color: var(--text-2); margin-top: 1px; }
+.stop-tags { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; align-items: center; }
+.tag { display: inline-flex; align-items: center; height: 16px; padding: 0 6px; border-radius: 3px; font-family: var(--font-eyebrow); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+.tag-u { background: var(--unassigned); color: var(--text-2); }
+.tag-s { background: #fff8e1; color: #b45309; }
+/* distance badge on unassigned cards */
+.dist-badge { font-size: 10px; font-weight: 700; color: var(--parent-blue); background: var(--parent-bg); border-radius: 10px; padding: 1px 6px; margin-left: auto; flex-shrink: 0; }
+
+/* ── MAP ── */
+.map-area { flex: 1; position: relative; background: #e8ecf0; overflow: hidden; }
+.map-secondary-notice {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,255,255,.95); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 6px 14px;
+  font-size: 11px; font-weight: 600; color: var(--text-2);
+  box-shadow: var(--shadow-sm); z-index: 40; white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+}
+.map-secondary-notice svg { color: var(--text-3); flex-shrink: 0; }
+.map-bg { position: absolute; inset: 0; background: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(165deg, #d4dde8 0%, #c8d4e0 40%, #d0dae5 100%); background-size: 40px 40px, 40px 40px, 100% 100%; }
+.road { position: absolute; background: #fff; border-radius: 2px; }
+.road-h { height: 6px; }
+.road-v { width: 6px; }
+.road-minor { background: #e2e8ed; }
+.map-svg { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.map-pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; transition: transform .15s; z-index: 10; }
+.map-pin:hover { transform: translate(-50%, -100%) scale(1.15); z-index: 20; }
+.map-pin.highlighted { transform: translate(-50%, -100%) scale(1.2); z-index: 25; }
+.map-pin.selected-parent .pin-body { box-shadow: 0 0 0 4px rgba(32,49,90,.3), var(--shadow-md); }
+.map-pin.highlighted-c .pin-body  { box-shadow: 0 0 0 4px rgba(123,79,166,.3), var(--shadow-md); }
+.map-pin.highlighted-u .pin-body  { box-shadow: 0 0 0 4px rgba(118,118,140,.3), var(--shadow-md); }
+.pin-body { width: 28px; height: 28px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); border: 2px solid #fff; }
+.pin-inner { transform: rotate(45deg); font-size: 10px; font-weight: 700; color: #fff; }
+.pin-p .pin-body { background: var(--parent-blue); }
+.pin-c .pin-body { background: var(--child-purple); }
+.pin-u .pin-body { background: var(--text-2); }
+.pin-tooltip { position: absolute; top: 32px; left: 50%; transform: translateX(-50%); background: rgba(28,35,64,.88); color: #fff; font-size: 10px; font-weight: 600; padding: 3px 7px; border-radius: 4px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .15s; }
+.map-pin:hover .pin-tooltip { opacity: 1; }
+.stacked-indicator { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; border-radius: 50%; background: var(--warn-fg); color: #fff; font-size: 8px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 1px solid #fff; z-index: 2; }
+.map-legend { position: absolute; bottom: 16px; left: 16px; background: rgba(255,255,255,.96); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 10px 12px; box-shadow: var(--shadow-md); z-index: 40; }
+.legend-t { font-family: var(--font-eyebrow); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); margin-bottom: 5px; }
+.legend-row { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 500; color: var(--text-2); margin-bottom: 3px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.map-ctrl { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 4px; z-index: 40; }
+.map-btn { width: 32px; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); color: var(--text-2); font-size: 16px; font-weight: 500; }
+
+/* ── DETAILS PANEL ── */
+.inspector { width: 0; min-width: 0; background: var(--surface); border-left: 0 solid var(--border); display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; transition: width .22s cubic-bezier(.4,0,.2,1), min-width .22s, border-left-width .22s; }
+.inspector.open { width: 310px; min-width: 310px; border-left-width: 1px; }
+.insp-hdr { padding: 12px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; min-height: 48px; }
+.insp-title { font-family: var(--font-eyebrow); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-2); }
+.insp-subtitle { font-size: 12px; font-weight: 700; margin-top: 2px; }
+.insp-body { flex: 1; overflow-y: auto; }
+.insp-body::-webkit-scrollbar { width: 4px; }
+.insp-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.insp-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px; color: var(--text-3); text-align: center; padding: 32px 20px; }
+.insp-empty svg { opacity: .2; }
+.insp-empty p { font-size: 12px; font-weight: 500; line-height: 1.6; }
+.insp-section { padding: 14px 14px 0; }
+.insp-section + .insp-section { border-top: 1px solid var(--border); }
+.insp-section-title { font-family: var(--font-eyebrow); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+.field-label { font-size: 10px; font-weight: 600; color: var(--text-2); margin-bottom: 2px; }
+.field-value { font-size: 12px; font-weight: 500; margin-bottom: 10px; }
+.field-value.mono { font-family: monospace; font-size: 11px; color: var(--text-2); }
+.addr-link { font-size: 13px; font-weight: 700; color: var(--navy); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; border-bottom: 1px dashed var(--navy); padding-bottom: 1px; transition: color .15s; margin-bottom: 10px; }
+.addr-link:hover { color: var(--parent-blue); border-bottom-color: var(--parent-blue); }
+.parent-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--parent-bg); color: var(--parent-blue); border-radius: var(--r-sm); padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer; margin-bottom: 10px; transition: background .15s; }
+.parent-pill:hover { background: #d4e9f5; }
+
+/* Inherited settings block */
+.inherited-block {
+  background: var(--page-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.inherited-label {
+  font-size: 9px; font-weight: 600; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.4px;
+  display: flex; align-items: center; gap: 4px;
+  margin-bottom: 6px;
+}
+.inherited-label svg { color: var(--text-3); }
+.inherited-value { font-size: 11px; font-weight: 600; color: var(--text-2); }
+.inherited-readonly { font-size: 9px; color: var(--text-3); font-style: italic; margin-top: 2px; }
+
+/* Make standalone button */
+.btn-standalone {
+  width: 100%; height: 30px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text-2);
+  font-family: var(--font-main);
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: all .15s;
+  margin-bottom: 14px;
+}
+.btn-standalone:hover { border-color: var(--error); color: var(--error); background: var(--error-bg); }
+
+/* Assign button in inspector */
+.btn-assign-primary {
+  width: 100%; height: 32px;
+  background: var(--green); color: #fff;
+  border: none; border-radius: var(--r-md);
+  font-family: var(--font-main); font-size: 12px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: background .15s; margin-top: 10px;
+}
+.btn-assign-primary:hover { background: var(--green-hover); }
+.btn-assign-primary:disabled { background: var(--text-3); cursor: not-allowed; }
+
+/* Validation error inline */
+.validation-error {
+  background: var(--error-bg);
+  border: 1px solid #fca5a5;
+  border-radius: var(--r-md);
+  padding: 8px 10px;
+  font-size: 11px; font-weight: 600; color: #b91c1c;
+  display: flex; align-items: flex-start; gap: 6px;
+  margin-bottom: 8px;
+}
+.validation-error svg { flex-shrink: 0; margin-top: 1px; }
+
+/* Service cards */
+.svc-card { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.svc-card:last-child { border-bottom: none; }
+.svc-icon { width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.svc-content { flex: 1; min-width: 0; }
+.svc-name { font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 5px; margin-bottom: 1px; }
+.svc-status { display: inline-flex; align-items: center; height: 14px; padding: 0 5px; border-radius: 3px; font-family: var(--font-eyebrow); font-size: 8px; font-weight: 500; text-transform: uppercase; }
+.st-active   { background: var(--status-active-bg);   color: var(--status-active-fg); }
+.st-inactive { background: var(--status-inactive-bg); color: var(--status-inactive-fg); }
+.st-suspended{ background: var(--status-warn-bg);     color: var(--status-warn-fg); }
+.svc-bin { font-size: 10px; color: var(--text-2); font-weight: 500; margin-bottom: 4px; }
+.svc-chips { display: flex; gap: 5px; flex-wrap: wrap; }
+.svc-chip { display: inline-flex; align-items: center; gap: 3px; height: 18px; padding: 0 6px; border-radius: 4px; font-size: 10px; font-weight: 600; border: 1px solid var(--border); color: var(--text-2); background: var(--page-bg); }
+.children-list { display: flex; flex-direction: column; gap: 4px; padding-bottom: 12px; }
+.child-chip { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--page-bg); border: 1px solid var(--border); border-radius: var(--r-md); cursor: pointer; transition: border-color .15s, background .15s; }
+.child-chip:hover { border-color: var(--child-purple); background: var(--child-bg); }
+.child-chip-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--child-purple); flex-shrink: 0; }
+.child-chip-info { flex: 1; min-width: 0; }
+.child-chip-addr { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.child-chip-uprn { font-size: 10px; color: var(--text-2); }
+.child-chip-svc { font-size: 10px; color: var(--text-2); background: var(--unassigned); border-radius: 8px; padding: 1px 6px; font-weight: 600; flex-shrink: 0; }
+.form-select { width: 100%; height: 36px; border: 1px solid var(--border); border-radius: var(--r-md); padding: 0 10px; font-family: var(--font-main); font-size: 12px; color: var(--text-primary); background: var(--page-bg); outline: none; }
+.form-select:focus { border-color: var(--navy); background: #fff; }
+.status-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 4px; font-family: var(--font-eyebrow); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .3px; margin-bottom: 10px; }
+.st-unassigned { background: var(--unassigned); color: var(--text-2); }
+
+/* ── MODAL ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(28,35,64,.45); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--surface); border-radius: var(--r-lg); width: 460px; box-shadow: var(--shadow-lg); overflow: hidden; transform: translateY(-10px); transition: transform .2s; }
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-hdr { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 14px; font-weight: 700; }
+.modal-close { background: none; border: none; cursor: pointer; color: var(--text-2); font-size: 20px; line-height: 1; }
+.modal-body { padding: 20px; }
+.modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+.modal-context-note { background: var(--page-bg); border: 1px solid var(--border); border-radius: var(--r-md); padding: 10px 12px; margin-bottom: 16px; font-size: 11px; font-weight: 500; color: var(--text-2); display: flex; gap: 8px; align-items: flex-start; }
+.modal-context-note svg { flex-shrink: 0; color: var(--parent-blue); margin-top: 1px; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--text-2); margin-bottom: 5px; display: block; }
+.form-input { width: 100%; height: 36px; border: 1px solid var(--border); border-radius: var(--r-md); padding: 0 10px; font-family: var(--font-main); font-size: 12px; color: var(--text-primary); background: var(--page-bg); outline: none; }
+.form-input:focus { border-color: var(--navy); background: #fff; }
+.form-input.has-error { border-color: var(--error); background: var(--error-bg); }
+.form-hint { font-size: 10px; color: var(--text-3); margin-top: 4px; }
+.form-error { font-size: 10px; color: var(--error); font-weight: 600; margin-top: 4px; }
+.sc-lookup-result { background: var(--page-bg); border: 1px solid var(--green); border-radius: var(--r-md); padding: 8px 10px; margin-top: 6px; }
+.sc-lookup-addr { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+.sc-lookup-uprn { font-size: 10px; color: var(--text-2); }
+.sc-lookup-route { font-size: 10px; color: var(--parent-blue); font-weight: 600; margin-top: 3px; }
+.btn-cancel { height: 34px; padding: 0 16px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); font-family: var(--font-main); font-size: 12px; font-weight: 600; color: var(--text-2); cursor: pointer; }
+.btn-cancel:hover { border-color: var(--navy); color: var(--navy); }
+.btn-create { height: 34px; padding: 0 16px; border: none; border-radius: var(--r-md); background: var(--navy); font-family: var(--font-main); font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; }
+.btn-create:hover { background: var(--navy-hover); }
+.btn-create:disabled { background: var(--text-3); cursor: not-allowed; }
+
+/* Confirm standalone modal */
+.confirm-modal { width: 380px; }
+.confirm-body { padding: 20px; }
+.confirm-warning { background: var(--error-bg); border: 1px solid #fca5a5; border-radius: var(--r-md); padding: 10px 12px; font-size: 11px; font-weight: 600; color: #b91c1c; margin-bottom: 12px; display: flex; gap: 8px; }
+.confirm-warning svg { flex-shrink: 0; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--dark); color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 12px; font-weight: 600; box-shadow: var(--shadow-lg); z-index: 200; opacity: 0; pointer-events: none; transition: all .25s; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: all; }
+.toast-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+.toast-undo { margin-left: 4px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 600; cursor: pointer; }
+.toast-undo:hover { background: rgba(255,255,255,.25); }
+
+/* ── LLPG SIDE PANEL ── */
+.llpg-panel { position: fixed; top: 136px; right: 0; bottom: 0; width: 340px; background: var(--surface); border-left: 1px solid var(--border); box-shadow: var(--shadow-lg); z-index: 60; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .25s; }
+.llpg-panel.open { transform: translateX(0); }
+.llpg-hdr { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.llpg-title { font-size: 13px; font-weight: 700; }
+.llpg-body { flex: 1; overflow-y: auto; padding: 8px; }
+.suggestion-card { border: 1px solid var(--border); border-radius: var(--r-lg); padding: 12px; margin-bottom: 6px; background: var(--surface); }
+.sug-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.sug-stop { font-size: 12px; font-weight: 600; }
+.sug-uprn { font-size: 10px; color: var(--text-2); margin-top: 2px; }
+.sug-arrow { color: var(--text-3); margin: 6px 0; font-size: 10px; font-weight: 600; }
+.sug-parent { font-size: 11px; font-weight: 600; color: var(--parent-blue); }
+.btn-assign-sm { height: 26px; padding: 0 10px; border: none; border-radius: var(--r-sm); background: var(--navy); color: #fff; font-family: var(--font-main); font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.btn-assign-sm:hover { background: var(--navy-hover); }
+
+/* Drag ghost */
+.drag-ghost { position: fixed; pointer-events: none; z-index: 1000; background: var(--navy); color: #fff; padding: 5px 10px; border-radius: var(--r-md); font-size: 11px; font-weight: 600; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 6px; opacity: 0; }
+.drag-ghost.visible { opacity: 1; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useCallback, useRef, useEffect } = React;
+
+const PARENTS_INIT = {
+  1: { addr: '12 Brockley Rise',     uprn: '100021483910', bin: '1100L Communal Wheeled Bin', route: 'LW-04', freq: 'Fortnightly', day: 'Thursday', children: ['c1','c2'], open: true },
+  2: { addr: '47 Hilly Fields Cres', uprn: '100021492030', bin: '1100L Communal Wheeled Bin', route: 'LW-04', freq: 'Weekly',       day: 'Wednesday', children: ['c3','c4','c5'], open: true },
+  3: { addr: '8 Manor Lane',         uprn: '100021500441', bin: '660L Communal Bin',           route: 'LW-04', freq: 'Fortnightly', day: 'Thursday', children: [], open: true },
+};
+const CHILDREN_INIT = {
+  c1: { addr: '12a Brockley Rise',    uprn: '100021483911', parentId: 1 },
+  c2: { addr: '12b Brockley Rise',    uprn: '100021483912', parentId: 1 },
+  c3: { addr: '47a Hilly Fields Cres',uprn: '100021492031', parentId: 2 },
+  c4: { addr: '47b Hilly Fields Cres',uprn: '100021492032', parentId: 2 },
+  c5: { addr: '47c Hilly Fields Cres',uprn: '100021492033', parentId: 2 },
+};
+const UNASSIGNED_INIT = [
+  { id: 'u1', addr: '19 Loampit Hill',  uprn: '100021510220', suggested: 1, dist: { 1: '4m',  2: '210m', 3: '380m' } },
+  { id: 'u2', addr: '19a Loampit Hill', uprn: '100021510221', suggested: 1, dist: { 1: '6m',  2: '214m', 3: '382m' } },
+  { id: 'u3', addr: '3 Tressillian Rd', uprn: '100021520310', suggested: 2, dist: { 1: '195m',2: '8m',   3: '290m' } },
+  { id: 'u4', addr: '3a Tressillian Rd',uprn: '100021520311', suggested: 2, dist: { 1: '197m',2: '8m',   3: '291m' } },
+  { id: 'u5', addr: '3b Tressillian Rd',uprn: '100021520312', suggested: 2, dist: { 1: '200m',2: '12m',  3: '295m' } },
+];
+const UNASSIGNED_LOOKUP = {
+  'uls1': { addr: '22 Brockley Rise',    uprn: '100021483920', dist: { 1:'9m', 2:'205m', 3:'370m' }, suggested: 1 },
+  'uls2': { addr: '71 Hilly Fields Cres',uprn: '100021492040', dist: { 1:'215m', 2:'14m', 3:'310m' }, suggested: 2 },
+  'uls3': { addr: '15 Manor Lane',       uprn: '100021500450', dist: { 1:'340m', 2:'280m', 3:'11m' }, suggested: 3 },
+};
+const LLPG_INIT = [
+  { id:'l1', stopId:'u1', stopAddr:'19 Loampit Hill',  stopUprn:'100021510220', parentId:1 },
+  { id:'l2', stopId:'u2', stopAddr:'19a Loampit Hill', stopUprn:'100021510221', parentId:1 },
+  { id:'l3', stopId:'u3', stopAddr:'3 Tressillian Rd', stopUprn:'100021520310', parentId:2 },
+  { id:'l4', stopId:'u4', stopAddr:'3a Tressillian Rd',stopUprn:'100021520311', parentId:2 },
+  { id:'l5', stopId:'u5', stopAddr:'3b Tressillian Rd',stopUprn:'100021520312', parentId:2 },
+];
+const SERVICES = {
+  c1:[{icon:'🗑',bg:'#F3F4F6',name:'Residual Waste',status:'active',bin:'180L Black Bin',freq:'Fortnightly',day:'Thursday',last:'17 Apr 2026'},{icon:'♻',bg:'#e8f2f9',name:'Dry Recycling',status:'active',bin:'240L Blue Bin',freq:'Fortnightly',day:'Thursday',last:'10 Apr 2026'},{icon:'🍃',bg:'#f0fdf4',name:'Food Waste',status:'active',bin:'23L Caddy',freq:'Weekly',day:'Thursday',last:'17 Apr 2026'}],
+  c2:[{icon:'🗑',bg:'#F3F4F6',name:'Residual Waste',status:'active',bin:'180L Black Bin',freq:'Fortnightly',day:'Thursday',last:'17 Apr 2026'},{icon:'♻',bg:'#e8f2f9',name:'Dry Recycling',status:'suspended',bin:'240L Blue Bin',freq:'Fortnightly',day:'Thursday',last:'27 Mar 2026'}],
+  c3:[{icon:'🗑',bg:'#F3F4F6',name:'Residual Waste',status:'active',bin:'240L Black Bin',freq:'Weekly',day:'Wednesday',last:'16 Apr 2026'},{icon:'♻',bg:'#e8f2f9',name:'Dry Recycling',status:'active',bin:'240L Blue Bin',freq:'Weekly',day:'Wednesday',last:'16 Apr 2026'},{icon:'🌿',bg:'#dcedeb',name:'Garden Waste',status:'active',bin:'240L Green Bin',freq:'Fortnightly',day:'Wednesday',last:'09 Apr 2026'},{icon:'🍃',bg:'#f0fdf4',name:'Food Waste',status:'inactive',bin:'23L Caddy',freq:'Weekly',day:'Wednesday',last:'—'}],
+  c4:[{icon:'🗑',bg:'#F3F4F6',name:'Residual Waste',status:'active',bin:'240L Black Bin',freq:'Weekly',day:'Wednesday',last:'16 Apr 2026'},{icon:'♻',bg:'#e8f2f9',name:'Dry Recycling',status:'active',bin:'240L Blue Bin',freq:'Weekly',day:'Wednesday',last:'16 Apr 2026'},{icon:'🍷',bg:'#f2ecf9',name:'Glass Collection',status:'active',bin:'55L Glass Box',freq:'Monthly',day:'Wednesday',last:'02 Apr 2026'}],
+  c5:[{icon:'🗑',bg:'#F3F4F6',name:'Residual Waste',status:'active',bin:'180L Black Bin',freq:'Weekly',day:'Wednesday',last:'16 Apr 2026'},{icon:'♻',bg:'#e8f2f9',name:'Dry Recycling',status:'active',bin:'240L Blue Bin',freq:'Fortnightly',day:'Wednesday',last:'09 Apr 2026'}],
+};
+const MAP_PINS = {
+  p1: { type:'p', x:28, y:45, label:'12 Brockley Rise' },
+  p2: { type:'p', x:58, y:32, label:'47 Hilly Fields Cres' },
+  p3: { type:'p', x:72, y:62, label:'8 Manor Lane' },
+  c1: { type:'c', x:28, y:45, label:'12a Brockley Rise', stackedWith:'p1' },
+  c2: { type:'c', x:28, y:45, label:'12b Brockley Rise', stackedWith:'p1' },
+  c3: { type:'c', x:58, y:32, label:'47a Hilly Fields',  stackedWith:'p2' },
+  c4: { type:'c', x:58, y:32, label:'47b Hilly Fields',  stackedWith:'p2' },
+  c5: { type:'c', x:58, y:32, label:'47c Hilly Fields',  stackedWith:'p2' },
+  u1: { type:'u', x:20, y:30, label:'19 Loampit Hill' },
+  u2: { type:'u', x:24, y:33, label:'19a Loampit Hill' },
+  u3: { type:'u', x:42, y:65, label:'3 Tressillian Rd' },
+  u4: { type:'u', x:47, y:68, label:'3a Tressillian Rd' },
+  u5: { type:'u', x:44, y:72, label:'3b Tressillian Rd' },
+};
+const DIST_OPTIONS = [50, 100, 200, 500];
+
+function App() {
+  const [parents, setParents]       = useState(PARENTS_INIT);
+  const [children, setChildren]     = useState(CHILDREN_INIT);
+  const [unassigned, setUnassigned] = useState(UNASSIGNED_INIT);
+  const [llpg, setLlpg]             = useState(LLPG_INIT);
+  const [filter, setFilter]         = useState('all');
+  const [search, setSearch]         = useState('');
+  const [selection, setSelection]   = useState(null);
+  const [modalOpen, setModalOpen]   = useState(false);
+  const [llpgOpen, setLlpgOpen]     = useState(false);
+  const [toast, setToast]           = useState(null);
+  const [dragId, setDragId]         = useState(null);
+  const [dragOver, setDragOver]     = useState(null);
+  const [ghostPos, setGhostPos]     = useState({ x:0, y:0 });
+  const [ghostVisible, setGhostVisible] = useState(false);
+  const [ghostLabel, setGhostLabel]     = useState('');
+  const [distFilter, setDistFilter]     = useState(100);
+  const [confirmStandalone, setConfirmStandalone] = useState(null); // {childId, parentId}
+  const [inspAssignTarget, setInspAssignTarget]   = useState('');
+  const [inspValidationErr, setInspValidationErr] = useState('');
+  // Modal state — search-based, not free-text
+  const [modalSearch, setModalSearch]   = useState('');
+  const [modalSelected, setModalSelected] = useState(null); // id into UNASSIGNED_LOOKUP or unassigned
+  const [modalBin, setModalBin]         = useState('1100L Communal Wheeled Bin');
+  const [modalSearchErr, setModalSearchErr] = useState('');
+  const toastTimer = useRef(null);
+  const newParentId = useRef(100);
+
+  const showToast = useCallback((msg, undoFn) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ msg, undoFn });
+    toastTimer.current = setTimeout(() => setToast(null), 3200);
+  }, []);
+
+  const navToast = (addr) => showToast('Opening service contract for ' + addr);
+  const selectParent     = (id) => { setSelection({ type:'parent', id }); setInspAssignTarget(''); setInspValidationErr(''); };
+  const selectChild      = (id) => { setSelection({ type:'child',  id }); setInspAssignTarget(''); setInspValidationErr(''); };
+  const selectUnassigned = (id) => { setSelection({ type:'unassigned', id }); setInspAssignTarget(''); setInspValidationErr(''); };
+  const toggleGroup      = (id) => setParents(p => ({ ...p, [id]: { ...p[id], open: !p[id].open } }));
+
+  // Drag & drop
+  const onDragStart = (e, id, label) => { setDragId(id); setGhostLabel(label); setGhostVisible(true); e.dataTransfer.effectAllowed = 'move'; };
+  const onDragEnd   = () => { setDragId(null); setGhostVisible(false); setDragOver(null); };
+  useEffect(() => {
+    const mv = (e) => setGhostPos({ x: e.clientX + 14, y: e.clientY - 10 });
+    window.addEventListener('dragover', mv);
+    return () => window.removeEventListener('dragover', mv);
+  }, []);
+
+  const onDrop = (groupId) => {
+    if (!dragId) return;
+    const stop = unassigned.find(s => s.id === dragId);
+    if (!stop) return;
+    const newChildId = dragId;
+    setChildren(c => ({ ...c, [newChildId]: { addr: stop.addr, uprn: stop.uprn, parentId: groupId } }));
+    setParents(p => ({ ...p, [groupId]: { ...p[groupId], children: [...p[groupId].children, newChildId] } }));
+    setUnassigned(u => u.filter(s => s.id !== dragId));
+    setLlpg(l => l.filter(s => s.stopId !== dragId));
+    showToast(stop.addr + ' assigned to group', () => {
+      setChildren(c => { const n={...c}; delete n[newChildId]; return n; });
+      setParents(p => ({ ...p, [groupId]: { ...p[groupId], children: p[groupId].children.filter(c => c !== newChildId) } }));
+      setUnassigned(u => [...u, stop]);
+    });
+    setDragId(null); setDragOver(null); setGhostVisible(false);
+  };
+
+  const removeChild = (childId, groupId) => {
+    const c = children[childId]; if (!c) return;
+    setParents(p => ({ ...p, [groupId]: { ...p[groupId], children: p[groupId].children.filter(ci => ci !== childId) } }));
+    setChildren(ch => { const n={...ch}; delete n[childId]; return n; });
+    setUnassigned(u => [...u, { id: childId, addr: c.addr, uprn: c.uprn, dist: {} }]);
+    if (selection?.id === childId) setSelection(null);
+    showToast(c.addr + ' removed from group', () => {
+      setParents(p => ({ ...p, [groupId]: { ...p[groupId], children: [...p[groupId].children, childId] } }));
+      setChildren(ch => ({ ...ch, [childId]: c }));
+      setUnassigned(u => u.filter(s => s.id !== childId));
+    });
+  };
+
+  const makeStandalone = (childId, parentId) => {
+    setConfirmStandalone(null);
+    removeChild(childId, parentId);
+  };
+
+  const assignSuggestion = (sug) => {
+    const stop = unassigned.find(s => s.id === sug.stopId);
+    if (!stop) { setLlpg(l => l.filter(s => s.id !== sug.id)); return; }
+    const newChildId = sug.stopId;
+    setChildren(c => ({ ...c, [newChildId]: { addr: stop.addr, uprn: stop.uprn, parentId: sug.parentId } }));
+    setParents(p => ({ ...p, [sug.parentId]: { ...p[sug.parentId], children: [...p[sug.parentId].children, newChildId] } }));
+    setUnassigned(u => u.filter(s => s.id !== sug.stopId));
+    setLlpg(l => l.filter(s => s.id !== sug.id));
+    showToast(stop.addr + ' assigned');
+  };
+
+  const assignFromInspector = (stopId, groupIdStr) => {
+    setInspValidationErr('');
+    if (!groupIdStr) return;
+    const groupId = parseInt(groupIdStr);
+    // Validation: is this stop already a parent? (shouldn't be, but guard)
+    if (parents[stopId]) { setInspValidationErr('This address is already a parent group and cannot be assigned as a child.'); return; }
+    const stop = unassigned.find(s => s.id === stopId);
+    if (!stop) return;
+    setChildren(c => ({ ...c, [stopId]: { addr: stop.addr, uprn: stop.uprn, parentId: groupId } }));
+    setParents(p => ({ ...p, [groupId]: { ...p[groupId], children: [...p[groupId].children, stopId] } }));
+    setUnassigned(u => u.filter(s => s.id !== stopId));
+    setLlpg(l => l.filter(s => s.stopId !== stopId));
+    showToast(stop.addr + ' assigned');
+    selectParent(groupId);
+  };
+
+  // Modal: "Mark as Communal" — lookup existing service contract by UPRN/address
+  const handleModalSearch = () => {
+    setModalSearchErr('');
+    const q = modalSearch.trim().toLowerCase();
+    if (!q) { setModalSearchErr('Enter an address or UPRN to search.'); return; }
+    // Check if already a parent
+    const existingParent = Object.values(parents).find(p => p.addr.toLowerCase().includes(q) || p.uprn.includes(q));
+    if (existingParent) { setModalSearchErr('This service contract is already a parent group.'); setModalSelected(null); return; }
+    // Check existing unassigned
+    const fromUnassigned = unassigned.find(s => s.addr.toLowerCase().includes(q) || s.uprn.includes(q));
+    if (fromUnassigned) { setModalSelected({ source:'unassigned', id: fromUnassigned.id, addr: fromUnassigned.addr, uprn: fromUnassigned.uprn }); return; }
+    // Check lookup table
+    const fromLookup = Object.entries(UNASSIGNED_LOOKUP).find(([k,v]) => v.addr.toLowerCase().includes(q) || v.uprn.includes(q));
+    if (fromLookup) { setModalSelected({ source:'lookup', id: fromLookup[0], addr: fromLookup[1].addr, uprn: fromLookup[1].uprn }); return; }
+    setModalSearchErr('No service contract found. Try another address or UPRN.');
+    setModalSelected(null);
+  };
+
+  const createParentFromSC = () => {
+    if (!modalSelected) return;
+    const id = newParentId.current++;
+    setParents(p => ({ ...p, [id]: { addr: modalSelected.addr, uprn: modalSelected.uprn, bin: modalBin, route: 'LW-04', freq: 'Fortnightly', day: 'Thursday', children: [], open: true } }));
+    if (modalSelected.source === 'unassigned') {
+      setUnassigned(u => u.filter(s => s.id !== modalSelected.id));
+    }
+    setModalOpen(false);
+    setModalSearch(''); setModalSelected(null); setModalSearchErr('');
+    showToast(modalSelected.addr + ' marked as communal parent');
+    selectParent(id);
+  };
+
+  // Filtering
+  const matchSearch = (text) => !search || text.toLowerCase().includes(search.toLowerCase());
+
+  const filteredParents = Object.entries(parents).filter(([id, p]) => {
+    if (filter === 'unassigned') return false;
+    if (filter === 'children')   return false;
+    if (search) {
+      const childMatch = p.children.some(cid => children[cid] && (matchSearch(children[cid].addr) || matchSearch(children[cid].uprn)));
+      return matchSearch(p.addr) || matchSearch(p.uprn) || childMatch;
+    }
+    return true;
+  });
+
+  // Filtered unassigned: only show stops within distFilter of at least one parent
+  const filteredUnassigned = unassigned.filter(s => {
+    if (filter === 'parents')  return false;
+    if (filter === 'children') return false;
+    if (!matchSearch(s.addr) && !matchSearch(s.uprn)) return false;
+    // Distance filter: check if any parent is within the chosen radius
+    if (!s.dist || Object.keys(s.dist).length === 0) return true; // no dist data, show always
+    const withinDist = Object.values(s.dist).some(d => {
+      const metres = parseInt(d.replace('m',''));
+      return metres <= distFilter;
+    });
+    return withinDist;
+  });
+
+  // Get nearest parent distance for a given stop
+  const getNearestDist = (stop, selectedParentId) => {
+    if (!stop.dist) return null;
+    if (selectedParentId && stop.dist[selectedParentId]) return stop.dist[selectedParentId];
+    // Return the smallest distance across all parents
+    const all = Object.values(stop.dist).map(d => ({ raw: d, m: parseInt(d.replace('m','')) }));
+    if (all.length === 0) return null;
+    return all.sort((a,b) => a.m - b.m)[0].raw;
+  };
+
+  // Inspector
+  const renderInspector = () => {
+    if (!selection) return (
+      <div className="insp-empty">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 00-8-8z"/></svg>
+        <p>Click a stop or group<br/>on the map or list</p>
+      </div>
+    );
+
+    if (selection.type === 'parent') {
+      const p = parents[selection.id]; if (!p) return null;
+      return (
+        <>
+          <div className="insp-hdr">
+            <div>
+              <div className="insp-title">Communal Bin — Parent</div>
+              <div className="insp-subtitle">{p.addr}</div>
+            </div>
+          </div>
+          <div className="insp-body">
+            <div className="insp-section">
+              <div className="insp-section-title">Address</div>
+              <a className="addr-link" onClick={() => navToast(p.addr)}>
+                {p.addr}
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+              <div className="field-label">UPRN</div>
+              <div className="field-value mono">{p.uprn}</div>
+              <div className="field-label">Bin Type</div>
+              <div className="field-value">{p.bin}</div>
+            </div>
+            <div className="insp-section">
+              <div className="insp-section-title">Inherited Route Settings</div>
+              <div className="inherited-block">
+                <div className="inherited-label">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                  Inherited by all children
+                </div>
+                <div className="inherited-value">Route {p.route} · {p.freq} · {p.day}</div>
+                <div className="inherited-readonly">Children inherit these settings and cannot change them independently</div>
+              </div>
+            </div>
+            <div className="insp-section">
+              <div className="insp-section-title">
+                Children
+                <span style={{color:'var(--text-3)',fontSize:'9px',fontWeight:600}}>{p.children.length} assigned</span>
+              </div>
+              <div className="children-list">
+                {p.children.length === 0 && <div style={{color:'var(--text-3)',fontSize:12,fontStyle:'italic',padding:'4px 0'}}>No children assigned yet.<br/>Drag stops from the list.</div>}
+                {p.children.map(cid => {
+                  const c = children[cid]; if (!c) return null;
+                  const svcCount = (SERVICES[cid]||[]).length;
+                  return (
+                    <div key={cid} className="child-chip" onClick={() => selectChild(cid)}>
+                      <div className="child-chip-dot"/>
+                      <div className="child-chip-info">
+                        <div className="child-chip-addr">{c.addr}</div>
+                        <div className="child-chip-uprn">UPRN {c.uprn}</div>
+                      </div>
+                      <span className="child-chip-svc">{svcCount} svcs</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    if (selection.type === 'child') {
+      const c = children[selection.id]; if (!c) return null;
+      const p = parents[c.parentId];
+      const svcs = SERVICES[selection.id] || [];
+      const activeCount = svcs.filter(s => s.status === 'active').length;
+      return (
+        <>
+          <div className="insp-hdr">
+            <div>
+              <div className="insp-title">Child Property</div>
+              <div className="insp-subtitle">{c.addr}</div>
+            </div>
+          </div>
+          <div className="insp-body">
+            <div className="insp-section">
+              <div className="insp-section-title">Address</div>
+              <a className="addr-link" onClick={() => navToast(c.addr)}>
+                {c.addr}
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+              <div className="field-label">UPRN</div>
+              <div className="field-value mono">{c.uprn}</div>
+              <div className="field-label">Parent Bin</div>
+              {p && <div className="parent-pill" onClick={() => selectParent(c.parentId)}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                {p.addr}
+              </div>}
+            </div>
+            <div className="insp-section">
+              <div className="insp-section-title">Inherited Route Settings</div>
+              {p && (
+                <div className="inherited-block">
+                  <div className="inherited-label">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                    Inherited from {p.addr}
+                  </div>
+                  <div className="inherited-value">Route {p.route} · {p.freq} · {p.day}</div>
+                  <div className="inherited-readonly">Read-only — changes must be made on the parent</div>
+                </div>
+              )}
+              <button className="btn-standalone" onClick={() => setConfirmStandalone({ childId: selection.id, parentId: c.parentId })}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Remove from group — make standalone
+              </button>
+            </div>
+            <div className="insp-section">
+              <div className="insp-section-title">
+                Services
+                <span style={{color:'var(--text-3)',fontSize:'9px',fontWeight:600}}>{svcs.length} total · {activeCount} active</span>
+              </div>
+              {svcs.map((s, i) => (
+                <div key={i} className="svc-card">
+                  <div className="svc-icon" style={{background:s.bg}}>{s.icon}</div>
+                  <div className="svc-content">
+                    <div className="svc-name">
+                      {s.name}
+                      <span className={`svc-status st-${s.status}`}>{s.status==='active'?'Active':s.status==='inactive'?'Not Active':'Suspended'}</span>
+                    </div>
+                    <div className="svc-bin">{s.bin}</div>
+                    <div className="svc-chips">
+                      <span className="svc-chip"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{s.freq}</span>
+                      <span className="svc-chip"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>{s.day}</span>
+                    </div>
+                    <div style={{fontSize:10,color:'var(--text-3)',marginTop:4}}>Last: {s.last}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    if (selection.type === 'unassigned') {
+      const stop = unassigned.find(s => s.id === selection.id);
+      if (!stop) return null;
+      const sugParent = stop.suggested ? parents[stop.suggested] : null;
+      // Validation: if selected assign target is already a parent of another child (not a valid concern, but guard circular)
+      const handleAssign = () => {
+        setInspValidationErr('');
+        if (!inspAssignTarget) { setInspValidationErr('Please select a parent group.'); return; }
+        assignFromInspector(stop.id, inspAssignTarget);
+        setInspAssignTarget('');
+      };
+      return (
+        <>
+          <div className="insp-hdr">
+            <div>
+              <div className="insp-title">Unassigned Stop</div>
+              <div className="insp-subtitle">{stop.addr}</div>
+            </div>
+          </div>
+          <div className="insp-body">
+            <div className="insp-section">
+              <div className="insp-section-title">Address</div>
+              <div style={{fontSize:13,fontWeight:700,marginBottom:8}}>{stop.addr}</div>
+              <div className="field-label">UPRN</div>
+              <div className="field-value mono">{stop.uprn}</div>
+              <div className="field-label">Status</div>
+              <div className="status-tag st-unassigned">Not Assigned</div>
+              {stop.dist && Object.keys(stop.dist).length > 0 && (
+                <>
+                  <div className="field-label">Distance to groups</div>
+                  <div style={{display:'flex',flexDirection:'column',gap:4,marginBottom:10}}>
+                    {Object.entries(stop.dist).map(([pid, d]) => {
+                      const pr = parents[parseInt(pid)];
+                      if (!pr) return null;
+                      return (
+                        <div key={pid} style={{display:'flex',alignItems:'center',justifyContent:'space-between',fontSize:11,fontWeight:500}}>
+                          <span style={{color:'var(--text-2)'}}>{pr.addr}</span>
+                          <span style={{fontWeight:700,color:'var(--parent-blue)',fontSize:10,background:'var(--parent-bg)',padding:'1px 6px',borderRadius:10}}>{d}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="insp-section">
+              <div className="insp-section-title">Assign to Parent</div>
+              {inspValidationErr && (
+                <div className="validation-error">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  {inspValidationErr}
+                </div>
+              )}
+              <div style={{color:'var(--text-3)',fontSize:11,fontWeight:500,marginBottom:8}}>Drag this stop onto a group, or select a parent below.</div>
+              <select className="form-select" value={inspAssignTarget} onChange={e => { setInspAssignTarget(e.target.value); setInspValidationErr(''); }}>
+                <option value="">— Select parent group —</option>
+                {Object.entries(parents).map(([id,p]) => {
+                  const dist = stop.dist && stop.dist[id] ? ` · ${stop.dist[id]}` : '';
+                  return <option key={id} value={id}>{p.addr}{dist}</option>;
+                })}
+              </select>
+              <button className="btn-assign-primary" onClick={handleAssign} disabled={!inspAssignTarget}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Assign to Group
+              </button>
+              {sugParent && (
+                <div style={{marginTop:10,padding:'8px 10px',background:'#fff8e1',borderRadius:'var(--r-md)',border:'1px solid #fde68a'}}>
+                  <div style={{fontSize:10,fontWeight:600,color:'#b45309',marginBottom:4}}>LLPG Suggestion</div>
+                  <div style={{fontSize:11,fontWeight:600,color:'var(--text-primary)'}}>{sugParent.addr}</div>
+                  <div style={{fontSize:10,color:'var(--text-2)'}}>Based on UPRN proximity</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      );
+    }
+    return null;
+  };
+
+  const getPinClass = (pinId, pinType) => {
+    if (!selection) return '';
+    if (pinType === 'p') {
+      const parentNum = parseInt(pinId.replace('p',''));
+      if (selection.type === 'parent' && selection.id === parentNum) return 'selected-parent';
+      if (selection.type === 'child') { const c = children[selection.id]; if (c && c.parentId === parentNum) return 'selected-parent'; }
+    }
+    if (pinType === 'c') { if (selection.type === 'child' && selection.id === pinId) return 'highlighted-c'; }
+    if (pinType === 'u') { if (selection.type === 'unassigned' && selection.id === pinId) return 'highlighted-u'; }
+    return '';
+  };
+
+  const handlePinClick = (pinId, pinType) => {
+    if (pinType === 'p') { selectParent(parseInt(pinId.replace('p',''))); }
+    else if (pinType === 'c') { selectChild(pinId); }
+    else { selectUnassigned(pinId); }
+  };
+
+  // Only show one pin per stacked group — the parent pin — suppress child pins that are at same coords
+  const visiblePins = Object.entries(MAP_PINS).filter(([id, pin]) => {
+    if (pin.type === 'u') return unassigned.some(u => u.id === id);
+    if (pin.type === 'c') return false; // children are stacked on parents — suppress individual child pins
+    return true;
+  });
+
+  // Count how many children share each parent pin
+  const childrenPerParent = {};
+  Object.values(MAP_PINS).filter(p => p.type === 'c').forEach(pin => {
+    if (pin.stackedWith) childrenPerParent[pin.stackedWith] = (childrenPerParent[pin.stackedWith] || 0) + 1;
+  });
+
+  const inspOpen = !!selection;
+  const llpgCount = llpg.length;
+
+  return (
+    <>
+      {/* Nav */}
+      <nav className="nav">
+        <div className="nav-logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          SmartCity
+        </div>
+        <div className="nav-breadcrumb">
+          <span>Routes</span><span className="sep">/</span>
+          <span>UK Config</span><span className="sep">/</span>
+          <span>Communal Bin Assignment</span>
+        </div>
+      </nav>
+
+      {/* Feature flag banner — Change #10 */}
+      <div className="feature-banner">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span className="feature-banner-label">Communal Bins enabled</span>
+        <span className="feature-banner-sep">·</span>
+        <span>Route LW-04 — Lewisham</span>
+        <span className="feature-banner-sep">·</span>
+        <span>Feature configured in Admin → Route Configuration</span>
+        <button className="feature-banner-action">Admin Settings</button>
+      </div>
+
+      {/* Sub-header */}
+      <div className="subheader">
+        <div className="sub-title">
+          Lewisham — Round LW-04
+          <span className="badge badge-blue">{Object.keys(parents).length} Groups</span>
+          <span className="badge badge-gray">{unassigned.length} Unassigned</span>
+        </div>
+        <div className="divider-v"/>
+        {['all','unassigned','parents','children'].map(f => (
+          <button key={f} className={`chip${filter===f?' active':''}`} onClick={() => setFilter(f)}>
+            {f.charAt(0).toUpperCase()+f.slice(1)}
+          </button>
+        ))}
+        {llpgCount > 0 && (
+          <button className="chip teal" onClick={() => setLlpgOpen(o=>!o)}>
+            LLPG Suggestions <span className="badge badge-blue" style={{marginLeft:3,background:'rgba(0,165,153,.15)',color:'var(--teal)'}}>{llpgCount}</span>
+          </button>
+        )}
+        <div className="search-wrap">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input className="search-input" type="text" placeholder="Search address or UPRN…" value={search} onChange={e => setSearch(e.target.value)}/>
+          {search && <button className="search-clear" onClick={() => setSearch('')}>×</button>}
+        </div>
+      </div>
+
+      {/* Main */}
+      <div className="main">
+
+        {/* Left panel */}
+        <div className="left-panel">
+          <div className="panel-hdr">
+            <div className="eyebrow">Stops — Drag or assign to link</div>
+            <div className="panel-tabs">
+              <button className="panel-tab active">Groups <span className="badge badge-blue" style={{marginLeft:4}}>{Object.keys(parents).length}</span></button>
+              <button className="panel-tab">All Stops</button>
+            </div>
+          </div>
+
+          {/* Distance filter row — Change #3 */}
+          <div className="distance-row">
+            <span className="distance-label">Nearby unassigned within:</span>
+            <div className="distance-chips">
+              {DIST_OPTIONS.map(d => (
+                <button key={d} className={`dist-chip${distFilter===d?' active':''}`} onClick={() => setDistFilter(d)}>{d}m</button>
+              ))}
+            </div>
+          </div>
+
+          <div className="list-body">
+            {/* Mark as Communal — Change #1: replaces "Create Parent", entry-point framing changed */}
+            <button className="mark-communal-btn" onClick={() => { setModalSearch(''); setModalSelected(null); setModalSearchErr(''); setModalOpen(true); }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Mark Service Contract as Communal Parent
+            </button>
+
+            {/* Parent groups */}
+            {filteredParents.map(([id, p]) => {
+              const pid = parseInt(id);
+              const isSelected = selection?.type === 'parent' && selection.id === pid;
+              const filteredChildren = p.children.filter(cid => {
+                const c = children[cid]; if (!search || !c) return true;
+                return matchSearch(c.addr) || matchSearch(c.uprn);
+              });
+              return (
+                <div key={id} className={`group-card${dragOver==pid?' drag-over':''}`}
+                  onDragOver={e => { e.preventDefault(); setDragOver(pid); }}
+                  onDragLeave={() => setDragOver(null)}
+                  onDrop={() => onDrop(pid)}
+                >
+                  <div className={`group-hdr${isSelected?' selected':''}`} onClick={() => { toggleGroup(pid); selectParent(pid); }}>
+                    <div className="group-icon">P</div>
+                    <div className="group-info">
+                      <div className="group-name">{p.addr}</div>
+                      <div className="group-uprn">UPRN {p.uprn}</div>
+                    </div>
+                    <span className="group-count">{p.children.length} {p.children.length===1?'child':'children'}</span>
+                    <svg className={`chevron${p.open?' open':''}`} width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  {p.open && (
+                    <div className="group-children">
+                      {filteredChildren.map(cid => {
+                        const c = children[cid]; if (!c) return null;
+                        const isChildSelected = selection?.type==='child' && selection.id===cid;
+                        const svcCount = (SERVICES[cid]||[]).length;
+                        return (
+                          <div key={cid} className={`child-row${isChildSelected?' selected':''}`} onClick={() => selectChild(cid)}>
+                            <div className="child-dot"/>
+                            <div style={{flex:1,minWidth:0}}>
+                              <div className="child-addr">{c.addr}</div>
+                              <div className="child-uprn-small">{c.uprn}</div>
+                            </div>
+                            <div className="child-right">
+                              <span className="svc-count">{svcCount} svcs</span>
+                              <span className="child-chevron">›</span>
+                              <button className="remove-btn" onClick={e => { e.stopPropagation(); setConfirmStandalone({ childId: cid, parentId: pid }); }} title="Remove from group">×</button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      <div className={`drop-zone${dragOver===pid?' over':''}`}>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg>
+                        Drop stop here
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Unassigned section — Change #3: labelled with distance context */}
+            {filteredUnassigned.length > 0 && (
+              <>
+                <div className="section-sep">
+                  <span className="sep-label">Nearby Unassigned · within {distFilter}m</span>
+                  <div className="sep-line"/>
+                </div>
+                {filteredUnassigned.map(stop => {
+                  const isHighlighted = selection?.type==='unassigned' && selection.id===stop.id;
+                  const isDragging = dragId === stop.id;
+                  const nearestDist = getNearestDist(stop, null);
+                  return (
+                    <div key={stop.id}
+                      className={`stop-card${isDragging?' dragging':''}${isHighlighted?' highlighted':''}`}
+                      draggable
+                      onDragStart={e => onDragStart(e, stop.id, stop.addr)}
+                      onDragEnd={onDragEnd}
+                      onClick={() => selectUnassigned(stop.id)}
+                    >
+                      <div className="sc-hdr">
+                        <svg className="drag-handle" width="10" height="14" viewBox="0 0 10 14" fill="currentColor">
+                          <circle cx="2.5" cy="2.5" r="1.5"/><circle cx="7.5" cy="2.5" r="1.5"/>
+                          <circle cx="2.5" cy="7" r="1.5"/><circle cx="7.5" cy="7" r="1.5"/>
+                          <circle cx="2.5" cy="11.5" r="1.5"/><circle cx="7.5" cy="11.5" r="1.5"/>
+                        </svg>
+                        <div className="stop-info">
+                          <div className="stop-addr">{stop.addr}</div>
+                          <div className="stop-uprn-txt">UPRN {stop.uprn}</div>
+                        </div>
+                      </div>
+                      <div className="stop-tags">
+                        <span className="tag tag-u">Unassigned</span>
+                        {stop.suggested && parents[stop.suggested] && (
+                          <span className="tag tag-s">Suggested → Group {Object.keys(parents).indexOf(String(stop.suggested))+1}</span>
+                        )}
+                        {/* Change #4: distance badge */}
+                        {nearestDist && <span className="dist-badge">{nearestDist} away</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
+            )}
+            {filteredUnassigned.length === 0 && unassigned.length > 0 && (
+              <div style={{color:'var(--text-3)',fontSize:11,fontWeight:500,padding:'12px 4px',textAlign:'center',fontStyle:'italic'}}>
+                No unassigned stops within {distFilter}m. Increase the distance filter to see more.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Map — Change #5: demoted to secondary, notice added */}
+        <div className="map-area">
+          {/* Secondary view notice */}
+          <div className="map-secondary-notice">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Map view only — children share the same pin as their parent. Use the list to assign.
+          </div>
+
+          <div className="map-bg"/>
+          <div className="road road-h" style={{top:'38%',left:0,right:0}}/>
+          <div className="road road-h road-minor" style={{top:'56%',left:'5%',right:'15%'}}/>
+          <div className="road road-h road-minor" style={{top:'70%',left:'25%',right:0}}/>
+          <div className="road road-v" style={{left:'30%',top:0,bottom:0}}/>
+          <div className="road road-v road-minor" style={{left:'56%',top:'15%',bottom:0}}/>
+          <div className="road road-v road-minor" style={{left:'72%',top:0,bottom:'45%'}}/>
+
+          <svg className="map-svg" xmlns="http://www.w3.org/2000/svg">
+            {/* No child connector lines since children are stacked on parent */}
+          </svg>
+
+          {/* Pins — only parents and unassigned shown */}
+          {visiblePins.map(([id, pin]) => {
+            const stackCount = pin.type === 'p' ? (childrenPerParent[id] || 0) : 0;
+            const activeChildren = pin.type === 'p' ? (parents[parseInt(id.replace('p',''))]?.children?.filter(cid => children[cid])?.length || 0) : 0;
+            return (
+              <div key={id}
+                className={`map-pin pin-${pin.type} ${getPinClass(id, pin.type)}`}
+                style={{ left: pin.x+'%', top: pin.y+'%' }}
+                onClick={() => handlePinClick(id, pin.type)}
+              >
+                <div className="pin-body">
+                  <span className="pin-inner">{pin.type.toUpperCase()}</span>
+                </div>
+                {/* Change #5: stacked indicator on parent pins */}
+                {pin.type === 'p' && activeChildren > 0 && (
+                  <div className="stacked-indicator">{activeChildren}</div>
+                )}
+                <div className="pin-tooltip">
+                  {pin.label}
+                  {pin.type === 'p' && activeChildren > 0 && <span style={{opacity:.8}}> (+{activeChildren} shared)</span>}
+                </div>
+              </div>
+            );
+          })}
+
+          <div className="map-legend">
+            <div className="legend-t">Map Key</div>
+            <div className="legend-row"><div className="legend-dot" style={{background:'var(--parent-blue)'}}/>Parent (children stacked)</div>
+            <div className="legend-row"><div className="legend-dot" style={{background:'var(--text-2)'}}/>Unassigned</div>
+          </div>
+          <div className="map-ctrl">
+            <div className="map-btn">+</div>
+            <div className="map-btn" style={{fontSize:13}}>⊘</div>
+            <div className="map-btn" style={{fontSize:13}}>⇱</div>
+          </div>
+        </div>
+
+        {/* Inspector — Changes #6 #7 #8 */}
+        <div className={`inspector${inspOpen?' open':''}`}>
+          {renderInspector()}
+        </div>
+      </div>
+
+      {/* LLPG side panel */}
+      <div className={`llpg-panel${llpgOpen?' open':''}`}>
+        <div className="llpg-hdr">
+          <span className="llpg-title">LLPG Suggestions <span className="badge badge-blue" style={{marginLeft:4}}>{llpg.length}</span></span>
+          <button className="modal-close" onClick={() => setLlpgOpen(false)}>×</button>
+        </div>
+        <div className="llpg-body">
+          {llpg.length === 0 && <div style={{color:'var(--text-3)',fontSize:12,padding:'12px 4px',fontStyle:'italic'}}>All suggestions assigned.</div>}
+          {llpg.map(sug => {
+            const p = parents[sug.parentId];
+            return (
+              <div key={sug.id} className="suggestion-card">
+                <div className="sug-top">
+                  <div>
+                    <div className="sug-stop">{sug.stopAddr}</div>
+                    <div className="sug-uprn">UPRN {sug.stopUprn}</div>
+                    <div className="sug-arrow">↓ suggested parent</div>
+                    <div className="sug-parent">{p?.addr||'—'}</div>
+                  </div>
+                  <button className="btn-assign-sm" onClick={() => assignSuggestion(sug)}>Assign</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Mark as Communal modal — Changes #1 #2: search-based, not free-text */}
+      <div className={`modal-overlay${modalOpen?' open':''}`} onClick={e => { if (e.target.classList.contains('modal-overlay')) setModalOpen(false); }}>
+        <div className="modal">
+          <div className="modal-hdr">
+            <span className="modal-title">Mark Service Contract as Communal Parent</span>
+            <button className="modal-close" onClick={() => setModalOpen(false)}>×</button>
+          </div>
+          <div className="modal-body">
+            <div className="modal-context-note">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <div>Only existing service contracts can be made communal parents. Search by address or UPRN to find the right record.</div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Search by address or UPRN</label>
+              <div style={{display:'flex',gap:6}}>
+                <input
+                  className={`form-input${modalSearchErr?' has-error':''}`}
+                  type="text"
+                  placeholder="e.g. 24 Manor Lane or 100021500441"
+                  value={modalSearch}
+                  onChange={e => { setModalSearch(e.target.value); setModalSearchErr(''); setModalSelected(null); }}
+                  onKeyDown={e => e.key === 'Enter' && handleModalSearch()}
+                />
+                <button className="btn-create" style={{width:70,flexShrink:0}} onClick={handleModalSearch}>Search</button>
+              </div>
+              {modalSearchErr && <div className="form-error">{modalSearchErr}</div>}
+              <div className="form-hint">Must be an existing service contract on this round</div>
+            </div>
+            {modalSelected && (
+              <div className="sc-lookup-result">
+                <div className="sc-lookup-addr">{modalSelected.addr}</div>
+                <div className="sc-lookup-uprn">UPRN {modalSelected.uprn}</div>
+                <div className="sc-lookup-route">Route LW-04 · Fortnightly · Thursday</div>
+              </div>
+            )}
+            {modalSelected && (
+              <div className="form-group" style={{marginTop:14}}>
+                <label className="form-label">Communal Bin Type</label>
+                <select className="form-select" value={modalBin} onChange={e => setModalBin(e.target.value)}>
+                  <option>1100L Communal Wheeled Bin</option>
+                  <option>660L Communal Bin</option>
+                  <option>240L Shared Bin</option>
+                </select>
+              </div>
+            )}
+          </div>
+          <div className="modal-footer">
+            <button className="btn-cancel" onClick={() => setModalOpen(false)}>Cancel</button>
+            <button className="btn-create" onClick={createParentFromSC} disabled={!modalSelected}>Mark as Communal Parent</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Confirm Standalone modal — Change #8 */}
+      {confirmStandalone && (
+        <div className="modal-overlay open" onClick={e => { if (e.target.classList.contains('modal-overlay')) setConfirmStandalone(null); }}>
+          <div className="modal confirm-modal">
+            <div className="modal-hdr">
+              <span className="modal-title">Remove from group?</span>
+              <button className="modal-close" onClick={() => setConfirmStandalone(null)}>×</button>
+            </div>
+            <div className="confirm-body">
+              <div className="confirm-warning">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <div>This property will be removed from its communal group and treated as a standalone service contract. It can be re-assigned to a group later.</div>
+              </div>
+              <div style={{fontSize:12,fontWeight:500,color:'var(--text-2)'}}>
+                <strong style={{color:'var(--text-primary)'}}>{children[confirmStandalone.childId]?.addr}</strong> will no longer inherit route settings from its parent.
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-cancel" onClick={() => setConfirmStandalone(null)}>Cancel</button>
+              <button className="btn-create" style={{background:'var(--error)'}} onClick={() => makeStandalone(confirmStandalone.childId, confirmStandalone.parentId)}>Remove from Group</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Drag ghost */}
+      <div className={`drag-ghost${ghostVisible?' visible':''}`} style={{left:ghostPos.x,top:ghostPos.y}}>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 00-8-8z"/></svg>
+        {ghostLabel}
+      </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className="toast show">
+          <div className="toast-dot"/>
+          <span>{toast.msg}</span>
+          {toast.undoFn && <button className="toast-undo" onClick={() => { toast.undoFn(); setToast(null); }}>Undo</button>}
+        </div>
+      )}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
