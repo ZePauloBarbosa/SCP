@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Montserrat',system-ui,sans-serif;background:#fafafc;color:#000;height:100vh;overflow:hidden;display:flex;flex-direction:column;font-size:13px}
+nav.topnav{height:44px;background:#242833;display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0}
+.nav-logo{color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;gap:5px}
+.nav-bc{display:flex;align-items:center;gap:4px;color:rgba(255,255,255,.5);font-size:10px;font-weight:500}
+.nav-bc span{color:rgba(255,255,255,.85)}
+.banner{background:#eef6ff;border-bottom:1px solid #bfdbfe;padding:4px 14px;display:flex;align-items:center;gap:7px;font-size:10px;font-weight:600;color:#1e40af;flex-shrink:0}
+.banner-action{margin-left:auto;font-size:10px;font-weight:600;color:#1e40af;background:none;border:1px solid #93c5fd;border-radius:4px;padding:1px 7px;cursor:pointer}
+.subhdr{height:40px;background:#fff;border-bottom:1px solid #d3d4d6;display:flex;align-items:center;padding:0 14px;gap:7px;flex-shrink:0;overflow-x:auto}
+.sub-title{font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;height:15px;padding:0 5px;border-radius:7px;font-size:8px;font-weight:700}
+.badge-blue{background:#e8f2f9;color:#1a6b9a}
+.badge-gray{background:#f2f2f5;color:#76768c}
+.badge-teal{background:rgba(0,165,153,.12);color:#00a599}
+.divv{width:1px;height:16px;background:#d3d4d6;flex-shrink:0}
+.chip{height:22px;padding:0 8px;border-radius:11px;border:1px solid #d3d4d6;background:#fff;color:#76768c;font-family:inherit;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:3px;transition:all .15s;white-space:nowrap}
+.chip:hover{border-color:#20315A;color:#20315A}
+.chip.active{background:#20315A;color:#fff;border-color:#20315A}
+.chip.teal-active{background:#00a599;color:#fff;border-color:#00a599}
+.swrap{position:relative;margin-left:auto}
+.swrap svg{position:absolute;left:7px;top:50%;transform:translateY(-50%);color:#b4b4c4;pointer-events:none}
+.sinput{width:160px;height:24px;border:1px solid #d3d4d6;border-radius:6px;padding:0 22px 0 24px;font-family:inherit;font-size:10px;color:#000;background:#fafafc;outline:none}
+.sinput:focus{border-color:#20315A;background:#fff}
+.sclear{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#b4b4c4;font-size:13px;line-height:1;padding:0}
+.main{display:flex;flex:1;overflow:hidden}
+.left-wrap{display:flex;flex-shrink:0;height:100%}
+.left-panel{width:340px;background:#fff;border-right:1px solid #d3d4d6;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.panel-hdr{padding:7px 11px 6px;border-bottom:1px solid #d3d4d6;display:flex;flex-direction:column;gap:5px}
+.eyebrow{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;color:#76768c}
+.panel-tabs{display:flex;border:1px solid #d3d4d6;border-radius:5px;overflow:hidden}
+.ptab{flex:1;height:22px;border:none;background:transparent;font-family:inherit;font-size:10px;font-weight:600;color:#76768c;cursor:pointer;transition:all .15s}
+.ptab.active{background:#20315A;color:#fff}
+.dist-row{display:flex;align-items:center;gap:5px;padding:4px 11px;border-bottom:1px solid #d3d4d6;background:#fafafc;flex-shrink:0}
+.dist-label{font-size:9px;font-weight:600;color:#76768c;white-space:nowrap}
+.dist-chips{display:flex;gap:2px}
+.dc{height:18px;padding:0 6px;border-radius:9px;border:1px solid #d3d4d6;background:#fff;color:#76768c;font-family:inherit;font-size:9px;font-weight:600;cursor:pointer;transition:all .12s}
+.dc:hover{border-color:#20315A;color:#20315A}
+.dc.active{background:#20315A;color:#fff;border-color:#20315A}
+.list-body{flex:1;overflow-y:auto;padding:6px}
+.list-body::-webkit-scrollbar{width:3px}
+.list-body::-webkit-scrollbar-thumb{background:#d3d4d6;border-radius:2px}
+.mk-btn{width:100%;height:28px;background:#20315A;color:#fff;border:none;border-radius:5px;font-family:inherit;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:7px;transition:background .15s}
+.mk-btn:hover{background:#1a2a4e}
+.gcard{border:1px solid #1a6b9a;border-radius:7px;margin-bottom:6px;overflow:hidden;background:#fff;transition:box-shadow .15s}
+.gcard.drag-over{box-shadow:0 0 0 2px #33A542;border-color:#33A542}
+.ghdr{padding:7px 9px;background:linear-gradient(135deg,#e8f2f9 0%,#f0f6fb 100%);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.ghdr:hover{background:linear-gradient(135deg,#ddedf6 0%,#e8f2f9 100%)}
+.ghdr.sel{outline:2px solid #20315A;outline-offset:-2px}
+.gicon{width:22px;height:22px;border-radius:50%;background:#1a6b9a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;flex-shrink:0}
+.ginfo{flex:1;min-width:0}
+.gname{font-size:10px;font-weight:700;color:#1a6b9a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.guprn{font-size:8px;color:#76768c;font-weight:500}
+.gcnt{font-size:8px;font-weight:700;color:#1a6b9a;background:#e8f2f9;padding:1px 5px;border-radius:8px;white-space:nowrap}
+.chev{color:#1a6b9a;transition:transform .2s;flex-shrink:0;font-size:11px}
+.chev.open{transform:rotate(180deg)}
+.gchildren{border-top:1px solid rgba(26,107,154,.15)}
+.crow{padding:5px 9px 5px 22px;border-bottom:1px solid rgba(26,107,154,.08);display:flex;align-items:center;gap:6px;cursor:pointer;transition:background .12s}
+.crow:last-of-type{border-bottom:none}
+.crow:hover{background:#f8f4fd}
+.crow.sel{background:#f2ecf9;border-left:3px solid #7b4fa6;padding-left:19px}
+.cdot{width:5px;height:5px;border-radius:50%;background:#7b4fa6;flex-shrink:0}
+.caddr{flex:1;font-size:10px;font-weight:600;color:#76768c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cuprn{font-size:8px;color:#b4b4c4}
+.cright{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.svcc{font-size:8px;color:#76768c;font-weight:600;background:#fafafc;border:1px solid #d3d4d6;border-radius:8px;padding:1px 4px}
+.cchev{color:#b4b4c4;font-size:9px}
+.crow.sel .cchev{color:#7b4fa6}
+.rmbtn{width:15px;height:15px;border:none;background:transparent;border-radius:2px;cursor:pointer;color:#b4b4c4;display:flex;align-items:center;justify-content:center;font-size:12px}
+.rmbtn:hover{background:#fee2e2;color:#ff5252}
+.dropzone{min-height:26px;border:1.5px dashed #d3d4d6;border-radius:5px;margin:5px 7px;display:flex;align-items:center;justify-content:center;color:#b4b4c4;font-size:10px;font-weight:600;gap:4px}
+.dropzone.over{border-color:#33A542;background:#dcedeb;color:#2a8f37}
+.sep-sec{padding:4px 2px 3px;display:flex;align-items:center;gap:5px}
+.sep-label{font-size:8px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;color:#76768c;white-space:nowrap}
+.sep-line{flex:1;height:1px;background:#d3d4d6}
+.stop-card{border:1px solid #d3d4d6;border-radius:7px;padding:7px 9px;margin-bottom:5px;background:#fff;cursor:grab;user-select:none;transition:border-color .15s}
+.stop-card:hover{border-color:#20315A}
+.stop-card.dragging{opacity:.35;cursor:grabbing}
+.stop-card.hl{border-color:#76768c;box-shadow:0 0 0 2px rgba(118,118,140,.2)}
+.stop-card.llpg-match{border-color:#00a599;background:#f0fdfb}
+.sc-hdr{display:flex;align-items:flex-start;gap:6px}
+.dhandle{color:#b4b4c4;margin-top:1px;flex-shrink:0;opacity:.5;font-size:11px}
+.sinfo{flex:1;min-width:0}
+.saddr{font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suprn{font-size:8px;color:#76768c;margin-top:1px}
+.stags{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap;align-items:center}
+.tag{display:inline-flex;align-items:center;height:13px;padding:0 4px;border-radius:2px;font-size:8px;font-weight:500;text-transform:uppercase;letter-spacing:.2px}
+.tag-u{background:#f2f2f5;color:#76768c}
+.tag-llpg{background:rgba(0,165,153,.12);color:#00a599}
+.dist-badge{font-size:8px;font-weight:700;color:#1a6b9a;background:#e8f2f9;border-radius:8px;padding:1px 4px;margin-left:auto;flex-shrink:0}
+.llpg-suggestion-row{display:flex;align-items:center;gap:5px;margin-top:5px;padding:4px 6px;background:rgba(0,165,153,.06);border:1px solid rgba(0,165,153,.2);border-radius:4px}
+.llpg-sug-label{font-size:8px;font-weight:600;color:#00a599;flex:1}
+.llpg-sug-parent{font-size:8px;font-weight:700;color:#1a6b9a}
+.llpg-assign-btn{height:18px;padding:0 7px;border:none;border-radius:3px;background:#00a599;color:#fff;font-family:inherit;font-size:8px;font-weight:600;cursor:pointer;white-space:nowrap}
+.llpg-assign-btn:hover{background:#008a80}
+.inspector{width:0;min-width:0;background:#fff;border-left:1px solid #d3d4d6;border-right:0px solid #d3d4d6;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;transition:width .22s cubic-bezier(.4,0,.2,1),min-width .22s,border-right-width .22s}
+.inspector.open{width:290px;min-width:290px;border-right-width:1px}
+.ihdr{padding:9px 11px;border-bottom:1px solid #d3d4d6;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;min-height:42px}
+.ieyebrow{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;color:#76768c}
+.isubtitle{font-size:11px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px}
+.ibody{flex:1;overflow-y:auto}
+.ibody::-webkit-scrollbar{width:3px}
+.ibody::-webkit-scrollbar-thumb{background:#d3d4d6;border-radius:2px}
+.iempty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:7px;color:#b4b4c4;text-align:center;padding:20px}
+.iempty p{font-size:10px;font-weight:500;line-height:1.6}
+.isec{padding:10px 11px 0}
+.isec+.isec{border-top:1px solid #d3d4d6}
+.isect{font-size:8px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;color:#76768c;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+.flabel{font-size:9px;font-weight:600;color:#76768c;margin-bottom:2px}
+.fval{font-size:11px;font-weight:500;margin-bottom:7px}
+.fval.mono{font-family:monospace;font-size:10px;color:#76768c}
+.addr-link{font-size:11px;font-weight:700;color:#20315A;display:inline-flex;align-items:center;gap:3px;cursor:pointer;border-bottom:1px dashed #20315A;padding-bottom:1px;margin-bottom:7px}
+.addr-link:hover{color:#1a6b9a;border-bottom-color:#1a6b9a}
+.ppill{display:inline-flex;align-items:center;gap:3px;background:#e8f2f9;color:#1a6b9a;border-radius:3px;padding:2px 6px;font-size:9px;font-weight:600;cursor:pointer;margin-bottom:7px}
+.ppill:hover{background:#d4e9f5}
+.iblock{background:#fafafc;border:1px solid #d3d4d6;border-radius:5px;padding:7px 9px;margin-bottom:7px}
+.iblabel{font-size:8px;font-weight:600;color:#b4b4c4;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.ibval{font-size:10px;font-weight:600;color:#76768c}
+.ibro{font-size:8px;color:#b4b4c4;font-style:italic;margin-top:2px}
+.btn-sa{width:100%;height:26px;background:none;border:1px solid #d3d4d6;border-radius:5px;color:#76768c;font-family:inherit;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;transition:all .15s;margin-bottom:10px}
+.btn-sa:hover{border-color:#ff5252;color:#ff5252;background:#fff0f0}
+.btn-assign{width:100%;height:26px;background:#33A542;color:#fff;border:none;border-radius:5px;font-family:inherit;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background .15s;margin-top:7px}
+.btn-assign:hover{background:#2a8f37}
+.btn-assign:disabled{background:#b4b4c4;cursor:not-allowed}
+.valerr{background:#fff0f0;border:1px solid #fca5a5;border-radius:5px;padding:6px 8px;font-size:10px;font-weight:600;color:#b91c1c;display:flex;align-items:flex-start;gap:4px;margin-bottom:6px}
+.svc-card{display:flex;align-items:flex-start;gap:7px;padding:7px 0;border-bottom:1px solid #d3d4d6}
+.svc-card:last-child{border-bottom:none}
+.svc-icon{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.svc-content{flex:1;min-width:0}
+.svc-name{font-size:10px;font-weight:700;display:flex;align-items:center;gap:3px;margin-bottom:1px}
+.svc-st{display:inline-flex;align-items:center;height:12px;padding:0 3px;border-radius:2px;font-size:7px;font-weight:500;text-transform:uppercase}
+.st-active{background:#dcedeb;color:#1a6b3a}
+.st-inactive{background:#f2f2f5;color:#76768c}
+.st-suspended{background:#fff5ed;color:#b45309}
+.svc-bin{font-size:9px;color:#76768c;font-weight:500;margin-bottom:2px}
+.svc-chips{display:flex;gap:3px;flex-wrap:wrap}
+.svc-chip{display:inline-flex;align-items:center;gap:2px;height:15px;padding:0 4px;border-radius:2px;font-size:8px;font-weight:600;border:1px solid #d3d4d6;color:#76768c;background:#fafafc}
+.ch-list{display:flex;flex-direction:column;gap:3px;padding-bottom:9px}
+.cchip{display:flex;align-items:center;gap:6px;padding:5px 7px;background:#fafafc;border:1px solid #d3d4d6;border-radius:5px;cursor:pointer;transition:border-color .15s}
+.cchip:hover{border-color:#7b4fa6;background:#f2ecf9}
+.cchip-dot{width:5px;height:5px;border-radius:50%;background:#7b4fa6;flex-shrink:0}
+.cchip-info{flex:1;min-width:0}
+.cchip-addr{font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cchip-uprn{font-size:8px;color:#76768c}
+.cchip-svc{font-size:8px;color:#76768c;background:#f2f2f5;border-radius:6px;padding:1px 4px;font-weight:600;flex-shrink:0}
+.fsel{width:100%;height:28px;border:1px solid #d3d4d6;border-radius:5px;padding:0 7px;font-family:inherit;font-size:10px;color:#000;background:#fafafc;outline:none}
+.fsel:focus{border-color:#20315A}
+.stag-u{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:3px;font-size:8px;font-weight:500;text-transform:uppercase;letter-spacing:.3px;margin-bottom:7px;background:#f2f2f5;color:#76768c}
+.iclose{background:none;border:none;cursor:pointer;color:#76768c;font-size:17px;line-height:1;padding:0}
+.map-area{flex:1;position:relative;background:#e8ecf0;overflow:hidden}
+.map-bg{position:absolute;inset:0;background:#d4dde8}
+.road{position:absolute;background:#fff;border-radius:1px}
+.road-h{height:5px}
+.road-v{width:5px}
+.road-minor{background:#e2e8ed}
+.map-notice{position:absolute;top:9px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.95);border:1px solid #d3d4d6;border-radius:7px;padding:4px 10px;font-size:9px;font-weight:600;color:#76768c;box-shadow:0 1px 3px rgba(36,40,51,.1);z-index:40;white-space:nowrap}
+.pin{position:absolute;transform:translate(-50%,-100%);cursor:pointer;transition:transform .15s;z-index:10}
+.pin:hover{transform:translate(-50%,-100%) scale(1.15);z-index:20}
+.pin.sel-p .pin-body{box-shadow:0 0 0 3px rgba(32,49,90,.3)}
+.pin.sel-u .pin-body{box-shadow:0 0 0 3px rgba(118,118,140,.3)}
+.pin-body{width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 3px 8px rgba(36,40,51,.15)}
+.pin-inner{transform:rotate(45deg);font-size:8px;font-weight:700;color:#fff}
+.pin-p .pin-body{background:#1a6b9a}
+.pin-u .pin-body{background:#76768c}
+.stackind{position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;background:#b45309;color:#fff;font-size:7px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1px solid #fff;z-index:2}
+.pintip{position:absolute;top:26px;left:50%;transform:translateX(-50%);background:rgba(28,35,64,.88);color:#fff;font-size:9px;font-weight:600;padding:2px 5px;border-radius:3px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
+.pin:hover .pintip{opacity:1}
+.map-legend{position:absolute;bottom:10px;left:10px;background:rgba(255,255,255,.96);border:1px solid #d3d4d6;border-radius:7px;padding:7px 9px;z-index:40}
+.leg-row{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:500;color:#76768c;margin-bottom:2px}
+.leg-row:last-child{margin-bottom:0}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.map-ctrl{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:2px;z-index:40}
+.map-btn{width:26px;height:26px;background:#fff;border:1px solid #d3d4d6;border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#76768c;font-size:13px;font-weight:500}
+.overlay{position:fixed;inset:0;background:rgba(28,35,64,.45);z-index:100;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:7px;width:400px;box-shadow:0 8px 24px rgba(36,40,51,.16);overflow:hidden}
+.modal.sm{width:340px}
+.mhdr{padding:11px 14px;border-bottom:1px solid #d3d4d6;display:flex;align-items:center;justify-content:space-between}
+.mtitle{font-size:12px;font-weight:700}
+.mclose{background:none;border:none;cursor:pointer;color:#76768c;font-size:17px;line-height:1}
+.mbody{padding:14px}
+.mfoot{padding:10px 14px;border-top:1px solid #d3d4d6;display:flex;justify-content:flex-end;gap:6px}
+.mnote{background:#fafafc;border:1px solid #d3d4d6;border-radius:5px;padding:7px 9px;margin-bottom:11px;font-size:10px;font-weight:500;color:#76768c}
+.fgrp{margin-bottom:10px}
+.flbl{font-size:10px;font-weight:600;color:#76768c;margin-bottom:3px;display:block}
+.finput{width:100%;height:28px;border:1px solid #d3d4d6;border-radius:5px;padding:0 7px;font-family:inherit;font-size:10px;color:#000;background:#fafafc;outline:none}
+.finput:focus{border-color:#20315A;background:#fff}
+.finput.err{border-color:#ff5252;background:#fff0f0}
+.fhint{font-size:8px;color:#b4b4c4;margin-top:2px}
+.ferr{font-size:8px;color:#ff5252;font-weight:600;margin-top:2px}
+.lookup{background:#fafafc;border:1px solid #33A542;border-radius:5px;padding:6px 8px;margin-top:4px}
+.lookup-addr{font-size:11px;font-weight:700}
+.lookup-uprn{font-size:9px;color:#76768c}
+.lookup-rt{font-size:9px;color:#1a6b9a;font-weight:600;margin-top:2px}
+.btn-cancel{height:28px;padding:0 12px;border:1px solid #d3d4d6;border-radius:5px;background:#fff;font-family:inherit;font-size:10px;font-weight:600;color:#76768c;cursor:pointer}
+.btn-cancel:hover{border-color:#20315A;color:#20315A}
+.btn-create{height:28px;padding:0 12px;border:none;border-radius:5px;background:#20315A;font-family:inherit;font-size:10px;font-weight:600;color:#fff;cursor:pointer}
+.btn-create:hover{background:#1a2a4e}
+.btn-create:disabled{background:#b4b4c4;cursor:not-allowed}
+.btn-danger{background:#ff5252}
+.btn-danger:hover{background:#e04040}
+.cwarn{background:#fff0f0;border:1px solid #fca5a5;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:#b91c1c;margin-bottom:9px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#242833;color:#fff;padding:7px 13px;border-radius:14px;font-size:10px;font-weight:600;box-shadow:0 8px 24px rgba(36,40,51,.16);z-index:200;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.tdot{width:6px;height:6px;border-radius:50%;background:#33A542}
+.tundo{margin-left:2px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:3px;padding:1px 6px;font-size:9px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <div class="nav-logo">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#33A542" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    SmartCity
+  </div>
+  <div class="nav-bc">
+    <span>Routes</span><span style="opacity:.4">/</span>
+    <span>UK Config</span><span style="opacity:.4">/</span>
+    <span>Communal Bin Assignment</span>
+  </div>
+</nav>
+<div class="banner">
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  <span style="font-weight:700">Communal Bins enabled</span>
+  <span style="color:#93c5fd;margin:0 2px">·</span>
+  <span>Route LW-04 — Lewisham</span>
+  <span style="color:#93c5fd;margin:0 2px">·</span>
+  <span>Feature configured in Admin → Route Configuration</span>
+  <button class="banner-action">Admin Settings</button>
+</div>
+<div class="subhdr" id="subhdr"></div>
+<div class="main">
+  <div class="left-wrap">
+    <div class="left-panel">
+      <div class="panel-hdr">
+        <div class="eyebrow">Stops — Drag or assign to link</div>
+        <div class="panel-tabs">
+          <button class="ptab active">Groups <span class="badge badge-blue" id="grp-cnt" style="margin-left:3px">3</span></button>
+          <button class="ptab">All Stops</button>
+        </div>
+      </div>
+      <div class="dist-row">
+        <span class="dist-label">Nearby within:</span>
+        <div class="dist-chips" id="dist-chips"></div>
+      </div>
+      <div class="list-body" id="list-body"></div>
+    </div>
+    <div class="inspector" id="inspector"></div>
+  </div>
+  <div class="map-area" id="map-area">
+    <div class="map-bg"></div>
+    <div class="road road-h" style="top:38%;left:0;right:0"></div>
+    <div class="road road-h road-minor" style="top:56%;left:5%;right:15%"></div>
+    <div class="road road-h road-minor" style="top:70%;left:25%;right:0"></div>
+    <div class="road road-v" style="left:30%;top:0;bottom:0"></div>
+    <div class="road road-v road-minor" style="left:56%;top:15%;bottom:0"></div>
+    <div class="road road-v road-minor" style="left:72%;top:0;bottom:45%"></div>
+    <div class="map-notice">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:3px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Map view — children share parent pin. Use list to assign.
+    </div>
+    <div id="map-pins"></div>
+    <div class="map-legend">
+      <div style="font-size:8px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;color:#76768c;margin-bottom:3px">Map Key</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#1a6b9a"></div>Parent (children stacked)</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#76768c"></div>Unassigned</div>
+    </div>
+    <div class="map-ctrl">
+      <div class="map-btn">+</div>
+      <div class="map-btn" style="font-size:11px">⊘</div>
+      <div class="map-btn" style="font-size:11px">⇱</div>
+    </div>
+  </div>
+</div>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+<script>
+const PARENTS={1:{addr:'12 Brockley Rise',uprn:'100021483910',bin:'1100L Communal Wheeled Bin',route:'LW-04',freq:'Fortnightly',day:'Thursday',children:['c1','c2'],open:true},2:{addr:'47 Hilly Fields Cres',uprn:'100021492030',bin:'1100L Communal Wheeled Bin',route:'LW-04',freq:'Weekly',day:'Wednesday',children:['c3','c4','c5'],open:true},3:{addr:'8 Manor Lane',uprn:'100021500441',bin:'660L Communal Bin',route:'LW-04',freq:'Fortnightly',day:'Thursday',children:[],open:true}};
+const CHILDREN={c1:{addr:'12a Brockley Rise',uprn:'100021483911',parentId:1},c2:{addr:'12b Brockley Rise',uprn:'100021483912',parentId:1},c3:{addr:'47a Hilly Fields Cres',uprn:'100021492031',parentId:2},c4:{addr:'47b Hilly Fields Cres',uprn:'100021492032',parentId:2},c5:{addr:'47c Hilly Fields Cres',uprn:'100021492033',parentId:2}};
+const UNASSIGNED_INIT=[{id:'u1',addr:'19 Loampit Hill',uprn:'100021510220',suggested:1,dist:{1:'4m',2:'210m',3:'380m'}},{id:'u2',addr:'19a Loampit Hill',uprn:'100021510221',suggested:1,dist:{1:'6m',2:'214m',3:'382m'}},{id:'u3',addr:'3 Tressillian Rd',uprn:'100021520310',suggested:2,dist:{1:'195m',2:'8m',3:'290m'}},{id:'u4',addr:'3a Tressillian Rd',uprn:'100021520311',suggested:2,dist:{1:'197m',2:'8m',3:'291m'}},{id:'u5',addr:'3b Tressillian Rd',uprn:'100021520312',suggested:2,dist:{1:'200m',2:'12m',3:'295m'}}];
+const UNASSIGNED_LOOKUP={uls1:{addr:'22 Brockley Rise',uprn:'100021483920',dist:{1:'9m',2:'205m',3:'370m'},suggested:1},uls2:{addr:'71 Hilly Fields Cres',uprn:'100021492040',dist:{1:'215m',2:'14m',3:'310m'},suggested:2},uls3:{addr:'15 Manor Lane',uprn:'100021500450',dist:{1:'340m',2:'280m',3:'11m'},suggested:3}};
+const LLPG_MAP={u1:1,u2:1,u3:2,u4:2,u5:2};
+const SERVICES={c1:[{icon:'🗑',bg:'#F3F4F6',name:'Residual Waste',status:'active',bin:'180L Black Bin',freq:'Fortnightly',day:'Thu',last:'17 Apr 2026'},{icon:'♻',bg:'#e8f2f9',name:'Dry Recycling',status:'active',bin:'240L Blue Bin',freq:'Fortnightly',day:'Thu',last:'10 Apr 2026'},{icon:'🍃',bg:'#f0fdf4',name:'Food Waste',status:'active',bin:'23L Caddy',freq:'Weekly',day:'Thu',last:'17 Apr 2026'}],c2:[{icon:'🗑',bg:'#F3F4F6',name:'Residual Waste',status:'active',bin:'180L Black Bin',freq:'Fortnightly',day:'Thu',last:'17 Apr 2026'},{icon:'♻',bg:'#e8f2f9',name:'Dry Recycling',status:'suspended',bin:'240L Blue Bin',freq:'Fortnightly',day:'Thu',last:'27 Mar 2026'}],c3:[{icon:'🗑',bg:'#F3F4F6',name:'Residual Waste',status:'active',bin:'240L Black Bin',freq:'Weekly',day:'Wed',last:'16 Apr 2026'},{icon:'♻',bg:'#e8f2f9',name:'Dry Recycling',status:'active',bin:'240L Blue Bin',freq:'Weekly',day:'Wed',last:'16 Apr 2026'},{icon:'🍃',bg:'#f0fdf4',name:'Food Waste',status:'inactive',bin:'23L Caddy',freq:'Weekly',day:'Wed',last:'—'}],c4:[{icon:'🗑',bg:'#F3F4F6',name:'Residual Waste',status:'active',bin:'240L Black Bin',freq:'Weekly',day:'Wed',last:'16 Apr 2026'},{icon:'♻',bg:'#e8f2f9',name:'Dry Recycling',status:'active',bin:'240L Blue Bin',freq:'Weekly',day:'Wed',last:'16 Apr 2026'}],c5:[{icon:'🗑',bg:'#F3F4F6',name:'Residual Waste',status:'active',bin:'180L Black Bin',freq:'Weekly',day:'Wed',last:'16 Apr 2026'},{icon:'♻',bg:'#e8f2f9',name:'Dry Recycling',status:'active',bin:'240L Blue Bin',freq:'Fortnightly',day:'Wed',last:'09 Apr 2026'}]};
+const MAP_PINS={p1:{type:'p',x:28,y:40,label:'12 Brockley Rise',pid:1},p2:{type:'p',x:58,y:28,label:'47 Hilly Fields Cres',pid:2},p3:{type:'p',x:72,y:58,label:'8 Manor Lane',pid:3},u1:{type:'u',x:20,y:26,label:'19 Loampit Hill'},u2:{type:'u',x:24,y:30,label:'19a Loampit Hill'},u3:{type:'u',x:42,y:61,label:'3 Tressillian Rd'},u4:{type:'u',x:47,y:64,label:'3a Tressillian Rd'},u5:{type:'u',x:44,y:68,label:'3b Tressillian Rd'}};
+const DIST_OPTIONS=[50,100,200,500];
+let state={parents:JSON.parse(JSON.stringify(PARENTS)),children:JSON.parse(JSON.stringify(CHILDREN)),unassigned:JSON.parse(JSON.stringify(UNASSIGNED_INIT)),llpgMap:JSON.parse(JSON.stringify(LLPG_MAP)),filter:'all',search:'',sel:null,distFilter:100,dragId:null,dragOver:null,inspTgt:'',inspErr:'',mSearch:'',mSel:null,mBin:'1100L Communal Wheeled Bin',mErr:'',modalOpen:false,confirmSA:null,newPid:100};
+let toastTimer=null;
+function setState(patch){const val=typeof patch==='function'?patch(state):patch;Object.assign(state,val);render();}
+function showToast(msg,undoFn){if(toastTimer)clearTimeout(toastTimer);const t=document.getElementById('toast-root');t.innerHTML=`<div class="toast"><div class="tdot"></div><span>${msg}</span>${undoFn?'<button class="tundo" id="undo-btn">Undo</button>':''}</div>`;if(undoFn)document.getElementById('undo-btn').onclick=()=>{undoFn();t.innerHTML='';};toastTimer=setTimeout(()=>{t.innerHTML='';},3000);}
+function getNearestDist(stop){if(!stop.dist)return null;const all=Object.values(stop.dist).map(d=>({raw:d,m:parseInt(d)}));if(!all.length)return null;return all.sort((a,b)=>a.m-b.m)[0].raw;}
+function matchSearch(t){return!state.search||t.toLowerCase().includes(state.search.toLowerCase());}
+function selParent(id){setState({sel:{type:'parent',id},inspTgt:'',inspErr:''});}
+function selChild(id){setState({sel:{type:'child',id},inspTgt:'',inspErr:''});}
+function selUnassigned(id){setState({sel:{type:'unassigned',id},inspTgt:'',inspErr:''});}
+function removeChild(cid,gid){const c=state.children[cid];if(!c)return;const snapP=JSON.parse(JSON.stringify(state.parents)),snapC=JSON.parse(JSON.stringify(state.children)),snapU=[...state.unassigned];const newP=JSON.parse(JSON.stringify(state.parents));newP[gid].children=newP[gid].children.filter(x=>x!==cid);const newC=JSON.parse(JSON.stringify(state.children));delete newC[cid];const newU=[...state.unassigned,{id:cid,addr:c.addr,uprn:c.uprn,dist:{}}];const newSel=state.sel?.id===cid?null:state.sel;setState({parents:newP,children:newC,unassigned:newU,sel:newSel});showToast(c.addr+' removed from group',()=>setState({parents:snapP,children:snapC,unassigned:snapU}));}
+function assignStop(stopId,gid){const stop=state.unassigned.find(s=>s.id===stopId);if(!stop)return;const snapP=JSON.parse(JSON.stringify(state.parents)),snapC=JSON.parse(JSON.stringify(state.children)),snapU=[...state.unassigned],snapL={...state.llpgMap};const newC=JSON.parse(JSON.stringify(state.children));newC[stopId]={addr:stop.addr,uprn:stop.uprn,parentId:gid};const newP=JSON.parse(JSON.stringify(state.parents));newP[gid].children=[...newP[gid].children,stopId];const newU=state.unassigned.filter(s=>s.id!==stopId);const newL={...state.llpgMap};delete newL[stopId];setState({children:newC,parents:newP,unassigned:newU,llpgMap:newL,dragId:null,dragOver:null});showToast(stop.addr+' assigned to group',()=>setState({children:snapC,parents:snapP,unassigned:snapU,llpgMap:snapL}));}
+function assignFromInsp(stopId){if(!state.inspTgt){setState({inspErr:'Please select a parent group.'});return;}assignStop(stopId,parseInt(state.inspTgt));selParent(parseInt(state.inspTgt));}
+function renderSubhdr(){const el=document.getElementById('subhdr');const llpgCount=Object.keys(state.llpgMap).filter(sid=>state.unassigned.some(u=>u.id===sid)).length;el.innerHTML=`<div class="sub-title">Lewisham — Round LW-04<span class="badge badge-blue">${Object.keys(state.parents).length} Groups</span><span class="badge badge-gray">${state.unassigned.length} Unassigned</span></div><div class="divv"></div>${['all','unassigned','parents','children'].map(f=>`<button class="chip${state.filter===f?' active':''}" onclick="setState({filter:'${f}',sel:null})">${f.charAt(0).toUpperCase()+f.slice(1)}</button>`).join('')}<button class="chip${state.filter==='llpg'?' teal-active':' teal'}" onclick="setState({filter:state.filter==='llpg'?'all':'llpg',sel:null})">LLPG Suggestions <span class="badge badge-teal" style="margin-left:3px">${llpgCount}</span></button><div class="swrap"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b4b4c4" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="sinput" type="text" placeholder="Search address or UPRN…" value="${state.search}" oninput="setState({search:this.value})">${state.search?`<button class="sclear" onclick="setState({search:''})">×</button>`:''}</div>`;}
+function renderDistChips(){document.getElementById('dist-chips').innerHTML=DIST_OPTIONS.map(d=>`<button class="dc${state.distFilter===d?' active':''}" onclick="setState({distFilter:${d}})">${d}m</button>`).join('');}
+function getFilteredUnassigned(){return state.unassigned.filter(s=>{if(state.filter==='parents'||state.filter==='children')return false;if(state.filter==='llpg'&&!state.llpgMap[s.id])return false;if(!matchSearch(s.addr)&&!matchSearch(s.uprn))return false;if(!s.dist||!Object.keys(s.dist).length)return true;return Object.values(s.dist).some(d=>parseInt(d)<=state.distFilter);});}
+function renderList(){const el=document.getElementById('list-body');const filteredParents=Object.entries(state.parents).filter(([id,p])=>{if(state.filter==='unassigned'||state.filter==='children'||state.filter==='llpg')return false;if(state.search){const cm=p.children.some(cid=>state.children[cid]&&(matchSearch(state.children[cid].addr)||matchSearch(state.children[cid].uprn)));return matchSearch(p.addr)||matchSearch(p.uprn)||cm;}return true;});const filteredU=getFilteredUnassigned();let html=`<button class="mk-btn" onclick="openModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Mark Service Contract as Communal Parent</button>`;if(state.filter==='llpg'){html+=`<div style="background:rgba(0,165,153,.06);border:1px solid rgba(0,165,153,.25);border-radius:5px;padding:6px 9px;margin-bottom:7px;font-size:9px;font-weight:600;color:#00a599">LLPG suggestions active — showing unassigned stops with a suggested parent match</div>`;}filteredParents.forEach(([id,p])=>{const pid=parseInt(id);const isSel=state.sel?.type==='parent'&&state.sel.id===pid;const isDO=state.dragOver===pid;const fc=p.children.filter(cid=>{const c=state.children[cid];if(!state.search||!c)return true;return matchSearch(c.addr)||matchSearch(c.uprn);});html+=`<div class="gcard${isDO?' drag-over':''}" ondragover="event.preventDefault();setState({dragOver:${pid}})" ondragleave="setState({dragOver:null})" ondrop="assignStop(state.dragId,${pid})"><div class="ghdr${isSel?' sel':''}" onclick="setState(s=>({...s,sel:{type:'parent',id:${pid}},parents:{...s.parents,${pid}:{...s.parents[${pid}],open:!s.parents[${pid}].open}},inspTgt:'',inspErr:''}))"><div class="gicon">P</div><div class="ginfo"><div class="gname">${p.addr}</div><div class="guprn">UPRN ${p.uprn}</div></div><span class="gcnt">${p.children.length} ${p.children.length===1?'child':'children'}</span><span class="chev${p.open?' open':''}">▾</span></div>`;if(p.open){html+=`<div class="gchildren">`;fc.forEach(cid=>{const c=state.children[cid];if(!c)return;const isCS=state.sel?.type==='child'&&state.sel.id===cid;const svCt=(SERVICES[cid]||[]).length;html+=`<div class="crow${isCS?' sel':''}" onclick="selChild('${cid}')"><div class="cdot"></div><div style="flex:1;min-width:0"><div class="caddr">${c.addr}</div><div class="cuprn">${c.uprn}</div></div><div class="cright"><span class="svcc">${svCt} svcs</span><span class="cchev">›</span><button class="rmbtn" onclick="event.stopPropagation();setState({confirmSA:{childId:'${cid}',parentId:${pid}}})">×</button></div></div>`;});html+=`<div class="dropzone${isDO?' over':''}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg>Drop stop here</div></div>`;}html+=`</div>`;});if(filteredU.length){const sepLabel=state.filter==='llpg'?'LLPG Suggested Stops':`Nearby Unassigned · within ${state.distFilter}m`;html+=`<div class="sep-sec"><span class="sep-label">${sepLabel}</span><div class="sep-line"></div></div>`;filteredU.forEach(stop=>{const isHL=state.sel?.type==='unassigned'&&state.sel.id===stop.id;const isDrag=state.dragId===stop.id;const nd=getNearestDist(stop);const hasLlpg=!!state.llpgMap[stop.id];const sugParentId=state.llpgMap[stop.id];const sugParent=sugParentId?state.parents[sugParentId]:null;html+=`<div class="stop-card${isDrag?' dragging':''}${isHL?' hl':''}${hasLlpg&&state.filter==='llpg'?' llpg-match':''}" draggable="true" ondragstart="setState({dragId:'${stop.id}'});event.dataTransfer.effectAllowed='move'" ondragend="setState({dragId:null,dragOver:null})" onclick="selUnassigned('${stop.id}')"><div class="sc-hdr"><span class="dhandle">⋮⋮</span><div class="sinfo"><div class="saddr">${stop.addr}</div><div class="suprn">UPRN ${stop.uprn}</div></div></div><div class="stags"><span class="tag tag-u">Unassigned</span>${hasLlpg?`<span class="tag tag-llpg">LLPG Match</span>`:''}${nd?`<span class="dist-badge">${nd} away</span>`:''}</div>${hasLlpg&&sugParent?`<div class="llpg-suggestion-row"><span class="llpg-sug-label">Suggested →</span><span class="llpg-sug-parent">${sugParent.addr}</span><button class="llpg-assign-btn" onclick="event.stopPropagation();assignStop('${stop.id}',${sugParentId})">Assign</button></div>`:''}</div>`;});}else if(state.unassigned.length&&state.filter!=='llpg'){html+=`<div style="color:#b4b4c4;font-size:9px;font-weight:500;padding:9px 2px;text-align:center;font-style:italic">No unassigned stops within ${state.distFilter}m.</div>`;}else if(state.filter==='llpg'&&!filteredU.length){html+=`<div style="color:#b4b4c4;font-size:9px;font-weight:500;padding:9px 2px;text-align:center;font-style:italic">All LLPG suggestions have been assigned.</div>`;}el.innerHTML=html;document.getElementById('grp-cnt').textContent=Object.keys(state.parents).length;}
+function renderInspector(){const el=document.getElementById('inspector');const open=!!state.sel;el.className='inspector'+(open?' open':'');if(!open){el.innerHTML=`<div class="iempty"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b4b4c4" stroke-width="1.5"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 00-8-8z"/></svg><p>Click a stop or group<br>on the map or list</p></div>`;return;}const{sel}=state;if(sel.type==='parent'){const p=state.parents[sel.id];if(!p){el.innerHTML='';return;}el.innerHTML=`<div class="ihdr"><div><div class="ieyebrow">Communal Bin — Parent</div><div class="isubtitle">${p.addr}</div></div><button class="iclose" onclick="setState({sel:null})">×</button></div><div class="ibody"><div class="isec"><div class="isect">Address</div><a class="addr-link" onclick="showToast('Opening service contract for ${p.addr.replace(/'/g,"\\'")}')"> ${p.addr} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a><div class="flabel">UPRN</div><div class="fval mono">${p.uprn}</div><div class="flabel">Bin Type</div><div class="fval">${p.bin}</div></div><div class="isec"><div class="isect">Inherited Route Settings</div><div class="iblock"><div class="iblabel">Inherited by all children</div><div class="ibval">Route ${p.route} · ${p.freq} · ${p.day}</div><div class="ibro">Children inherit these settings and cannot change them independently</div></div></div><div class="isec"><div class="isect">Children <span style="color:#b4b4c4;font-size:8px;font-weight:600">${p.children.length} assigned</span></div><div class="ch-list">${p.children.length===0?`<div style="color:#b4b4c4;font-size:10px;font-style:italic;padding:3px 0">No children yet. Drag stops from the list.</div>`:''}${p.children.map(cid=>{const c=state.children[cid];if(!c)return'';const sv=(SERVICES[cid]||[]).length;return`<div class="cchip" onclick="selChild('${cid}')"><div class="cchip-dot"></div><div class="cchip-info"><div class="cchip-addr">${c.addr}</div><div class="cchip-uprn">UPRN ${c.uprn}</div></div><span class="cchip-svc">${sv} svcs</span></div>`;}).join('')}</div></div></div>`;return;}if(sel.type==='child'){const c=state.children[sel.id];if(!c){el.innerHTML='';return;}const p=state.parents[c.parentId];const svcs=SERVICES[sel.id]||[];const actCt=svcs.filter(s=>s.status==='active').length;el.innerHTML=`<div class="ihdr"><div><div class="ieyebrow">Child Property</div><div class="isubtitle">${c.addr}</div></div><button class="iclose" onclick="setState({sel:null})">×</button></div><div class="ibody"><div class="isec"><div class="isect">Address</div><a class="addr-link" onclick="showToast('Opening service contract for ${c.addr.replace(/'/g,"\\'")}')"> ${c.addr} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a><div class="flabel">UPRN</div><div class="fval mono">${c.uprn}</div>${p?`<div class="flabel">Parent Bin</div><div class="ppill" onclick="selParent(${c.parentId})">◀ ${p.addr}</div>`:''}</div><div class="isec"><div class="isect">Inherited Route</div>${p?`<div class="iblock"><div class="iblabel">From ${p.addr}</div><div class="ibval">Route ${p.route} · ${p.freq} · ${p.day}</div><div class="ibro">Read-only — changes must be made on the parent</div></div>`:''}<button class="btn-sa" onclick="setState({confirmSA:{childId:'${sel.id}',parentId:${c.parentId}}})">✕ Remove from group — make standalone</button></div><div class="isec"><div class="isect">Services <span style="color:#b4b4c4;font-size:8px;font-weight:600">${svcs.length} total · ${actCt} active</span></div>${svcs.map(s=>`<div class="svc-card"><div class="svc-icon" style="background:${s.bg}">${s.icon}</div><div class="svc-content"><div class="svc-name">${s.name} <span class="svc-st st-${s.status}">${s.status==='active'?'Active':s.status==='inactive'?'Not Active':'Suspended'}</span></div><div class="svc-bin">${s.bin}</div><div class="svc-chips"><span class="svc-chip">📅 ${s.freq}</span><span class="svc-chip">⏰ ${s.day}</span></div><div style="font-size:8px;color:#b4b4c4;margin-top:2px">Last: ${s.last}</div></div></div>`).join('')}</div></div>`;return;}if(sel.type==='unassigned'){const stop=state.unassigned.find(s=>s.id===sel.id);if(!stop){el.innerHTML='';return;}const sug=state.llpgMap[stop.id]?state.parents[state.llpgMap[stop.id]]:null;el.innerHTML=`<div class="ihdr"><div><div class="ieyebrow">Unassigned Stop</div><div class="isubtitle">${stop.addr}</div></div><button class="iclose" onclick="setState({sel:null})">×</button></div><div class="ibody"><div class="isec"><div class="isect">Address</div><div style="font-size:11px;font-weight:700;margin-bottom:6px">${stop.addr}</div><div class="flabel">UPRN</div><div class="fval mono">${stop.uprn}</div><div class="flabel">Status</div><div class="stag-u">Not Assigned</div>${stop.dist&&Object.keys(stop.dist).length?`<div class="flabel">Distance to groups</div><div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px">${Object.entries(stop.dist).map(([pid,d])=>{const pr=state.parents[parseInt(pid)];if(!pr)return'';return`<div style="display:flex;align-items:center;justify-content:space-between;font-size:9px;font-weight:500"><span style="color:#76768c">${pr.addr}</span><span style="font-weight:700;color:#1a6b9a;font-size:8px;background:#e8f2f9;padding:1px 4px;border-radius:7px">${d}</span></div>`;}).join('')}</div>`:''}</div><div class="isec"><div class="isect">Assign to Parent</div>${state.inspErr?`<div class="valerr">⚠ ${state.inspErr}</div>`:''}<div style="color:#b4b4c4;font-size:9px;font-weight:500;margin-bottom:6px">Drag this stop onto a group, or select a parent below.</div><select class="fsel" onchange="setState({inspTgt:this.value,inspErr:''})"><option value="">— Select parent group —</option>${Object.entries(state.parents).map(([id,p])=>{const d=stop.dist&&stop.dist[id]?' · '+stop.dist[id]:'';return`<option value="${id}"${state.inspTgt==id?' selected':''}>${p.addr}${d}</option>`;}).join('')}</select><button class="btn-assign" onclick="assignFromInsp('${stop.id}')" ${!state.inspTgt?'disabled':''}>✓ Assign to Group</button>${sug?`<div style="margin-top:7px;padding:6px 8px;background:rgba(0,165,153,.06);border-radius:5px;border:1px solid rgba(0,165,153,.25)"><div style="font-size:8px;font-weight:600;color:#00a599;margin-bottom:2px">LLPG Suggestion</div><div style="font-size:10px;font-weight:600">${sug.addr}</div><div style="font-size:8px;color:#76768c">Based on UPRN proximity</div></div>`:''}</div></div>`;return;}el.innerHTML='';}
+function renderMap(){const el=document.getElementById('map-pins');const childPerParent={};Object.values(state.children).forEach(c=>{childPerParent[c.parentId]=(childPerParent[c.parentId]||0)+1;});let html='';Object.entries(MAP_PINS).forEach(([id,pin])=>{if(pin.type==='u'&&!state.unassigned.some(u=>u.id===id))return;const pid=pin.pid;const cnt=pin.type==='p'?(childPerParent[pid]||0):0;const isSel=pin.type==='p'?(state.sel?.type==='parent'&&state.sel.id===pid)||(state.sel?.type==='child'&&state.children[state.sel.id]?.parentId===pid):state.sel?.type==='unassigned'&&state.sel.id===id;const selCls=isSel?(pin.type==='p'?' sel-p':' sel-u'):'';const onclick=pin.type==='p'?`selParent(${pid})`:`selUnassigned('${id}')`;html+=`<div class="pin pin-${pin.type}${selCls}" style="left:${pin.x}%;top:${pin.y}%" onclick="${onclick}"><div class="pin-body"><span class="pin-inner">${pin.type.toUpperCase()}</span></div>${cnt>0?`<div class="stackind">${cnt}</div>`:''}<div class="pintip">${pin.label}${cnt>0?` (+${cnt} shared)`:''}</div></div>`;});el.innerHTML=html;}
+function openModal(){setState({modalOpen:true,mSearch:'',mSel:null,mErr:'',mBin:'1100L Communal Wheeled Bin'});}
+function handleModalSearch(){const q=state.mSearch.trim().toLowerCase();if(!q){setState({mErr:'Enter an address or UPRN.'});return;}const ep=Object.values(state.parents).find(p=>p.addr.toLowerCase().includes(q)||p.uprn.includes(q));if(ep){setState({mErr:'Already a parent group.',mSel:null});return;}const fu=state.unassigned.find(s=>s.addr.toLowerCase().includes(q)||s.uprn.includes(q));if(fu){setState({mSel:{source:'unassigned',id:fu.id,addr:fu.addr,uprn:fu.uprn},mErr:''});return;}const fl=Object.entries(UNASSIGNED_LOOKUP).find(([k,v])=>v.addr.toLowerCase().includes(q)||v.uprn.includes(q));if(fl){setState({mSel:{source:'lookup',id:fl[0],addr:fl[1].addr,uprn:fl[1].uprn},mErr:''});return;}setState({mErr:'No service contract found.',mSel:null});}
+function createParentFromSC(){if(!state.mSel)return;const id=state.newPid;const newP=JSON.parse(JSON.stringify(state.parents));newP[id]={addr:state.mSel.addr,uprn:state.mSel.uprn,bin:state.mBin,route:'LW-04',freq:'Fortnightly',day:'Thursday',children:[],open:true};let newU=state.unassigned;if(state.mSel.source==='unassigned')newU=state.unassigned.filter(s=>s.id!==state.mSel.id);const addr=state.mSel.addr;setState({parents:newP,unassigned:newU,modalOpen:false,newPid:id+1});showToast(addr+' marked as communal parent');selParent(id);}
+function renderModal(){const el=document.getElementById('modal-root');if(state.modalOpen){el.innerHTML=`<div class="overlay" onclick="if(event.target===this)setState({modalOpen:false})"><div class="modal"><div class="mhdr"><span class="mtitle">Mark Service Contract as Communal Parent</span><button class="mclose" onclick="setState({modalOpen:false})">×</button></div><div class="mbody"><div class="mnote">Only existing service contracts can be made communal parents. Search by address or UPRN to find the right record.</div><div class="fgrp"><label class="flbl">Search by address or UPRN</label><div style="display:flex;gap:5px"><input class="finput${state.mErr?' err':''}" type="text" placeholder="e.g. 24 Manor Lane or 100021500441" value="${state.mSearch}" oninput="setState({mSearch:this.value,mErr:'',mSel:null})" onkeydown="if(event.key==='Enter')handleModalSearch()"><button class="btn-create" style="width:58px;flex-shrink:0" onclick="handleModalSearch()">Search</button></div>${state.mErr?`<div class="ferr">${state.mErr}</div>`:''}<div class="fhint">Must be an existing service contract on this round</div></div>${state.mSel?`<div class="lookup"><div class="lookup-addr">${state.mSel.addr}</div><div class="lookup-uprn">UPRN ${state.mSel.uprn}</div><div class="lookup-rt">Route LW-04 · Fortnightly · Thursday</div></div>`:''} ${state.mSel?`<div class="fgrp" style="margin-top:10px"><label class="flbl">Communal Bin Type</label><select class="fsel" onchange="setState({mBin:this.value})"><option${state.mBin==='1100L Communal Wheeled Bin'?' selected':''}>1100L Communal Wheeled Bin</option><option${state.mBin==='660L Communal Bin'?' selected':''}>660L Communal Bin</option><option${state.mBin==='240L Shared Bin'?' selected':''}>240L Shared Bin</option></select></div>`:''}</div><div class="mfoot"><button class="btn-cancel" onclick="setState({modalOpen:false})">Cancel</button><button class="btn-create" onclick="createParentFromSC()" ${!state.mSel?'disabled':''}>Mark as Communal Parent</button></div></div></div>`;}else if(state.confirmSA){const{childId,parentId}=state.confirmSA;const c=state.children[childId]||{};el.innerHTML=`<div class="overlay" onclick="if(event.target===this)setState({confirmSA:null})"><div class="modal sm"><div class="mhdr"><span class="mtitle">Remove from group?</span><button class="mclose" onclick="setState({confirmSA:null})">×</button></div><div class="mbody"><div class="cwarn">This property will be removed from its communal group and treated as a standalone service contract. It can be re-assigned later.</div><div style="font-size:10px;font-weight:500;color:#76768c"><strong style="color:#000">${c.addr||''}</strong> will no longer inherit route settings from its parent.</div></div><div class="mfoot"><button class="btn-cancel" onclick="setState({confirmSA:null})">Cancel</button><button class="btn-create btn-danger" onclick="removeChild('${childId}',${parentId});setState({confirmSA:null})">Remove from Group</button></div></div></div>`;}else{el.innerHTML='';}}
+function render(){renderSubhdr();renderDistChips();renderList();renderInspector();renderMap();renderModal();}
+render();
+</script>
+</body>
+</html>
