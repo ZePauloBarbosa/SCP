@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pickup Exceptions — Default Quick Button</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --navy: #20315A;
+    --navy-dark: #242833;
+    --green: #33A542;
+    --page-bg: #FAFAFC;
+    --white: #FFFFFF;
+    --border: #E5E7EB;
+    --text-secondary: #6B7280;
+    --text-light: #9CA3AF;
+    --toggle-off: #CBD5E1;
+    --accordion-bg: #EAEDF2;
+    --active-card-bg: #EEF1F8;
+    --shadow: rgba(36,40,51,0.15) 0 8px 32px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #e8ecf5 0%, #f2f4f8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(36, 40, 51, 0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+
+  .modal {
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    width: 920px;
+    max-width: 98vw;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 60px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--navy);
+    letter-spacing: -0.01em;
+  }
+  .close-btn {
+    width: 28px; height: 28px;
+    background: none; border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .close-btn:hover { background: var(--page-bg); color: var(--navy); }
+
+  /* Vehicle Type */
+  .vehicle-type-row {
+    padding: 14px 24px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .vehicle-type-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .vehicle-type-select {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--navy);
+    border: none;
+    border-bottom: 2px solid var(--navy);
+    background: transparent;
+    padding: 4px 28px 4px 0;
+    appearance: none;
+    cursor: pointer;
+    min-width: 200px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2320315A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+  }
+
+  /* Table scroll */
+  .table-scroll {
+    flex: 1;
+    overflow-y: auto;
+  }
+  .table-scroll::-webkit-scrollbar { width: 6px; }
+  .table-scroll::-webkit-scrollbar-track { background: var(--page-bg); }
+  .table-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead tr {
+    background: var(--page-bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  thead th {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 10px 12px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  thead th.center { text-align: center; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:nth-child(even) { background: var(--page-bg); }
+  tbody tr:hover { background: var(--active-card-bg); }
+
+  td {
+    padding: 0 12px;
+    height: 52px;
+    vertical-align: middle;
+    font-size: 13px;
+    color: var(--navy);
+    font-weight: 400;
+  }
+  td.center { text-align: center; }
+
+  .drag-handle {
+    color: var(--text-light);
+    cursor: grab;
+    font-size: 14px;
+    user-select: none;
+  }
+
+  /* Toggle */
+  .toggle {
+    position: relative;
+    display: inline-block;
+    width: 36px; height: 20px;
+  }
+  .toggle input { display: none; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: var(--toggle-off);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    left: 2px; top: 2px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+  }
+  .toggle input:checked + .toggle-track { background: var(--navy); }
+  .toggle input:checked + .toggle-track::after { transform: translateX(16px); }
+
+  /* Dropdowns */
+  .select-field {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    color: var(--navy);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 6px 28px 6px 10px;
+    background: white;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2320315A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    appearance: none;
+    cursor: pointer;
+    min-width: 110px;
+    height: 32px;
+    transition: border-color 0.15s;
+  }
+  .select-field:hover { border-color: var(--navy); }
+  .select-field:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 2px rgba(32,49,90,0.1); }
+
+  /* NEW badge */
+  .new-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+    background: var(--green);
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  /* Footer */
+  .modal-footer {
+    border-top: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .btn {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0 28px;
+    height: 36px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: opacity 0.15s, background 0.15s;
+  }
+  .btn-primary { background: var(--navy); color: white; border: none; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-secondary { background: transparent; color: var(--navy); border: 1px solid var(--navy); }
+  .btn-secondary:hover { background: var(--active-card-bg); }
+</style>
+</head>
+<body>
+
+<div class="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Pickup Exceptions</span>
+      <button class="close-btn" onclick="this.closest('.overlay').style.display='none'" aria-label="Close">✕</button>
+    </div>
+
+    <div class="vehicle-type-row">
+      <div class="vehicle-type-label">Vehicle Type</div>
+      <select class="vehicle-type-select">
+        <option>Delivery / Utility</option>
+        <option>Cart</option>
+        <option>Front Load</option>
+        <option>Residential</option>
+        <option>Roll Off</option>
+      </select>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:32px;"></th>
+            <th>Configurations</th>
+            <th class="center" style="width:80px;">Active</th>
+            <th class="center" style="width:120px;">
+              Quick Button
+              <span class="new-badge">New</span>
+            </th>
+            <th style="width:140px;">Picture</th>
+            <th style="width:140px;">Alert Details</th>
+            <th class="center" style="width:110px;">Enable Subtype</th>
+            <th style="width:160px;">Default Subtype</th>
+          </tr>
+        </thead>
+        <tbody id="exception-rows"></tbody>
+      </table>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary">Return To Defaults</button>
+      <button class="btn btn-primary">Save</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const exceptions = [
+  { name: "Prohibited Item",              picture: "Optional", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Not Out",                      picture: "Optional", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Blocked",                      picture: "Required", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Contaminated / Unacceptable",  picture: "Required", alert: "Required", subtype: true,  defaultSubtype: "Tire" },
+  { name: "Bulk Item",                    picture: "Optional", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Other",                        picture: "Optional", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Couldn't Locate",              picture: "Optional", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Not Ready",                    picture: "Optional", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Damaged Container",            picture: "Optional", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Overflowing",                  picture: "Optional", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Couldn't Enter/Reach Address", picture: "Optional", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Extra",                        picture: "Required", alert: "None",     subtype: true,  defaultSubtype: "Cart" },
+  { name: "Move Container for Access",    picture: "Required", alert: "None",     subtype: false, defaultSubtype: "" },
+  { name: "Overweight / Oversized",       picture: "Required", alert: "Optional", subtype: false, defaultSubtype: "" },
+  { name: "Drop",                         picture: "None",     alert: "None",     subtype: false, defaultSubtype: "",   active: true },
+];
+
+const subtypeOptions = ["—", "Cart", "Bin", "Tire", "Bag", "Box", "Other"];
+const pictureOptions = ["None", "Optional", "Required"];
+const alertOptions   = ["None", "Optional", "Required"];
+
+const tbody = document.getElementById('exception-rows');
+
+exceptions.forEach((ex, i) => {
+  const isActive = !!ex.active;
+  const tr = document.createElement('tr');
+
+  const subtypeToggleHtml = ex.subtype !== undefined ? `
+    <label class="toggle">
+      <input type="checkbox" ${ex.subtype ? 'checked' : ''}>
+      <span class="toggle-track"></span>
+    </label>` : '';
+
+  const defaultSubtypeHtml = ex.subtype !== undefined ? `
+    <select class="select-field" style="min-width:130px;${!ex.subtype ? 'opacity:0.35;pointer-events:none;' : ''}">
+      ${subtypeOptions.map(o => `<option ${o === (ex.defaultSubtype || '—') ? 'selected' : ''}>${o}</option>`).join('')}
+    </select>` : '';
+
+  tr.innerHTML = `
+    <td><span class="drag-handle">⠿</span></td>
+    <td style="font-weight:500;">${ex.name}</td>
+    <td class="center">
+      <label class="toggle">
+        <input type="checkbox" class="active-toggle" ${isActive ? 'checked' : ''}>
+        <span class="toggle-track"></span>
+      </label>
+    </td>
+    <td class="center">
+      <label class="toggle" style="${!isActive ? 'opacity:0.35;pointer-events:none;' : ''}">
+        <input type="checkbox" class="quick-btn-toggle" data-idx="${i}" ${!isActive ? 'disabled' : ''}>
+        <span class="toggle-track"></span>
+      </label>
+    </td>
+    <td>
+      <select class="select-field">
+        ${pictureOptions.map(o => `<option ${o === ex.picture ? 'selected' : ''}>${o}</option>`).join('')}
+      </select>
+    </td>
+    <td>
+      <select class="select-field">
+        ${alertOptions.map(o => `<option ${o === ex.alert ? 'selected' : ''}>${o}</option>`).join('')}
+      </select>
+    </td>
+    <td class="center">${subtypeToggleHtml}</td>
+    <td>${defaultSubtypeHtml}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// Radio-group behaviour: only one Quick Button toggle on at a time
+document.querySelectorAll('.quick-btn-toggle').forEach(toggle => {
+  toggle.addEventListener('change', function() {
+    if (this.checked) {
+      document.querySelectorAll('.quick-btn-toggle').forEach(other => {
+        if (other !== this) other.checked = false;
+      });
+    }
+  });
+});
+
+// Active toggle: enable/disable Quick Button toggle on the same row
+document.querySelectorAll('.active-toggle').forEach(activeToggle => {
+  activeToggle.addEventListener('change', function() {
+    const row = this.closest('tr');
+    const quickLabel = row.querySelector('.quick-btn-toggle').closest('label');
+    const quickInput = row.querySelector('.quick-btn-toggle');
+    if (this.checked) {
+      quickLabel.style.opacity = '1';
+      quickLabel.style.pointerEvents = 'auto';
+      quickInput.disabled = false;
+    } else {
+      // If this row was the active quick button, deselect it
+      quickInput.checked = false;
+      quickInput.disabled = true;
+      quickLabel.style.opacity = '0.35';
+      quickLabel.style.pointerEvents = 'none';
+    }
+  });
+});
+</script>
+</body>
+</html>
