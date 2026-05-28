@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Service — Navigation Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #242833; font-size: 14px; }
+
+/* ── TOP NAV ── */
+.top-nav { height: 70px; background: #242833; display: flex; align-items: center; padding: 0 24px; gap: 0; }
+.nav-logo { color: #fff; font-weight: 700; font-size: 15px; margin-right: 40px; display: flex; align-items: center; gap: 8px; }
+.nav-logo-icon { width: 28px; height: 28px; background: #33A542; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; }
+.nav-link { color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 500; letter-spacing: 0.8px; text-transform: uppercase; padding: 0 18px; height: 70px; display: flex; align-items: center; gap: 7px; cursor: pointer; border-bottom: 3px solid transparent; }
+.nav-link.active { color: #fff; border-bottom-color: #33A542; }
+.nav-badge { background: #33A542; color: #fff; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.nav-right .client-tag { background: rgba(255,255,255,0.12); color: #fff; font-size: 12px; padding: 4px 12px; border-radius: 4px; }
+
+/* ── SUB NAV ── */
+.sub-nav { height: 48px; background: #fff; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; padding: 0 24px; gap: 0; }
+.sub-nav-link { font-size: 14px; font-weight: 400; color: #6B7280; height: 48px; display: flex; align-items: center; padding: 0 16px; cursor: pointer; border-bottom: 3px solid transparent; }
+.sub-nav-link.active { color: #33A542; border-bottom-color: #33A542; font-weight: 500; }
+
+/* ── PAGE LAYOUT ── */
+.page { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
+
+/* ── OPTION LABEL BANNER ── */
+.mock-banner { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 4px; padding: 8px 16px; font-size: 12px; color: #92400E; margin-bottom: 24px; }
+
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.option-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; overflow: hidden; }
+.option-label { background: #20315A; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 8px 20px; }
+.option-note { background: #EEF1F8; color: #20315A; font-size: 11px; font-weight: 400; padding: 6px 20px; border-bottom: 1px solid #E5E7EB; line-height: 1.5; }
+
+/* ── SHARED EDIT SERVICE STRUCTURE ── */
+.edit-page { padding: 20px 20px 0; }
+.back-link { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #20315A; margin-bottom: 10px; cursor: pointer; }
+.back-link svg { flex-shrink: 0; }
+.edit-title { font-size: 20px; font-weight: 600; color: #20315A; margin-bottom: 4px; }
+.edit-meta { font-size: 12px; font-weight: 300; color: #6B7280; margin-bottom: 14px; }
+.edit-meta strong { font-weight: 500; color: #242833; }
+
+/* ── NAV PATTERNS ── */
+
+/* OPTION A — Prev/Next + counter */
+.nav-a { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 10px 14px; background: #FAFAFC; border: 1px solid #E5E7EB; border-radius: 5px; }
+.nav-a-counter { font-size: 12px; font-weight: 500; color: #20315A; }
+.nav-a-label { font-size: 12px; font-weight: 300; color: #9CA3AF; flex: 1; }
+.nav-a-label strong { color: #242833; font-weight: 500; }
+.arrow-btn { width: 30px; height: 30px; border: 1px solid #E5E7EB; background: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6B7280; transition: all 0.1s; }
+.arrow-btn:hover { border-color: #20315A; color: #20315A; background: #EEF1F8; }
+.arrow-btn:disabled { opacity: 0.35; cursor: default; }
+
+/* OPTION B — Flat dropdown */
+.nav-b { margin-bottom: 16px; }
+.nav-b-label { font-size: 10px; font-weight: 700; color: #9CA3AF; letter-spacing: 0.7px; text-transform: uppercase; margin-bottom: 5px; }
+.nav-b-select { width: 100%; height: 36px; border: 1px solid #E5E7EB; border-radius: 5px; padding: 0 30px 0 12px; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 400; color: #242833; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat calc(100% - 10px) center; appearance: none; cursor: pointer; }
+
+/* OPTION C — Two-level: type then contract */
+.nav-c { margin-bottom: 16px; display: flex; gap: 8px; }
+.nav-c-col { flex: 1; }
+.nav-c-col-label { font-size: 10px; font-weight: 700; color: #9CA3AF; letter-spacing: 0.7px; text-transform: uppercase; margin-bottom: 5px; }
+.nav-c-select { width: 100%; height: 36px; border: 1px solid #E5E7EB; border-radius: 5px; padding: 0 28px 0 10px; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 400; color: #242833; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) center; appearance: none; cursor: pointer; }
+.nav-c-divider { display: flex; align-items: flex-end; padding-bottom: 8px; color: #9CA3AF; font-size: 18px; font-weight: 300; }
+
+/* OPTION D — Pill tabs */
+.nav-d { margin-bottom: 16px; }
+.nav-d-label { font-size: 10px; font-weight: 700; color: #9CA3AF; letter-spacing: 0.7px; text-transform: uppercase; margin-bottom: 6px; }
+.nav-d-groups { display: flex; flex-direction: column; gap: 6px; }
+.nav-d-group-label { font-size: 10px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.nav-d-group-dot { width: 7px; height: 7px; border-radius: 50%; }
+.nav-d-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+.nav-d-pill { height: 26px; padding: 0 12px; border: 1px solid #E5E7EB; border-radius: 13px; font-size: 11px; font-weight: 400; color: #6B7280; background: #fff; cursor: pointer; display: flex; align-items: center; white-space: nowrap; transition: all 0.1s; }
+.nav-d-pill:hover { border-color: #20315A; color: #20315A; }
+.nav-d-pill.active { background: #20315A; color: #fff; border-color: #20315A; font-weight: 500; }
+
+/* OPTION E — Grouped dropdown + counter hybrid */
+.nav-e { margin-bottom: 16px; }
+.nav-e-row { display: flex; align-items: flex-end; gap: 10px; }
+.nav-e-col { flex: 1; }
+.nav-e-label { font-size: 10px; font-weight: 700; color: #9CA3AF; letter-spacing: 0.7px; text-transform: uppercase; margin-bottom: 5px; }
+.nav-e-select { width: 100%; height: 36px; border: 1px solid #20315A; border-radius: 5px; padding: 0 28px 0 10px; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 400; color: #242833; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2320315A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) center; appearance: none; cursor: pointer; }
+.nav-e-counter { height: 36px; padding: 0 12px; background: #EEF1F8; border: 1px solid #D1D8EC; border-radius: 5px; display: flex; align-items: center; font-size: 12px; font-weight: 500; color: #20315A; white-space: nowrap; gap: 8px; }
+.nav-e-arrows { display: flex; gap: 2px; }
+.nav-e-arrow { width: 26px; height: 26px; border: 1px solid #D1D8EC; border-radius: 3px; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6B7280; transition: all 0.1s; }
+.nav-e-arrow:hover { border-color: #20315A; color: #20315A; }
+
+/* ── SHARED SERVICE DETAIL FORM (abbreviated) ── */
+.service-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 5px; padding: 16px 20px; margin-bottom: 0; }
+.service-card-title { font-size: 13px; font-weight: 600; color: #20315A; margin-bottom: 14px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-field label { display: block; font-size: 10px; font-weight: 300; color: #9CA3AF; margin-bottom: 3px; }
+.form-field .field-val { font-size: 13px; font-weight: 400; color: #242833; border-bottom: 1px solid #E5E7EB; padding-bottom: 4px; }
+.form-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px; border-top: 1px solid #E5E7EB; background: #FAFAFC; }
+.btn-cancel { height: 34px; padding: 0 20px; border: 1px solid #E5E7EB; border-radius: 5px; background: #fff; font-family: 'Montserrat', sans-serif; font-size: 13px; color: #6B7280; cursor: pointer; }
+.btn-save { height: 34px; padding: 0 20px; border: none; border-radius: 5px; background: #20315A; font-family: 'Montserrat', sans-serif; font-size: 13px; color: #fff; cursor: pointer; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">R</div>
+    Routeware
+  </div>
+  <div class="nav-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    DISPATCH
+  </div>
+  <div class="nav-link active">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    CUSTOMERS
+  </div>
+  <div class="nav-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    FLEET
+  </div>
+  <div class="nav-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    INSIGHTS
+  </div>
+  <div class="nav-right">
+    <span class="client-tag">Lewisham</span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+</nav>
+
+<!-- SUB NAV -->
+<div class="sub-nav">
+  <div class="sub-nav-link active">Customers</div>
+  <div class="sub-nav-link">Suspended Locations</div>
+  <div class="sub-nav-link">Service Network</div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <div class="mock-banner">
+    ⚠️ <strong>Navigation options mock</strong> — five patterns for jumping between service contracts on the Edit Service page. Pick your preferred approach; all else stays identical.
+  </div>
+
+  <div class="options-grid">
+
+    <!-- ═══ OPTION A: Prev/Next + counter ═══ -->
+    <div class="option-card">
+      <div class="option-label">Option A — Prev / Next arrows + position counter</div>
+      <div class="option-note">Simple. Always visible. Shows "Refuse · Bin 180L" as label so you know what you're on. Arrows step one contract at a time in the order they appear in the list above.</div>
+      <div class="edit-page">
+        <div class="back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Customer Details
+        </div>
+        <div class="edit-title">Edit Service</div>
+        <div class="edit-meta">Customer Name: <strong>1</strong> &nbsp;|&nbsp; Location Address: <strong>1, WELFORD MEWS, LONDON, SE23 3FB</strong></div>
+
+        <!-- NAV A -->
+        <div class="nav-a">
+          <button class="arrow-btn" disabled>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div>
+            <div class="nav-a-counter">2 of 4</div>
+          </div>
+          <div class="nav-a-label"><strong>Refuse · Bin · 180 Litre</strong> &nbsp;·&nbsp; Every Other Week</div>
+          <button class="arrow-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-title">Service Details</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Service Type</label><div class="field-val">Domestic ▾</div></div>
+            <div class="form-field"><label>Equipment Type</label><div class="field-val">Bin ▾</div></div>
+            <div class="form-field"><label>Equipment Size</label><div class="field-val">180 Litre Container ▾</div></div>
+            <div class="form-field"><label>Waste Type</label><div class="field-val">Refuse ▾</div></div>
+            <div class="form-field"><label>Number Of Containers</label><div class="field-val">1</div></div>
+            <div class="form-field"><label>Service Account #</label><div class="field-val">REF_100942701201</div></div>
+            <div class="form-field"><label>Service Effective Date</label><div class="field-val">15/04/2026</div></div>
+            <div class="form-field"><label>Account Status</label><div class="field-val">Active ▾</div></div>
+          </div>
+        </div>
+        <div class="form-footer">
+          <button class="btn-cancel">Cancel</button>
+          <button class="btn-save">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ OPTION B: Flat dropdown ═══ -->
+    <div class="option-card">
+      <div class="option-label">Option B — Single dropdown (flat list)</div>
+      <div class="option-note">One dropdown listing all contracts. Fast to jump to any one directly. Gets long at 20+ but is the most compact. No grouping.</div>
+      <div class="edit-page">
+        <div class="back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Customer Details
+        </div>
+        <div class="edit-title">Edit Service</div>
+        <div class="edit-meta">Customer Name: <strong>1</strong> &nbsp;|&nbsp; Location Address: <strong>1, WELFORD MEWS, LONDON, SE23 3FB</strong></div>
+
+        <!-- NAV B -->
+        <div class="nav-b">
+          <div class="nav-b-label">Service contract &nbsp;·&nbsp; <span style="color:#6B7280;font-weight:300;font-size:10px;text-transform:none;letter-spacing:0">2 of 4</span></div>
+          <select class="nav-b-select">
+            <option>Refuse · EuroBin · 1100 Litre · Every Week</option>
+            <option selected>Refuse · Bin · 180 Litre · Every Other Week</option>
+            <option>Recycling · Bin · 240 Litre · Every Week</option>
+            <option>Garden · Bin · 140 Litre · Every Two Weeks</option>
+          </select>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-title">Service Details</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Service Type</label><div class="field-val">Domestic ▾</div></div>
+            <div class="form-field"><label>Equipment Type</label><div class="field-val">Bin ▾</div></div>
+            <div class="form-field"><label>Equipment Size</label><div class="field-val">180 Litre Container ▾</div></div>
+            <div class="form-field"><label>Waste Type</label><div class="field-val">Refuse ▾</div></div>
+            <div class="form-field"><label>Number Of Containers</label><div class="field-val">1</div></div>
+            <div class="form-field"><label>Service Account #</label><div class="field-val">REF_100942701201</div></div>
+            <div class="form-field"><label>Service Effective Date</label><div class="field-val">15/04/2026</div></div>
+            <div class="form-field"><label>Account Status</label><div class="field-val">Active ▾</div></div>
+          </div>
+        </div>
+        <div class="form-footer">
+          <button class="btn-cancel">Cancel</button>
+          <button class="btn-save">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ OPTION C: Two-level (type then contract) ═══ -->
+    <div class="option-card">
+      <div class="option-label">Option C — Two-level: Service Type → then Contract</div>
+      <div class="option-note">First pick the waste type (Refuse / Recycling / Garden), which filters the second dropdown to only show contracts of that type. Scales well at 20+ bins.</div>
+      <div class="edit-page">
+        <div class="back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Customer Details
+        </div>
+        <div class="edit-title">Edit Service</div>
+        <div class="edit-meta">Customer Name: <strong>1</strong> &nbsp;|&nbsp; Location Address: <strong>1, WELFORD MEWS, LONDON, SE23 3FB</strong></div>
+
+        <!-- NAV C -->
+        <div class="nav-c">
+          <div class="nav-c-col">
+            <div class="nav-c-col-label">Service Type</div>
+            <select class="nav-c-select" onchange="filterContracts(this)">
+              <option value="all">All types</option>
+              <option value="refuse" selected>Refuse (2)</option>
+              <option value="recycling">Recycling (1)</option>
+              <option value="garden">Garden (1)</option>
+            </select>
+          </div>
+          <div class="nav-c-divider">›</div>
+          <div class="nav-c-col">
+            <div class="nav-c-col-label">Service contract &nbsp;<span style="color:#9CA3AF;font-weight:300;font-size:10px;text-transform:none;letter-spacing:0">2 of 2</span></div>
+            <select class="nav-c-select" id="contract-select-c">
+              <option>Refuse · EuroBin · 1100 Litre · Every Week</option>
+              <option selected>Refuse · Bin · 180 Litre · Every Other Week</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-title">Service Details</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Service Type</label><div class="field-val">Domestic ▾</div></div>
+            <div class="form-field"><label>Equipment Type</label><div class="field-val">Bin ▾</div></div>
+            <div class="form-field"><label>Equipment Size</label><div class="field-val">180 Litre Container ▾</div></div>
+            <div class="form-field"><label>Waste Type</label><div class="field-val">Refuse ▾</div></div>
+            <div class="form-field"><label>Number Of Containers</label><div class="field-val">1</div></div>
+            <div class="form-field"><label>Service Account #</label><div class="field-val">REF_100942701201</div></div>
+            <div class="form-field"><label>Service Effective Date</label><div class="field-val">15/04/2026</div></div>
+            <div class="form-field"><label>Account Status</label><div class="field-val">Active ▾</div></div>
+          </div>
+        </div>
+        <div class="form-footer">
+          <button class="btn-cancel">Cancel</button>
+          <button class="btn-save">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ OPTION D: Grouped pill tabs ═══ -->
+    <div class="option-card">
+      <div class="option-label">Option D — Grouped pill tabs</div>
+      <div class="option-note">Contracts shown as clickable pills, visually grouped by Service Type. Great at small counts (4–8). At 20+ they wrap to multiple lines — workable but denser.</div>
+      <div class="edit-page">
+        <div class="back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Customer Details
+        </div>
+        <div class="edit-title">Edit Service</div>
+        <div class="edit-meta">Customer Name: <strong>1</strong> &nbsp;|&nbsp; Location Address: <strong>1, WELFORD MEWS, LONDON, SE23 3FB</strong></div>
+
+        <!-- NAV D -->
+        <div class="nav-d">
+          <div class="nav-d-groups">
+            <div>
+              <div class="nav-d-group-label"><span class="nav-d-group-dot" style="background:#20315A"></span>Refuse</div>
+              <div class="nav-d-pills">
+                <div class="nav-d-pill">EuroBin · 1100L</div>
+                <div class="nav-d-pill active">Bin · 180L</div>
+              </div>
+            </div>
+            <div style="margin-top:8px">
+              <div class="nav-d-group-label"><span class="nav-d-group-dot" style="background:#33A542"></span>Recycling</div>
+              <div class="nav-d-pills">
+                <div class="nav-d-pill">Bin · 240L</div>
+              </div>
+            </div>
+            <div style="margin-top:8px">
+              <div class="nav-d-group-label"><span class="nav-d-group-dot" style="background:#059669"></span>Garden</div>
+              <div class="nav-d-pills">
+                <div class="nav-d-pill">Bin · 140L</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-title">Service Details</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Service Type</label><div class="field-val">Domestic ▾</div></div>
+            <div class="form-field"><label>Equipment Type</label><div class="field-val">Bin ▾</div></div>
+            <div class="form-field"><label>Equipment Size</label><div class="field-val">180 Litre Container ▾</div></div>
+            <div class="form-field"><label>Waste Type</label><div class="field-val">Refuse ▾</div></div>
+            <div class="form-field"><label>Number Of Containers</label><div class="field-val">1</div></div>
+            <div class="form-field"><label>Service Account #</label><div class="field-val">REF_100942701201</div></div>
+            <div class="form-field"><label>Service Effective Date</label><div class="field-val">15/04/2026</div></div>
+            <div class="form-field"><label>Account Status</label><div class="field-val">Active ▾</div></div>
+          </div>
+        </div>
+        <div class="form-footer">
+          <button class="btn-cancel">Cancel</button>
+          <button class="btn-save">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ OPTION E: Grouped dropdown + arrows + counter (hybrid) ═══ -->
+    <div class="option-card" style="grid-column: 1 / -1;">
+      <div class="option-label">Option E — Hybrid: Grouped dropdown + arrows + counter (recommended)</div>
+      <div class="option-note">Combines direct jump (grouped dropdown with optgroups by Service Type) + sequential stepping (arrows) + position awareness (N of Total). Best of A + B + C. Scales to 20+ with optgroups keeping it readable. Active selection always visible in the dropdown.</div>
+      <div class="edit-page">
+        <div class="back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Customer Details
+        </div>
+        <div class="edit-title">Edit Service</div>
+        <div class="edit-meta">Customer Name: <strong>1</strong> &nbsp;|&nbsp; Location Address: <strong>1, WELFORD MEWS, LONDON, SE23 3FB</strong></div>
+
+        <!-- NAV E -->
+        <div class="nav-e">
+          <div class="nav-e-label">Service contract</div>
+          <div class="nav-e-row">
+            <div class="nav-e-col">
+              <select class="nav-e-select">
+                <optgroup label="── Refuse (2) ──">
+                  <option>Refuse · EuroBin · 1100 Litre · Every Week</option>
+                  <option selected>Refuse · Bin · 180 Litre · Every Other Week</option>
+                </optgroup>
+                <optgroup label="── Recycling (1) ──">
+                  <option>Recycling · Bin · 240 Litre · Every Week</option>
+                </optgroup>
+                <optgroup label="── Garden (1) ──">
+                  <option>Garden · Bin · 140 Litre · Every Two Weeks</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="nav-e-counter">
+              <span>2 of 4</span>
+              <div class="nav-e-arrows">
+                <button class="nav-e-arrow">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="nav-e-arrow">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-title">Service Details</div>
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+            <div class="form-field"><label>Service Type</label><div class="field-val">Domestic ▾</div></div>
+            <div class="form-field"><label>Equipment Type</label><div class="field-val">Bin ▾</div></div>
+            <div class="form-field"><label>Equipment Size</label><div class="field-val">180 Litre Container ▾</div></div>
+            <div class="form-field"><label>Waste Type</label><div class="field-val">Refuse ▾</div></div>
+            <div class="form-field"><label>Number Of Containers</label><div class="field-val">1</div></div>
+            <div class="form-field"><label>Service Account #</label><div class="field-val">REF_100942701201</div></div>
+            <div class="form-field"><label>Service Effective Date</label><div class="field-val">15/04/2026</div></div>
+            <div class="form-field"><label>Account Status</label><div class="field-val">Active ▾</div></div>
+          </div>
+        </div>
+        <div class="form-footer">
+          <button class="btn-cancel">Cancel</button>
+          <button class="btn-save">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /options-grid -->
+</div><!-- /page -->
+
+<script>
+  // Option C — filter second dropdown when type changes
+  const contractsByType = {
+    all: [
+      'Refuse · EuroBin · 1100 Litre · Every Week',
+      'Refuse · Bin · 180 Litre · Every Other Week',
+      'Recycling · Bin · 240 Litre · Every Week',
+      'Garden · Bin · 140 Litre · Every Two Weeks'
+    ],
+    refuse: [
+      'Refuse · EuroBin · 1100 Litre · Every Week',
+      'Refuse · Bin · 180 Litre · Every Other Week'
+    ],
+    recycling: ['Recycling · Bin · 240 Litre · Every Week'],
+    garden: ['Garden · Bin · 140 Litre · Every Two Weeks']
+  };
+
+  function filterContracts(typeSelect) {
+    const contracts = contractsByType[typeSelect.value] || contractsByType.all;
+    const contractSel = document.getElementById('contract-select-c');
+    contractSel.innerHTML = contracts.map((c, i) =>
+      `<option${i === 0 ? ' selected' : ''}>${c}</option>`
+    ).join('');
+    // Update counter
+    const label = typeSelect.closest('.nav-c').querySelector('.nav-c-col:last-child .nav-c-col-label span');
+    if (label) label.textContent = `1 of ${contracts.length}`;
+  }
+
+  // Option D — pill click
+  document.querySelectorAll('.nav-d-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      pill.closest('.nav-d-pills').querySelectorAll('.nav-d-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
