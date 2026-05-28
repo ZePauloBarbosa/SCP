@@ -3,924 +3,610 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customer Details — Grouped Service Contracts (Trade UK)</title>
+<title>Customer Details — Trade UK Mock</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #242833; font-size: 14px; overflow-x: hidden; }
 
-  body {
-    font-family: 'Montserrat', sans-serif;
-    background: #FAFAFC;
-    color: #242833;
-    font-size: 14px;
-  }
+/* ── TOP NAV ── */
+.top-nav { height: 70px; background: #242833; display: flex; align-items: center; padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+.nav-logo { color: #fff; font-weight: 700; font-size: 15px; margin-right: 40px; display: flex; align-items: center; gap: 8px; }
+.nav-logo-icon { width: 28px; height: 28px; background: #33A542; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; }
+.nav-link { color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 500; letter-spacing: 0.8px; text-transform: uppercase; padding: 0 18px; height: 70px; display: flex; align-items: center; gap: 7px; cursor: pointer; border-bottom: 3px solid transparent; }
+.nav-link.active { color: #fff; border-bottom-color: #33A542; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.client-tag { background: rgba(255,255,255,0.12); color: #fff; font-size: 12px; padding: 4px 12px; border-radius: 4px; }
 
-  /* ── TOP NAV ── */
-  .top-nav {
-    height: 70px;
-    background: #242833;
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    gap: 0;
-  }
-  .nav-logo {
-    color: #fff;
-    font-weight: 600;
-    font-size: 16px;
-    margin-right: 40px;
-    letter-spacing: 0.3px;
-  }
-  .nav-link {
-    color: rgba(255,255,255,0.7);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    padding: 0 16px;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    border-bottom: 4px solid transparent;
-    transition: color 0.15s;
-  }
-  .nav-link:hover { color: #fff; }
-  .nav-link.active { color: #fff; border-bottom-color: #33A542; }
+/* ── SUB NAV ── */
+.sub-nav { height: 48px; background: #fff; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; padding: 0 24px; position: sticky; top: 70px; z-index: 99; }
+.sub-nav-link { font-size: 14px; font-weight: 400; color: #6B7280; height: 48px; display: flex; align-items: center; padding: 0 16px; cursor: pointer; border-bottom: 3px solid transparent; }
+.sub-nav-link.active { color: #33A542; border-bottom-color: #33A542; font-weight: 500; }
 
-  /* ── SUB NAV ── */
-  .sub-nav {
-    height: 48px;
-    background: #fff;
-    border-bottom: 1px solid #E5E7EB;
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    gap: 0;
-  }
-  .sub-nav-link {
-    font-size: 14px;
-    font-weight: 400;
-    color: #6B7280;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    padding: 0 16px;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-  }
-  .sub-nav-link.active { color: #33A542; border-bottom-color: #33A542; font-weight: 500; }
+/* ── DUAL PANE WRAPPER ── */
+.app-shell { display: flex; min-height: calc(100vh - 118px); position: relative; overflow: hidden; }
 
-  /* ── PAGE CONTENT ── */
-  .page-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px;
-  }
+/* ── LEFT PANE (Customer Details) ── */
+.left-pane {
+  flex: 1;
+  min-width: 0;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  padding: 24px;
+}
+.app-shell.edit-open .left-pane {
+  transform: translateX(-100%);
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+}
 
-  /* ── PANEL ── */
-  .panel {
-    background: #fff;
-    border: 1px solid #E5E7EB;
-    border-radius: 5px;
-    margin-bottom: 16px;
-  }
-  .panel-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #20315A;
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid #E5E7EB;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .panel-title .edit-icon {
-    color: #9CA3AF;
-    cursor: pointer;
-    font-size: 16px;
-  }
+/* ── RIGHT PANE (Edit Service) ── */
+.right-pane {
+  position: absolute;
+  top: 0; right: 0;
+  width: 100%;
+  min-height: 100%;
+  background: #FAFAFC;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  padding: 28px 32px;
+  overflow-y: auto;
+}
+.app-shell.edit-open .right-pane {
+  transform: translateX(0);
+  position: relative;
+}
 
-  /* ── CUSTOMER INFO GRID ── */
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0;
-    padding: 20px 24px;
-    border-bottom: 1px solid #E5E7EB;
-  }
-  .info-field label {
-    display: block;
-    font-size: 11px;
-    font-weight: 300;
-    color: #9CA3AF;
-    margin-bottom: 4px;
-    text-transform: none;
-    letter-spacing: 0;
-  }
-  .info-field span {
-    font-size: 14px;
-    font-weight: 400;
-    color: #242833;
-  }
+/* ── PANEL ── */
+.panel { background: #fff; border: 1px solid #E5E7EB; border-radius: 5px; margin-bottom: 16px; }
+.panel-title { font-size: 18px; font-weight: 600; color: #20315A; padding: 20px 24px 16px; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; justify-content: space-between; }
+.icon-btn { width: 28px; height: 28px; background: none; border: none; cursor: pointer; color: #9CA3AF; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: color 0.1s, background 0.1s; }
+.icon-btn:hover { color: #20315A; background: #F3F4F6; }
 
-  .locations-header {
-    padding: 16px 24px 12px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    border-bottom: 1px solid #E5E7EB;
-  }
-  .locations-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #20315A;
-  }
-  .build-status {
-    display: flex;
-    gap: 32px;
-  }
-  .build-status-item label {
-    font-size: 11px;
-    font-weight: 300;
-    color: #9CA3AF;
-    display: block;
-    margin-bottom: 2px;
-  }
-  .build-status-item span {
-    font-size: 14px;
-    font-weight: 500;
-    color: #242833;
-  }
+/* ── CUSTOMER INFO ── */
+.info-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 0; padding: 20px 24px; border-bottom: 1px solid #E5E7EB; }
+.info-field label { display: block; font-size: 11px; font-weight: 300; color: #9CA3AF; margin-bottom: 4px; }
+.info-field span { font-size: 14px; font-weight: 400; color: #242833; }
+.locations-header { padding: 16px 24px 12px; display: flex; align-items: center; gap: 24px; border-bottom: 1px solid #E5E7EB; }
+.locations-label { font-size: 13px; font-weight: 500; color: #20315A; }
+.build-status { display: flex; gap: 32px; }
+.build-status-item label { font-size: 11px; font-weight: 300; color: #9CA3AF; display: block; margin-bottom: 2px; }
+.build-status-item span { font-size: 14px; font-weight: 500; color: #242833; }
+.search-bar { padding: 12px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #E5E7EB; }
+.search-input { flex: 1; height: 34px; border: 1px solid #E5E7EB; border-radius: 5px; padding: 0 12px 0 32px; font-family: 'Montserrat',sans-serif; font-size: 13px; font-weight: 300; color: #9CA3AF; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center; }
+.status-filter { height: 34px; border: 1px solid #E5E7EB; border-radius: 5px; padding: 0 28px 0 12px; font-family: 'Montserrat',sans-serif; font-size: 13px; font-weight: 300; color: #242833; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) center; appearance: none; cursor: pointer; }
 
-  /* ── SEARCH + MAP ── */
-  .search-bar {
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid #E5E7EB;
-  }
-  .search-input {
-    flex: 1;
-    height: 34px;
-    border: 1px solid #E5E7EB;
-    border-radius: 5px;
-    padding: 0 12px 0 32px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
-    font-weight: 300;
-    color: #9CA3AF;
-    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;
-  }
-  .status-filter {
-    height: 34px;
-    border: 1px solid #E5E7EB;
-    border-radius: 5px;
-    padding: 0 28px 0 12px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
-    font-weight: 300;
-    color: #242833;
-    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) center;
-    appearance: none;
-    cursor: pointer;
-  }
+/* ── MAP ── */
+.map-container { height: 200px; background: #E8EDF2; position: relative; overflow: hidden; border-bottom: 1px solid #E5E7EB; }
+.map-bg { width: 100%; height: 100%; background: linear-gradient(135deg,#dde4ec 0%,#e8edf3 40%,#d4dce8 100%); position: relative; }
+.map-bg::before { content: ''; position: absolute; inset: 0; background: linear-gradient(45deg,transparent 48%,#c8d0da 49%,#c8d0da 51%,transparent 52%), linear-gradient(-30deg,transparent 45%,#c8d0da 46%,#c8d0da 48%,transparent 49%), linear-gradient(80deg,transparent 52%,#c8d0da 53%,#c8d0da 55%,transparent 56%); }
+.map-pin { position: absolute; top: 50%; left: 52%; transform: translate(-50%,-50%); background: #33A542; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; z-index: 2; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+.map-controls { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 4px; z-index: 2; }
+.map-btn { width: 28px; height: 28px; background: #fff; border: 1px solid #E5E7EB; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #6B7280; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
 
-  .map-container {
-    height: 200px;
-    background: #E8EDF2;
-    position: relative;
-    overflow: hidden;
-    border-bottom: 1px solid #E5E7EB;
-  }
-  .map-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #dde4ec 0%, #e8edf3 40%, #d4dce8 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-  /* Simple road lines for map feel */
-  .map-placeholder::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(45deg, transparent 48%, #c8d0da 49%, #c8d0da 51%, transparent 52%),
-      linear-gradient(-30deg, transparent 45%, #c8d0da 46%, #c8d0da 48%, transparent 49%),
-      linear-gradient(80deg, transparent 52%, #c8d0da 53%, #c8d0da 55%, transparent 56%);
-  }
-  .map-pin {
-    position: absolute;
-    top: 50%;
-    left: 52%;
-    transform: translate(-50%, -50%);
-    background: #33A542;
-    color: #fff;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    z-index: 2;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-  }
-  .map-controls {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    z-index: 2;
-  }
-  .map-btn {
-    width: 28px;
-    height: 28px;
-    background: #fff;
-    border: 1px solid #E5E7EB;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 13px;
-    color: #6B7280;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
+/* ── LOCATION TABLE ── */
+.table-header-row { display: grid; grid-template-columns: 80px 1fr 160px 220px 120px; padding: 0 24px; height: 40px; align-items: center; border-bottom: 1px solid #E5E7EB; background: #fff; }
+.table-header-row span { font-size: 10px; font-weight: 700; color: #9CA3AF; letter-spacing: .8px; text-transform: uppercase; }
+.location-summary { display: grid; grid-template-columns: 80px 1fr 160px 220px 120px; padding: 0 24px; min-height: 64px; align-items: center; cursor: pointer; background: #fff; transition: background 0.1s; }
+.location-summary:hover { background: #FAFAFC; }
+.loc-address-main { font-size: 14px; font-weight: 400; color: #242833; }
+.loc-address-sub { font-size: 12px; font-weight: 300; color: #9CA3AF; margin-top: 2px; }
+.status-account { font-size: 11px; font-weight: 300; color: #9CA3AF; }
+.service-icons { display: flex; gap: 6px; align-items: center; }
+.svc-icon { width: 40px; height: 40px; background: #33A542; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+.svc-icon-label { font-size: 8px; font-weight: 500; color: #fff; }
+.chevron-btn { width: 28px; height: 28px; background: none; border: none; cursor: pointer; color: #6B7280; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: transform 0.2s, background 0.1s; }
+.chevron-btn:hover { background: #F3F4F6; }
+.chevron-btn.open { transform: rotate(180deg); }
+.loc-options { display: flex; align-items: center; gap: 6px; }
 
-  /* ── LOCATION TABLE ── */
-  .table-header-row {
-    display: grid;
-    grid-template-columns: 80px 1fr 160px 220px 120px;
-    padding: 0 24px;
-    height: 40px;
-    align-items: center;
-    border-bottom: 1px solid #E5E7EB;
-    background: #fff;
-  }
-  .table-header-row span {
-    font-size: 10px;
-    font-weight: 700;
-    color: #9CA3AF;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-  }
+/* ── EXPANDED SERVICES ── */
+.services-expanded { display: none; background: #FAFAFC; border-top: 1px solid #E5E7EB; }
+.services-expanded.open { display: block; }
+.service-type-group { border-bottom: 1px solid #E5E7EB; }
+.service-type-group:last-child { border-bottom: none; }
+.service-group-header { display: flex; align-items: center; padding: 0 24px 0 48px; height: 44px; cursor: pointer; background: #F4F6FA; border-bottom: 1px solid #E5E7EB; gap: 10px; transition: background 0.1s; }
+.service-group-header:hover { background: #EEF1F8; }
+.group-chevron { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; color: #6B7280; transition: transform 0.2s ease; flex-shrink: 0; }
+.group-chevron.open { transform: rotate(90deg); }
+.group-type-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.dot-refuse { background: #20315A; }
+.dot-recycling { background: #33A542; }
+.dot-garden { background: #059669; }
+.dot-food { background: #D97706; }
+.group-type-name { font-size: 13px; font-weight: 600; color: #20315A; }
+.group-count { margin-left: 6px; font-size: 11px; font-weight: 400; color: #6B7280; background: #E5E7EB; border-radius: 10px; padding: 1px 7px; }
+.group-contracts { display: none; }
+.group-contracts.open { display: block; }
+.contract-header-row { display: grid; grid-template-columns: 48px 140px 200px 80px 140px 160px 1fr; align-items: center; padding: 6px 24px 6px 48px; background: #EEF1F8; border-bottom: 1px solid #E5E7EB; }
+.contract-header-row span { font-size: 9px; font-weight: 700; color: #9CA3AF; letter-spacing: .8px; text-transform: uppercase; }
+.contract-row { display: grid; grid-template-columns: 48px 140px 200px 80px 140px 160px 1fr; align-items: center; padding: 0 24px 0 48px; height: 40px; background: #fff; border-bottom: 1px solid #F3F4F6; transition: background 0.1s; }
+.contract-row:last-child { border-bottom: none; }
+.contract-row:hover { background: #FAFAFC; }
+.contract-svc-icon { width: 30px; height: 30px; background: #33A542; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.contract-col-value { font-size: 12px; font-weight: 300; color: #242833; }
+.contract-active-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 400; color: #059669; }
+.contract-active-dot { width: 6px; height: 6px; background: #059669; border-radius: 50%; }
+.contract-ref { font-size: 11px; font-weight: 300; color: #9CA3AF; }
+.contract-actions { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
 
-  .location-row {
-    border-bottom: 1px solid #E5E7EB;
-  }
-  .location-summary {
-    display: grid;
-    grid-template-columns: 80px 1fr 160px 220px 120px;
-    padding: 0 24px;
-    min-height: 64px;
-    align-items: center;
-    cursor: pointer;
-    background: #fff;
-    transition: background 0.1s;
-  }
-  .location-summary:hover { background: #FAFAFC; }
+/* edit btn highlight */
+.edit-btn { cursor: pointer; color: #9CA3AF; transition: color 0.1s; }
+.edit-btn:hover { color: #20315A; }
 
-  .loc-num { font-size: 14px; font-weight: 300; color: #242833; }
+/* ── MOCK BANNER ── */
+.mock-banner { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 4px; padding: 8px 16px; font-size: 12px; color: #92400E; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 
-  .loc-address { padding-right: 12px; }
-  .loc-address-main { font-size: 14px; font-weight: 400; color: #242833; }
-  .loc-address-sub { font-size: 12px; font-weight: 300; color: #9CA3AF; margin-top: 2px; }
+/* ════════════════════════════════════
+   EDIT SERVICE PAGE (right pane)
+════════════════════════════════════ */
+.edit-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #20315A; margin-bottom: 16px; cursor: pointer; font-weight: 500; }
+.edit-back:hover { text-decoration: underline; }
+.edit-page-title { font-size: 22px; font-weight: 600; color: #20315A; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.edit-page-meta { font-size: 12px; font-weight: 300; color: #6B7280; margin-bottom: 20px; }
+.edit-page-meta strong { color: #242833; font-weight: 500; }
 
-  .loc-status {}
-  .status-badge {
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 300;
-    color: #242833;
-  }
-  .status-account { font-size: 11px; font-weight: 300; color: #9CA3AF; }
+/* ── OPTION E NAV ── */
+.service-nav { margin-bottom: 20px; }
+.service-nav-label { font-size: 10px; font-weight: 700; color: #9CA3AF; letter-spacing: .7px; text-transform: uppercase; margin-bottom: 6px; }
+.service-nav-row { display: flex; align-items: center; gap: 10px; }
+.service-nav-select { flex: 1; height: 38px; border: 1.5px solid #20315A; border-radius: 5px; padding: 0 30px 0 12px; font-family: 'Montserrat',sans-serif; font-size: 13px; font-weight: 400; color: #242833; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2320315A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat calc(100% - 10px) center; appearance: none; cursor: pointer; }
+.service-nav-counter { height: 38px; padding: 0 14px; background: #EEF1F8; border: 1px solid #D1D8EC; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 500; color: #20315A; white-space: nowrap; }
+.nav-arrow { width: 28px; height: 28px; border: 1px solid #D1D8EC; border-radius: 3px; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6B7280; transition: all 0.1s; }
+.nav-arrow:hover { border-color: #20315A; color: #20315A; background: #EEF1F8; }
+.nav-arrows { display: flex; gap: 3px; }
 
-  .service-icons {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
-  .svc-icon {
-    width: 40px;
-    height: 40px;
-    background: #33A542;
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1px;
-  }
-  .svc-icon svg { opacity: 0.9; }
-  .svc-icon-label {
-    font-size: 8px;
-    font-weight: 500;
-    color: #fff;
-    letter-spacing: 0.3px;
-  }
+/* ── SERVICE DETAILS CARD ── */
+.svc-detail-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 5px; padding: 0; margin-bottom: 16px; }
+.svc-card-body { display: flex; gap: 0; }
+.svc-form-col { flex: 1; padding: 20px 24px; }
+.svc-map-col { width: 340px; flex-shrink: 0; border-left: 1px solid #E5E7EB; position: relative; overflow: hidden; border-radius: 0 5px 0 0; }
+.svc-map-inner { height: 100%; min-height: 200px; background: linear-gradient(135deg,#dde4ec 0%,#e8edf3 40%,#d4dce8 100%); position: relative; }
+.svc-map-inner::before { content: ''; position: absolute; inset: 0; background: linear-gradient(45deg,transparent 48%,#c8d0da 49%,#c8d0da 51%,transparent 52%), linear-gradient(-25deg,transparent 45%,#c8d0da 46%,#c8d0da 48%,transparent 49%), linear-gradient(70deg,transparent 52%,#c8d0da 53%,#c8d0da 55%,transparent 56%); }
+.edit-pickup-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.92); border: 1px solid #E5E7EB; border-radius: 4px; padding: 5px 10px; font-family: 'Montserrat',sans-serif; font-size: 11px; font-weight: 500; color: #242833; cursor: pointer; z-index: 2; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+.map-pin-orange { position: absolute; top: 45%; left: 52%; transform: translate(-50%,-50%); z-index: 2; }
+.svc-map-controls { position: absolute; left: 8px; bottom: 40px; display: flex; flex-direction: column; gap: 3px; z-index: 2; }
+.svc-map-btn { width: 26px; height: 26px; background: #fff; border: 1px solid #E5E7EB; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; color: #6B7280; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
 
-  .loc-options {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .chevron-btn {
-    width: 28px;
-    height: 28px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #6B7280;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: background 0.1s, transform 0.2s;
-  }
-  .chevron-btn:hover { background: #F3F4F6; }
-  .chevron-btn.open { transform: rotate(180deg); }
-  .icon-btn {
-    width: 28px;
-    height: 28px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #9CA3AF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: color 0.1s, background 0.1s;
-  }
-  .icon-btn:hover { color: #20315A; background: #F3F4F6; }
+.svc-card-title { font-size: 14px; font-weight: 600; color: #242833; margin-bottom: 16px; }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; margin-bottom: 16px; }
+.form-field-svc { }
+.form-field-svc label { display: block; font-size: 11px; font-weight: 300; color: #9CA3AF; margin-bottom: 5px; }
+.form-field-svc .fv { font-size: 13px; font-weight: 400; color: #242833; padding-bottom: 6px; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; justify-content: space-between; }
+.form-field-svc .fv svg { color: #9CA3AF; flex-shrink: 0; }
+.temp-container-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.checkbox-custom { width: 15px; height: 15px; border: 1px solid #D9D9E1; border-radius: 3px; flex-shrink: 0; }
+.temp-label { font-size: 13px; font-weight: 300; color: #242833; }
 
-  /* ── EXPANDED SERVICES AREA ── */
-  .services-expanded {
-    display: none;
-    background: #FAFAFC;
-    border-top: 1px solid #E5E7EB;
-  }
-  .services-expanded.open { display: block; }
+/* Notifications toggle */
+.notifications-row { display: flex; align-items: center; gap: 12px; padding: 16px 0; border-top: 1px solid #E5E7EB; }
+.toggle { width: 36px; height: 20px; background: #CBD5E1; border-radius: 10px; position: relative; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
+.toggle.on { background: #20315A; }
+.toggle-knob { width: 16px; height: 16px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.toggle.on .toggle-knob { left: 18px; }
+.notif-label { font-size: 13px; font-weight: 400; color: #242833; }
 
-  /* ── NEW: SERVICE TYPE GROUP ── */
-  .service-type-group {
-    border-bottom: 1px solid #E5E7EB;
-  }
-  .service-type-group:last-child { border-bottom: none; }
+/* Frequency row */
+.freq-row { margin-top: 12px; }
+.freq-label { font-size: 11px; font-weight: 300; color: #9CA3AF; margin-bottom: 5px; }
+.freq-val { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #242833; }
+.freq-val svg { color: #9CA3AF; }
 
-  .service-group-header {
-    display: flex;
-    align-items: center;
-    padding: 0 24px 0 48px;
-    height: 44px;
-    cursor: pointer;
-    background: #F4F6FA;
-    border-bottom: 1px solid #E5E7EB;
-    gap: 10px;
-    transition: background 0.1s;
-  }
-  .service-group-header:hover { background: #EEF1F8; }
+/* Routes section */
+.routes-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 5px; padding: 20px 24px; margin-bottom: 16px; }
+.routes-title { font-size: 14px; font-weight: 600; color: #242833; margin-bottom: 16px; }
+.days-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 16px; }
+.day-row { display: flex; align-items: center; gap: 10px; }
+.day-checkbox { width: 15px; height: 15px; border: 1px solid #D9D9E1; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.day-checkbox.checked { background: #20315A; border-color: #20315A; }
+.day-checkbox.checked::after { content: ''; display: block; width: 8px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px,-1px); }
+.day-name { font-size: 13px; font-weight: 300; color: #242833; width: 72px; flex-shrink: 0; }
+.route-select { flex: 1; height: 30px; border: 1px solid #E5E7EB; border-radius: 4px; padding: 0 8px; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9CA3AF; background: #fff; appearance: none; }
+.route-select.assigned { color: #242833; border-color: #20315A; background: #EEF1F8; font-size: 11px; }
+.route-select-wrap { flex: 1; position: relative; }
+.route-select-wrap::after { content: ''; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-top: 4px solid #6B7280; }
 
-  .group-chevron {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6B7280;
-    transition: transform 0.2s ease;
-    flex-shrink: 0;
-  }
-  .group-chevron.open { transform: rotate(90deg); }
-
-  .group-type-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .dot-refuse    { background: #20315A; }
-  .dot-recycling { background: #33A542; }
-  .dot-garden    { background: #059669; }
-  .dot-food      { background: #D97706; }
-  .dot-other     { background: #6B7280; }
-
-  .group-type-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: #20315A;
-    letter-spacing: 0.2px;
-  }
-  .group-count {
-    margin-left: 6px;
-    font-size: 11px;
-    font-weight: 400;
-    color: #6B7280;
-    background: #E5E7EB;
-    border-radius: 10px;
-    padding: 1px 7px;
-  }
-
-  /* ── CONTRACTS WITHIN A GROUP ── */
-  .group-contracts {
-    display: none;
-  }
-  .group-contracts.open { display: block; }
-
-  .contract-row {
-    display: grid;
-    grid-template-columns: 48px 140px 200px 80px 140px 160px 1fr;
-    align-items: center;
-    padding: 0 24px 0 48px;
-    height: 40px;
-    background: #fff;
-    border-bottom: 1px solid #F3F4F6;
-    transition: background 0.1s;
-  }
-  .contract-row:last-child { border-bottom: none; }
-  .contract-row:hover { background: #FAFAFC; }
-
-  .contract-icon-wrap {
-    display: flex;
-    align-items: center;
-  }
-  .contract-svc-icon {
-    width: 30px;
-    height: 30px;
-    background: #33A542;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .contract-col-label {
-    font-size: 10px;
-    font-weight: 700;
-    color: #9CA3AF;
-    letter-spacing: 0.7px;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 2px;
-  }
-  .contract-col-value {
-    font-size: 12px;
-    font-weight: 300;
-    color: #242833;
-  }
-
-  .contract-active-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    font-weight: 400;
-    color: #059669;
-  }
-  .contract-active-dot {
-    width: 6px;
-    height: 6px;
-    background: #059669;
-    border-radius: 50%;
-  }
-
-  .contract-ref {
-    font-size: 11px;
-    font-weight: 300;
-    color: #9CA3AF;
-  }
-
-  .contract-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    justify-content: flex-end;
-  }
-
-  /* Column headers for the contract rows */
-  .contract-header-row {
-    display: grid;
-    grid-template-columns: 48px 140px 200px 80px 140px 160px 1fr;
-    align-items: center;
-    padding: 6px 24px 6px 48px;
-    background: #EEF1F8;
-    border-bottom: 1px solid #E5E7EB;
-  }
-  .contract-header-row span {
-    font-size: 9px;
-    font-weight: 700;
-    color: #9CA3AF;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-  }
-
-  /* ── MOCK LABEL ── */
-  .mock-banner {
-    background: #FEF3C7;
-    border: 1px solid #F59E0B;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-size: 12px;
-    color: #92400E;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+/* Footer */
+.edit-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 0 8px; }
+.btn-cancel { height: 36px; padding: 0 24px; border: 1px solid #E5E7EB; border-radius: 5px; background: #fff; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #6B7280; cursor: pointer; transition: border-color 0.1s; }
+.btn-cancel:hover { border-color: #9CA3AF; }
+.btn-save { height: 36px; padding: 0 28px; border: none; border-radius: 5px; background: #20315A; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #fff; cursor: pointer; font-weight: 500; transition: opacity 0.1s; }
+.btn-save:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
 
 <!-- TOP NAV -->
 <nav class="top-nav">
-  <div class="nav-logo">⬡ Routeware</div>
-  <div class="nav-link">DISPATCH</div>
-  <div class="nav-link active">CUSTOMERS</div>
-  <div class="nav-link">FLEET</div>
-  <div class="nav-link">INSIGHTS</div>
+  <div class="nav-logo"><div class="nav-logo-icon">R</div>Routeware</div>
+  <div class="nav-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>DISPATCH
+  </div>
+  <div class="nav-link active">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>CUSTOMERS
+  </div>
+  <div class="nav-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>FLEET
+  </div>
+  <div class="nav-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>INSIGHTS
+  </div>
+  <div class="nav-right">
+    <span class="client-tag">Lewisham</span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
 </nav>
 
 <!-- SUB NAV -->
 <div class="sub-nav">
-  <div class="sub-nav-link active">Customer Details</div>
-  <div class="sub-nav-link">Service History</div>
-  <div class="sub-nav-link">Documents</div>
+  <div class="sub-nav-link active">Customers</div>
+  <div class="sub-nav-link">Suspended Locations</div>
+  <div class="sub-nav-link">Service Network</div>
 </div>
 
-<!-- PAGE -->
-<div class="page-content">
+<!-- APP SHELL -->
+<div class="app-shell" id="appShell">
 
-  <!-- Mock disclaimer -->
-  <div class="mock-banner">
-    ⚠️ <strong>Functional mock</strong> — for review purposes only. All visuals must match existing SmartCity Portal look and feel.
-    &nbsp;|&nbsp; Proposed change: service contracts grouped by Service Type within expanded location row.
-  </div>
+  <!-- ══ LEFT PANE — Customer Details ══ -->
+  <div class="left-pane">
+    <div class="mock-banner">⚠️ <strong>Functional mock</strong> — click any ✏️ edit button on a contract row to open the Edit Service page with Option E navigation.</div>
 
-  <!-- Customer Details Panel -->
-  <div class="panel">
-    <div class="panel-title">
-      Customer details
-      <span class="edit-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </span>
-    </div>
+    <div class="panel">
+      <div class="panel-title">Customer details
+        <button class="icon-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      </div>
 
-    <!-- Customer Info -->
-    <div class="info-grid">
-      <div class="info-field">
-        <label>Customer Name</label>
-        <span>1</span>
+      <div class="info-grid">
+        <div class="info-field"><label>Customer Name</label><span>1</span></div>
+        <div class="info-field"><label>Customer Type</label><span>Residential</span></div>
+        <div class="info-field"><label>Phone</label><span>-</span></div>
+        <div class="info-field"><label>Account Number</label><span>10094270120</span></div>
+        <div class="info-field"><label>Account status</label><span>Active</span></div>
       </div>
-      <div class="info-field">
-        <label>Customer Type</label>
-        <span>Residential</span>
-      </div>
-      <div class="info-field">
-        <label>Phone</label>
-        <span>-</span>
-      </div>
-      <div class="info-field">
-        <label>Account Number</label>
-        <span>10094270120</span>
-      </div>
-      <div class="info-field">
-        <label>Account status</label>
-        <span>Active</span>
-      </div>
-    </div>
 
-    <!-- Locations header -->
-    <div class="locations-header">
-      <span class="locations-label">Customer locations</span>
-      <div class="build-status">
-        <div class="build-status-item">
-          <label>Build Status</label>
-          <span>Built</span>
-        </div>
-        <div class="build-status-item">
-          <label>Address Status</label>
-          <span>-</span>
+      <div class="locations-header">
+        <span class="locations-label">Customer locations</span>
+        <div class="build-status">
+          <div class="build-status-item"><label>Build Status</label><span>Built</span></div>
+          <div class="build-status-item"><label>Address Status</label><span>-</span></div>
         </div>
       </div>
-    </div>
 
-    <!-- Search + filter -->
-    <div class="search-bar">
-      <input class="search-input" type="text" placeholder="Search Locations">
-      <select class="status-filter">
-        <option>2 statuses</option>
-        <option>Active</option>
-        <option>Inactive</option>
-      </select>
-    </div>
-
-    <!-- Map -->
-    <div class="map-container">
-      <div class="map-placeholder">
-        <div class="map-pin">1</div>
+      <div class="search-bar">
+        <input class="search-input" type="text" placeholder="Search Locations">
+        <select class="status-filter"><option>2 statuses</option></select>
       </div>
-      <div class="map-controls">
-        <button class="map-btn">+</button>
-        <button class="map-btn">−</button>
-        <button class="map-btn">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-        </button>
-        <button class="map-btn">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        </button>
+
+      <div class="map-container">
+        <div class="map-bg"><div class="map-pin">1</div></div>
+        <div class="map-controls">
+          <button class="map-btn">+</button>
+          <button class="map-btn">−</button>
+          <button class="map-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83"/></svg></button>
+          <button class="map-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+        </div>
       </div>
-    </div>
 
-    <!-- Table header -->
-    <div class="table-header-row">
-      <span>Location<br>Number</span>
-      <span>Address</span>
-      <span>Status</span>
-      <span>Services &nbsp; <span style="font-weight:300;text-transform:none;letter-spacing:0;font-size:11px;color:#6B7280">4 statuses ▾</span></span>
-      <span>Options</span>
-    </div>
+      <div class="table-header-row">
+        <span>Location<br>Number</span>
+        <span>Address</span>
+        <span>Status</span>
+        <span>Services <span style="font-weight:300;text-transform:none;letter-spacing:0;font-size:11px;color:#6B7280">4 statuses ▾</span></span>
+        <span>Options</span>
+      </div>
 
-    <!-- Location row -->
-    <div class="location-row">
-      <div class="location-summary" onclick="toggleLocation(this)">
-        <div class="loc-num">1</div>
-        <div class="loc-address">
-          <div class="loc-address-main">1, WELFORD MEWS, LONDON, SE...</div>
-          <div class="loc-address-sub">RD04 - Residential - Terraced</div>
-        </div>
-        <div class="loc-status">
-          <div class="status-badge">Active</div>
-          <div class="status-account">10094270120</div>
-        </div>
-        <div class="service-icons">
-          <!-- Bin icon 1 -->
-          <div class="svc-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg>
-            <span class="svc-icon-label">Active</span>
+      <!-- LOCATION ROW -->
+      <div>
+        <div class="location-summary" onclick="toggleLocation(this)">
+          <div style="font-size:14px;font-weight:300">1</div>
+          <div>
+            <div class="loc-address-main">1, WELFORD MEWS, LONDON, SE...</div>
+            <div class="loc-address-sub">RD04 - Residential - Terraced</div>
           </div>
-          <div class="svc-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6l3 14h12l3-14"/><path d="M1 6h22M10 3h4"/></svg>
-            <span class="svc-icon-label">Active</span>
+          <div>
+            <div style="font-size:14px;font-weight:400">Active</div>
+            <div class="status-account">10094270120</div>
           </div>
-          <div class="svc-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><ellipse cx="12" cy="8" rx="8" ry="5"/><path d="M4 8v8c0 2.76 3.58 5 8 5s8-2.24 8-5V8"/></svg>
-            <span class="svc-icon-label">Active</span>
+          <div class="service-icons">
+            <div class="svc-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg><span class="svc-icon-label">Active</span></div>
+            <div class="svc-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6l3 14h12l3-14"/><path d="M1 6h22M10 3h4"/></svg><span class="svc-icon-label">Active</span></div>
+            <div class="svc-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><ellipse cx="12" cy="8" rx="8" ry="5"/><path d="M4 8v8c0 2.76 3.58 5 8 5s8-2.24 8-5V8"/></svg><span class="svc-icon-label">Active</span></div>
+          </div>
+          <div class="loc-options">
+            <button class="chevron-btn open" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+            <button class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg></button>
+            <button class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+            <button class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
           </div>
         </div>
-        <div class="loc-options">
-          <button class="chevron-btn" title="Expand / Collapse" onclick="event.stopPropagation()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-          <button class="icon-btn" title="Zoom">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
-          </button>
-          <button class="icon-btn" title="Edit">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="icon-btn" title="Add service">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-          </button>
-          <button class="icon-btn" title="Delete">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </button>
-        </div>
-      </div>
 
-      <!-- ▼ EXPANDED AREA — NEW GROUPED DESIGN ▼ -->
-      <div class="services-expanded" id="loc1-services">
+        <!-- EXPANDED — starts open -->
+        <div class="services-expanded open" id="loc1-services">
 
-        <!-- GROUP 1: Refuse -->
-        <div class="service-type-group">
-          <div class="service-group-header" onclick="toggleGroup(this)">
-            <span class="group-chevron">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-            </span>
-            <span class="group-type-dot dot-refuse"></span>
-            <span class="group-type-name">Refuse</span>
-            <span class="group-count">2</span>
-          </div>
-          <div class="group-contracts">
-            <div class="contract-header-row">
-              <span></span>
-              <span>Service Type</span>
-              <span>Equipment</span>
-              <span>Count</span>
-              <span>Frequency</span>
-              <span>Reference</span>
-              <span></span>
+          <!-- REFUSE GROUP -->
+          <div class="service-type-group">
+            <div class="service-group-header" onclick="toggleGroup(this)">
+              <span class="group-chevron open"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></span>
+              <span class="group-type-dot dot-refuse"></span>
+              <span class="group-type-name">Refuse</span><span class="group-count">2</span>
             </div>
-            <!-- Contract 1 -->
-            <div class="contract-row">
-              <div class="contract-icon-wrap">
-                <div class="contract-svc-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg>
+            <div class="group-contracts open">
+              <div class="contract-header-row">
+                <span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Reference</span><span></span>
+              </div>
+              <div class="contract-row">
+                <div><div class="contract-svc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg></div></div>
+                <div class="contract-col-value">Domestic</div>
+                <div class="contract-col-value">EuroBin · 1100 Litre</div>
+                <div class="contract-col-value">1</div>
+                <div class="contract-col-value">Every Week</div>
+                <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Ref_10094270120</div></div>
+                <div class="contract-actions">
+                  <button class="icon-btn edit-btn" onclick="openEdit(0)" title="Edit service">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                 </div>
               </div>
-              <div>
-              <span class="contract-col-value">Domestic</span>
-              </div>
-              <div>
-              <span class="contract-col-value">EuroBin · 1100 Litre</span>
-              </div>
-              <div>
-              <span class="contract-col-value">1</span>
-              </div>
-              <div>
-              <span class="contract-col-value">Every Week</span>
-              </div>
-              <div>
-                <span class="contract-active-badge"><span class="contract-active-dot"></span>Active</span>
-                <div class="contract-ref">Ref_10094270120</div>
-              </div>
-              <div class="contract-actions">
-                <button class="icon-btn">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button class="icon-btn">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                </button>
-              </div>
-            </div>
-            <!-- Contract 2 -->
-            <div class="contract-row">
-              <div class="contract-icon-wrap">
-                <div class="contract-svc-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6l3 14h12l3-14"/><path d="M1 6h22M10 3h4"/></svg>
+              <div class="contract-row">
+                <div><div class="contract-svc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6l3 14h12l3-14"/><path d="M1 6h22M10 3h4"/></svg></div></div>
+                <div class="contract-col-value">Domestic</div>
+                <div class="contract-col-value">Bin · 180 Litre</div>
+                <div class="contract-col-value">1</div>
+                <div class="contract-col-value">Every Other Week</div>
+                <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">REF_100942701201</div></div>
+                <div class="contract-actions">
+                  <button class="icon-btn edit-btn" onclick="openEdit(1)" title="Edit service">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                 </div>
               </div>
-              <div>
-              <span class="contract-col-value">Domestic</span>
+            </div>
+          </div>
+
+          <!-- RECYCLING GROUP -->
+          <div class="service-type-group">
+            <div class="service-group-header" onclick="toggleGroup(this)">
+              <span class="group-chevron open"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></span>
+              <span class="group-type-dot dot-recycling"></span>
+              <span class="group-type-name">Recycling</span><span class="group-count">1</span>
+            </div>
+            <div class="group-contracts open">
+              <div class="contract-header-row">
+                <span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Reference</span><span></span>
               </div>
-              <div>
-              <span class="contract-col-value">Bin · 180 Litre</span>
+              <div class="contract-row">
+                <div><div class="contract-svc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div></div>
+                <div class="contract-col-value">Domestic</div>
+                <div class="contract-col-value">Bin · 240 Litre</div>
+                <div class="contract-col-value">1</div>
+                <div class="contract-col-value">Every Week</div>
+                <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Rec_10094270120</div></div>
+                <div class="contract-actions">
+                  <button class="icon-btn edit-btn" onclick="openEdit(2)" title="Edit service">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                </div>
               </div>
-              <div>
-              <span class="contract-col-value">1</span>
+            </div>
+          </div>
+
+          <!-- GARDEN GROUP -->
+          <div class="service-type-group">
+            <div class="service-group-header" onclick="toggleGroup(this)">
+              <span class="group-chevron open"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></span>
+              <span class="group-type-dot dot-garden"></span>
+              <span class="group-type-name">Garden</span><span class="group-count">1</span>
+            </div>
+            <div class="group-contracts open">
+              <div class="contract-header-row">
+                <span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Reference</span><span></span>
               </div>
-              <div>
-              <span class="contract-col-value">Every Other Week</span>
+              <div class="contract-row">
+                <div><div class="contract-svc-icon" style="background:#059669"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 4 3 7 9 6M12 12c0-5 5-8 9-6 0 4-3 7-9 6"/></svg></div></div>
+                <div class="contract-col-value">Domestic</div>
+                <div class="contract-col-value">Bin · 140 Litre</div>
+                <div class="contract-col-value">1</div>
+                <div class="contract-col-value">Every Two Weeks</div>
+                <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">GDN_10094270120</div></div>
+                <div class="contract-actions">
+                  <button class="icon-btn edit-btn" onclick="openEdit(3)" title="Edit service">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                </div>
               </div>
-              <div>
-                <span class="contract-active-badge"><span class="contract-active-dot"></span>Active</span>
-                <div class="contract-ref">REF_100942701201</div>
-              </div>
-              <div class="contract-actions">
-                <button class="icon-btn">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button class="icon-btn">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                </button>
-              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- /left-pane -->
+
+  <!-- ══ RIGHT PANE — Edit Service ══ -->
+  <div class="right-pane" id="editPane">
+
+    <div class="edit-back" onclick="closeEdit()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Customer Details
+    </div>
+
+    <div class="edit-page-title">
+      Edit Service
+    </div>
+    <div class="edit-page-meta">
+      Customer Name: <strong>1</strong> &nbsp;|&nbsp; Location Name: <strong>1</strong> &nbsp;|&nbsp; Location Address: <strong id="editAddress">1, WELFORD MEWS, SE23 3FB</strong>
+    </div>
+
+    <!-- OPTION E NAV -->
+    <div class="service-nav">
+      <div class="service-nav-label">Service contract</div>
+      <div class="service-nav-row">
+        <select class="service-nav-select" id="serviceNavSelect" onchange="selectContract(parseInt(this.value))">
+          <optgroup label="── Refuse (2) ──">
+            <option value="0">Refuse · EuroBin · 1100 Litre · Every Week</option>
+            <option value="1">Refuse · Bin · 180 Litre · Every Other Week</option>
+          </optgroup>
+          <optgroup label="── Recycling (1) ──">
+            <option value="2">Recycling · Bin · 240 Litre · Every Week</option>
+          </optgroup>
+          <optgroup label="── Garden (1) ──">
+            <option value="3">Garden · Bin · 140 Litre · Every Two Weeks</option>
+          </optgroup>
+        </select>
+        <div class="service-nav-counter">
+          <span id="navCounter">1 of 4</span>
+          <div class="nav-arrows">
+            <button class="nav-arrow" id="navPrev" onclick="stepContract(-1)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="nav-arrow" id="navNext" onclick="stepContract(1)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICE DETAILS CARD -->
+    <div class="svc-detail-card">
+      <div class="svc-card-body">
+        <div class="svc-form-col">
+          <div class="svc-card-title">Service Details</div>
+          <div class="form-grid-2">
+            <div class="form-field-svc"><label>Service Type</label><div class="fv" id="fServiceType">Domestic <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div></div>
+            <div class="form-field-svc"><label>Equipment Type</label><div class="fv" id="fEquipType">EuroBin <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div></div>
+            <div class="form-field-svc"><label>Equipment Size</label><div class="fv" id="fEquipSize">1100 Litre Container <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div></div>
+            <div class="form-field-svc"><label>Waste Type</label><div class="fv" id="fWasteType">Refuse <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div></div>
+            <div class="form-field-svc"><label>Number Of Containers</label><div class="fv" id="fCount">1</div></div>
+            <div class="form-field-svc"><label>Container #</label><div class="fv" id="fContainerNum" style="color:#9CA3AF">—</div></div>
+            <div class="form-field-svc"><label>Service Effective Date</label><div class="fv" id="fEffDate">15/04/2026 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div>
+            <div class="form-field-svc"><label>Service Expiration Date</label><div class="fv" id="fExpDate" style="color:#9CA3AF">— <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div></div>
+            <div class="form-field-svc"><label>Account Status</label><div class="fv" id="fStatus">Active <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div></div>
+            <div class="form-field-svc"><label>Service Account #</label><div class="fv" id="fRef">Ref_10094270120</div></div>
+          </div>
+          <div class="temp-container-row"><div class="checkbox-custom"></div><span class="temp-label">Temporary Container</span></div>
+          <div class="form-field-svc" style="margin-bottom:0"><label>Service Notes</label><div class="fv" style="color:#9CA3AF;min-height:40px;align-items:flex-start;padding-top:4px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" style="margin-left:auto;margin-top:2px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div></div>
+          <div class="notifications-row">
+            <div class="toggle" id="notifToggle" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+            <span class="notif-label">Customer Notifications</span>
+          </div>
+          <div class="freq-row">
+            <div class="freq-label">Pickup Frequency Type</div>
+            <div class="freq-val" id="fFreq">Every Week <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg> <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+          </div>
+        </div>
+        <!-- MAP SIDE -->
+        <div class="svc-map-col">
+          <div class="svc-map-inner">
+            <button class="edit-pickup-btn">Edit Pickup Location</button>
+            <div class="map-pin-orange">
+              <svg width="28" height="36" viewBox="0 0 28 36" fill="none"><path d="M14 0C6.27 0 0 6.27 0 14c0 9.33 14 22 14 22s14-12.67 14-22C28 6.27 21.73 0 14 0z" fill="#F59E0B"/><circle cx="14" cy="14" r="5" fill="white"/></svg>
+            </div>
+            <div class="svc-map-controls">
+              <button class="svc-map-btn">+</button>
+              <button class="svc-map-btn">−</button>
+              <button class="svc-map-btn"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg></button>
+              <button class="svc-map-btn"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- GROUP 2: Recycling -->
-        <div class="service-type-group">
-          <div class="service-group-header" onclick="toggleGroup(this)">
-            <span class="group-chevron">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-            </span>
-            <span class="group-type-dot dot-recycling"></span>
-            <span class="group-type-name">Recycling</span>
-            <span class="group-count">1</span>
-          </div>
-          <div class="group-contracts">
-            <div class="contract-header-row">
-              <span></span>
-              <span>Service Type</span>
-              <span>Equipment</span>
-              <span>Count</span>
-              <span>Frequency</span>
-              <span>Reference</span>
-              <span></span>
-            </div>
-            <div class="contract-row">
-              <div class="contract-icon-wrap">
-                <div class="contract-svc-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                </div>
-              </div>
-              <div>
-              <span class="contract-col-value">Domestic</span>
-              </div>
-              <div>
-              <span class="contract-col-value">Bin · 240 Litre</span>
-              </div>
-              <div>
-              <span class="contract-col-value">1</span>
-              </div>
-              <div>
-              <span class="contract-col-value">Every Week</span>
-              </div>
-              <div>
-                <span class="contract-active-badge"><span class="contract-active-dot"></span>Active</span>
-                <div class="contract-ref">Rec_10094270120</div>
-              </div>
-              <div class="contract-actions">
-                <button class="icon-btn">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button class="icon-btn">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- ROUTES -->
+    <div class="routes-card">
+      <div class="routes-title">Routes</div>
+      <div class="days-grid">
+        <div class="day-row"><div class="day-checkbox"></div><span class="day-name">Monday</span><div class="route-select-wrap"><select class="route-select"><option>Route Templates</option></select></div></div>
+        <div class="day-row"><div class="day-checkbox"></div><span class="day-name">Tuesday</span><div class="route-select-wrap"><select class="route-select"><option>Route Templates</option></select></div></div>
+        <div class="day-row"><div class="day-checkbox checked"></div><span class="day-name">Wednesday</span><div class="route-select-wrap"><select class="route-select assigned"><option>WEDNESDAY CREW...</option></select></div></div>
+        <div class="day-row"><div class="day-checkbox"></div><span class="day-name">Thursday</span><div class="route-select-wrap"><select class="route-select"><option>Route Templates</option></select></div></div>
+        <div class="day-row"><div class="day-checkbox"></div><span class="day-name">Friday</span><div class="route-select-wrap"><select class="route-select"><option>Route Templates</option></select></div></div>
+        <div class="day-row"><div class="day-checkbox"></div><span class="day-name">Saturday</span><div class="route-select-wrap"><select class="route-select"><option>Route Templates</option></select></div></div>
+        <div class="day-row"><div class="day-checkbox"></div><span class="day-name">Sunday</span><div class="route-select-wrap"><select class="route-select"><option>Route Templates</option></select></div></div>
+      </div>
+    </div>
 
-        <!-- GROUP 3: Garden — collapsed, showing the collapsed state -->
-        <div class="service-type-group">
-          <div class="service-group-header" onclick="toggleGroup(this)">
-            <span class="group-chevron">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-            </span>
-            <span class="group-type-dot dot-garden"></span>
-            <span class="group-type-name">Garden</span>
-            <span class="group-count">1</span>
-          </div>
-          <div class="group-contracts">
-            <div class="contract-header-row">
-              <span></span>
-              <span>Service Type</span>
-              <span>Equipment</span>
-              <span>Count</span>
-              <span>Frequency</span>
-              <span>Reference</span>
-              <span></span>
-            </div>
-            <div class="contract-row">
-              <div class="contract-icon-wrap">
-                <div class="contract-svc-icon" style="background:#059669">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 4 3 7 9 6M12 12c0-5 5-8 9-6 0 4-3 7-9 6"/></svg>
-                </div>
-              </div>
-              <div>
-              <span class="contract-col-value">Domestic</span>
-              </div>
-              <div>
-              <span class="contract-col-value">Bin · 140 Litre</span>
-              </div>
-              <div>
-              <span class="contract-col-value">1</span>
-              </div>
-              <div>
-              <span class="contract-col-value">Every Two Weeks</span>
-              </div>
-              <div>
-                <span class="contract-active-badge"><span class="contract-active-dot"></span>Active</span>
-                <div class="contract-ref">GDN_10094270120</div>
-              </div>
-              <div class="contract-actions">
-                <button class="icon-btn">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button class="icon-btn">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div class="edit-footer">
+      <button class="btn-cancel" onclick="closeEdit()">Cancel</button>
+      <button class="btn-save">Save</button>
+    </div>
 
-      </div><!-- /services-expanded -->
-    </div><!-- /location-row -->
-
-  </div><!-- /panel -->
-</div><!-- /page-content -->
+  </div><!-- /right-pane -->
+</div><!-- /app-shell -->
 
 <script>
-  function toggleLocation(summaryEl) {
-    const row = summaryEl.closest('.location-row');
-    const expanded = row.querySelector('.services-expanded');
-    const chevron = summaryEl.querySelector('.chevron-btn');
-    const isOpen = expanded.classList.toggle('open');
-    chevron.classList.toggle('open', isOpen);
-  }
+// Contract data
+const contracts = [
+  { label: 'Refuse · EuroBin · 1100 Litre · Every Week', serviceType: 'Domestic', equipType: 'EuroBin', equipSize: '1100 Litre Container', wasteType: 'Refuse', count: '1', ref: 'Ref_10094270120', effDate: '15/04/2026', freq: 'Every Week' },
+  { label: 'Refuse · Bin · 180 Litre · Every Other Week', serviceType: 'Domestic', equipType: 'Bin', equipSize: '180 Litre Container', wasteType: 'Refuse', count: '1', ref: 'REF_100942701201', effDate: '15/04/2026', freq: 'Every Other Week' },
+  { label: 'Recycling · Bin · 240 Litre · Every Week', serviceType: 'Domestic', equipType: 'Bin', equipSize: '240 Litre Container', wasteType: 'Recycling', count: '1', ref: 'Rec_10094270120', effDate: '01/03/2026', freq: 'Every Week' },
+  { label: 'Garden · Bin · 140 Litre · Every Two Weeks', serviceType: 'Domestic', equipType: 'Bin', equipSize: '140 Litre Container', wasteType: 'Garden', count: '1', ref: 'GDN_10094270120', effDate: '01/04/2026', freq: 'Every Two Weeks' }
+];
 
-  function toggleGroup(headerEl) {
-    const group = headerEl.closest('.service-type-group');
-    const contracts = group.querySelector('.group-contracts');
-    const chevron = headerEl.querySelector('.group-chevron');
-    const isOpen = contracts.classList.toggle('open');
-    chevron.classList.toggle('open', isOpen);
-  }
+let currentContract = 0;
 
-  // Start with location expanded so the new pattern is visible on load
-  window.addEventListener('DOMContentLoaded', () => {
-    const locSummary = document.querySelector('.location-summary');
-    toggleLocation(locSummary);
-  });
+function openEdit(idx) {
+  currentContract = idx;
+  renderContract(idx);
+  document.getElementById('appShell').classList.add('edit-open');
+  window.scrollTo(0,0);
+}
+
+function closeEdit() {
+  document.getElementById('appShell').classList.remove('edit-open');
+}
+
+function renderContract(idx) {
+  const c = contracts[idx];
+  document.getElementById('serviceNavSelect').value = idx;
+  document.getElementById('navCounter').textContent = (idx + 1) + ' of ' + contracts.length;
+  document.getElementById('navPrev').disabled = idx === 0;
+  document.getElementById('navNext').disabled = idx === contracts.length - 1;
+  document.getElementById('navPrev').style.opacity = idx === 0 ? '0.35' : '1';
+  document.getElementById('navNext').style.opacity = idx === contracts.length - 1 ? '0.35' : '1';
+  document.getElementById('fServiceType').innerHTML = c.serviceType + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
+  document.getElementById('fEquipType').innerHTML = c.equipType + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
+  document.getElementById('fEquipSize').innerHTML = c.equipSize + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
+  document.getElementById('fWasteType').innerHTML = c.wasteType + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
+  document.getElementById('fCount').textContent = c.count;
+  document.getElementById('fRef').textContent = c.ref;
+  document.getElementById('fEffDate').innerHTML = c.effDate + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+  document.getElementById('fFreq').innerHTML = c.freq + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg> <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
+}
+
+function selectContract(idx) {
+  currentContract = idx;
+  renderContract(idx);
+}
+
+function stepContract(dir) {
+  const next = currentContract + dir;
+  if (next >= 0 && next < contracts.length) {
+    currentContract = next;
+    renderContract(next);
+  }
+}
+
+function toggleLocation(el) {
+  const exp = el.closest('div').querySelector('.services-expanded');
+  const chev = el.querySelector('.chevron-btn');
+  if (exp) { exp.classList.toggle('open'); chev && chev.classList.toggle('open'); }
+}
+function toggleGroup(headerEl) {
+  const group = headerEl.closest('.service-type-group');
+  const contracts = group.querySelector('.group-contracts');
+  const chevron = headerEl.querySelector('.group-chevron');
+  const isOpen = contracts.classList.toggle('open');
+  chevron.classList.toggle('open', isOpen);
+}
 </script>
 </body>
 </html>
