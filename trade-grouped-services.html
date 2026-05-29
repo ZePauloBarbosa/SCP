@@ -118,9 +118,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .group-count { margin-left: 6px; font-size: 11px; font-weight: 400; color: #6B7280; background: #E5E7EB; border-radius: 10px; padding: 1px 7px; }
 .group-contracts { display: none; }
 .group-contracts.open { display: block; }
-.contract-header-row { display: grid; grid-template-columns: 48px 140px 200px 80px 140px 160px 1fr; align-items: center; padding: 6px 24px 6px 48px; background: #EEF1F8; border-bottom: 1px solid #E5E7EB; }
+.contract-header-row { display: grid; grid-template-columns: 48px 120px 180px 60px 130px 140px 160px 1fr; align-items: center; padding: 6px 24px 6px 48px; background: #EEF1F8; border-bottom: 1px solid #E5E7EB; }
 .contract-header-row span { font-size: 9px; font-weight: 700; color: #9CA3AF; letter-spacing: .8px; text-transform: uppercase; }
-.contract-row { display: grid; grid-template-columns: 48px 140px 200px 80px 140px 160px 1fr; align-items: center; padding: 0 24px 0 48px; height: 40px; background: #fff; border-bottom: 1px solid #F3F4F6; transition: background 0.1s; }
+.contract-row { display: grid; grid-template-columns: 48px 120px 180px 60px 130px 140px 160px 1fr; align-items: center; padding: 0 24px 0 48px; height: 40px; background: #fff; border-bottom: 1px solid #F3F4F6; transition: background 0.1s; }
 .contract-row:last-child { border-bottom: none; }
 .contract-row:hover { background: #FAFAFC; }
 .contract-svc-icon { width: 30px; height: 30px; background: #33A542; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
@@ -132,6 +132,10 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 
 /* edit btn highlight */
 .edit-btn { cursor: pointer; color: #9CA3AF; transition: color 0.1s; }
+.route-assigned { font-size: 11px; font-weight: 500; color: #20315A; }
+.route-na { font-size: 11px; font-weight: 300; color: #CBD5E1; font-style: italic; }
+.route-assigned { font-size: 11px; font-weight: 500; color: #20315A; }
+.route-na { font-size: 11px; font-weight: 300; color: #CBD5E1; font-style: italic; }
 .edit-btn:hover { color: #20315A; }
 
 /* ── MOCK BANNER ── */
@@ -333,7 +337,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
             </div>
             <div class="group-contracts open">
               <div class="contract-header-row">
-                <span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Reference</span><span></span>
+                <span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Route</span><span>Reference</span><span></span>
               </div>
               <div class="contract-row">
                 <div><div class="contract-svc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg></div></div>
@@ -341,6 +345,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value">EuroBin · 1100 Litre</div>
                 <div class="contract-col-value">1</div>
                 <div class="contract-col-value">Every Week</div>
+                <div class="contract-col-value route-na">Not available</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Ref_10094270120</div></div>
                 <div class="contract-actions">
                   <button class="icon-btn edit-btn" onclick="openEdit(0)" title="Edit service">
@@ -355,6 +360,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value">Bin · 180 Litre</div>
                 <div class="contract-col-value">1</div>
                 <div class="contract-col-value">Every Other Week</div>
+                <div class="contract-col-value route-assigned">WEDNESDAY CREW</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">REF_100942701201</div></div>
                 <div class="contract-actions">
                   <button class="icon-btn edit-btn" onclick="openEdit(1)" title="Edit service">
@@ -375,7 +381,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
             </div>
             <div class="group-contracts open">
               <div class="contract-header-row">
-                <span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Reference</span><span></span>
+                <span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Route</span><span>Reference</span><span></span>
               </div>
               <div class="contract-row">
                 <div><div class="contract-svc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div></div>
@@ -383,6 +389,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value">Bin · 240 Litre</div>
                 <div class="contract-col-value">1</div>
                 <div class="contract-col-value">Every Week</div>
+                <div class="contract-col-value route-na">Not available</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Rec_10094270120</div></div>
                 <div class="contract-actions">
                   <button class="icon-btn edit-btn" onclick="openEdit(2)" title="Edit service">
@@ -403,7 +410,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
             </div>
             <div class="group-contracts open">
               <div class="contract-header-row">
-                <span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Reference</span><span></span>
+                <span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Route</span><span>Reference</span><span></span>
               </div>
               <div class="contract-row">
                 <div><div class="contract-svc-icon" style="background:#059669"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 4 3 7 9 6M12 12c0-5 5-8 9-6 0 4-3 7-9 6"/></svg></div></div>
@@ -411,6 +418,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value">Bin · 140 Litre</div>
                 <div class="contract-col-value">1</div>
                 <div class="contract-col-value">Every Two Weeks</div>
+                <div class="contract-col-value route-na">Not available</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">GDN_10094270120</div></div>
                 <div class="contract-actions">
                   <button class="icon-btn edit-btn" onclick="openEdit(3)" title="Edit service">
