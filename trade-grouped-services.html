@@ -283,7 +283,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       <select class="filter-select"><option>2 statuses</option><option>Active</option><option>Inactive</option></select>
       <div class="filter-divider"></div>
       <div class="past-due-toggle-wrap">
-        <div class="toggle" id="pastDueToggle" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+        <div class="toggle" id="pastDueToggle" onclick="togglePastDue(this)"><div class="toggle-knob"></div></div>
         <span class="past-due-label">Past-Due</span>
       </div>
     </div>
@@ -296,7 +296,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       </div>
 
       <!-- Regular customers -->
-      <div class="cust-row" onclick="goToDetails()">
+      <div class="cust-row" data-pastdue="false" onclick="goToDetails()">
         <div>
           <div class="cust-name-wrap"><span class="cust-name">Customer Billing</span></div>
           <div class="cust-type">Business</div>
@@ -312,7 +312,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
         </div>
       </div>
 
-      <div class="cust-row" onclick="goToDetails()">
+      <div class="cust-row" data-pastdue="false" onclick="goToDetails()">
         <div>
           <div class="cust-name-wrap"><span class="cust-name">Customer Billing 10</span></div>
           <div class="cust-type">Business</div>
@@ -325,7 +325,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
         </div>
       </div>
 
-      <div class="cust-row" onclick="goToDetails()">
+      <div class="cust-row" data-pastdue="false" onclick="goToDetails()">
         <div>
           <div class="cust-name-wrap"><span class="cust-name">Customer Billing 13</span></div>
           <div class="cust-type">Business</div>
@@ -338,7 +338,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
         </div>
       </div>
 
-      <div class="cust-row" onclick="goToDetails()">
+      <div class="cust-row" data-pastdue="false" onclick="goToDetails()">
         <div>
           <div class="cust-name-wrap"><span class="cust-name">Customer Billing 15</span></div>
           <div class="cust-type">Business</div>
@@ -351,7 +351,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
         </div>
       </div>
 
-      <div class="cust-row" onclick="goToDetails()">
+      <div class="cust-row" data-pastdue="false" onclick="goToDetails()">
         <div>
           <div class="cust-name-wrap"><span class="cust-name">Customer Billing 6</span></div>
           <div class="cust-type">Business</div>
@@ -365,7 +365,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       </div>
 
       <!-- PAST-DUE customer -->
-      <div class="cust-row" onclick="goToDetails()">
+      <div class="cust-row" data-pastdue="true" onclick="goToDetails()">
         <div>
           <div class="cust-name-wrap">
             <span class="cust-name">Customer Billing 7</span>
@@ -383,7 +383,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
         </div>
       </div>
 
-      <div class="cust-row" onclick="goToDetails()">
+      <div class="cust-row" data-pastdue="false" onclick="goToDetails()">
         <div>
           <div class="cust-name-wrap"><span class="cust-name">Customer Billing 8</span></div>
           <div class="cust-type">Business</div>
@@ -396,7 +396,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
         </div>
       </div>
 
-      <div class="cust-row" onclick="goToDetails()">
+      <div class="cust-row" data-pastdue="false" onclick="goToDetails()">
         <div>
           <div class="cust-name-wrap"><span class="cust-name">Customer Billing 9</span></div>
           <div class="cust-type">Business</div>
@@ -410,7 +410,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       </div>
 
       <!-- PAST-DUE customer 2 -->
-      <div class="cust-row" onclick="goToDetails()">
+      <div class="cust-row" data-pastdue="true" onclick="goToDetails()">
         <div>
           <div class="cust-name-wrap">
             <span class="cust-name">Customer Billing 11</span>
@@ -804,6 +804,35 @@ function showToast(msg) {
   setTimeout(()=>{ t.style.opacity='0'; }, 2800);
 }
 document.getElementById('saveModal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+  // ── PAST-DUE FILTER ──
+  function togglePastDue(toggleEl) {
+    toggleEl.classList.toggle('on');
+    const isOn = toggleEl.classList.contains('on');
+    document.querySelectorAll('.cust-row').forEach(row => {
+      if (isOn) {
+        row.style.display = row.dataset.pastdue === 'true' ? '' : 'none';
+      } else {
+        row.style.display = '';
+      }
+    });
+    // Update empty state
+    const visible = [...document.querySelectorAll('.cust-row')].filter(r => r.style.display !== 'none');
+    let empty = document.getElementById('pastdue-empty');
+    if (isOn && visible.length === 0) {
+      if (!empty) {
+        empty = document.createElement('div');
+        empty.id = 'pastdue-empty';
+        empty.style.cssText = 'padding:32px 24px;text-align:center;font-size:13px;font-weight:300;color:#9CA3AF;';
+        empty.textContent = 'No past-due customers found.';
+        document.querySelector('.cust-table').appendChild(empty);
+      }
+      empty.style.display = '';
+    } else if (empty) {
+      empty.style.display = 'none';
+    }
+  }
+
 </script>
 </body>
 </html>
