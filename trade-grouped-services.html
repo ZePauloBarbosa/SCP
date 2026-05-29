@@ -316,6 +316,53 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .badge-overdue { background: #FEE2E2; color: #B91C1C; }
 .badge-extension { background: #EDE9FE; color: #5B21B6; }
 
+
+/* ── CUSTOMER-LEVEL TABS ── */
+.cust-tabs-wrap { border-top: 1px solid #E5E7EB; }
+.cust-tabs { display: flex; gap: 0; border-bottom: 2px solid #E5E7EB; padding: 0 24px; background: #fff; }
+.cust-tab {
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #6B7280;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.cust-tab:hover { color: #20315A; }
+.cust-tab.active { color: #20315A; border-bottom-color: #20315A; font-weight: 600; }
+.cust-tab-panel { display: none; }
+.cust-tab-panel.active { display: block; }
+
+/* Billing Details — customer level */
+.billing-month-group { border: 1px solid #E5E7EB; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+.billing-month-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; background: #F4F6FA; cursor: pointer;
+  border-bottom: 1px solid #E5E7EB;
+  transition: background 0.1s;
+}
+.billing-month-header:hover { background: #EEF1F8; }
+.billing-month-title { font-size: 14px; font-weight: 600; color: #20315A; }
+.billing-month-meta { display: flex; align-items: center; gap: 16px; }
+.billing-month-total { font-size: 13px; font-weight: 500; color: #242833; }
+.billing-month-count { font-size: 12px; font-weight: 300; color: #9CA3AF; }
+.billing-month-actions { display: flex; align-items: center; gap: 8px; }
+.dl-btn {
+  height: 28px; padding: 0 12px; border: 1px solid #E5E7EB; border-radius: 4px;
+  background: #fff; font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 500;
+  color: #20315A; cursor: pointer; display: flex; align-items: center; gap: 5px;
+  transition: border-color 0.1s, background 0.1s; white-space: nowrap;
+}
+.dl-btn:hover { border-color: #20315A; background: #EEF1F8; }
+.dl-btn-group { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 20px; background: #FAFAFC; border-bottom: 1px solid #E5E7EB; }
+.billing-month-body { display: none; }
+.billing-month-body.open { display: block; }
+.billing-month-chevron { transition: transform 0.2s; color: #6B7280; }
+.billing-month-chevron.open { transform: rotate(180deg); }
+
 </style>
 </head>
 <body>
@@ -561,6 +608,17 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
           <button class="map-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
         </div>
       </div>
+      <!-- CUSTOMER-LEVEL TABS -->
+      <div class="cust-tabs-wrap">
+        <div class="cust-tabs">
+          <div class="cust-tab active" onclick="switchCustTab('svcdetails', this)">Service Details</div>
+          <div class="cust-tab" onclick="switchCustTab('opcal-cust', this)">Operational Calendar</div>
+          <div class="cust-tab" onclick="switchCustTab('bilcal-cust', this)">Billing Calendar</div>
+          <div class="cust-tab" onclick="switchCustTab('bildetails-cust', this)">Billing Details</div>
+        </div>
+
+        <!-- TAB: Service Details (existing location table) -->
+        <div class="cust-tab-panel active" id="ctab-svcdetails">
       <div class="table-header-row">
         <span>Location<br>Number</span><span>Address</span><span>Status</span>
         <span>Services <span style="font-weight:300;text-transform:none;letter-spacing:0;font-size:11px;color:#6B7280">4 statuses ▾</span></span>
@@ -661,6 +719,268 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
         </div>
       </div>
     </div>
+        </div><!-- /ctab-svcdetails -->
+
+        <!-- TAB: Operational Calendar (customer level — rolled up by waste type) -->
+        <div class="cust-tab-panel" id="ctab-opcal-cust" style="padding:20px 24px;">
+          <div class="cal-header">
+            <div class="cal-title">Collection Schedule — All Services</div>
+            <div class="cal-nav">
+              <button class="cal-nav-btn">&#8249;</button>
+              <span class="cal-month">May 2026</span>
+              <button class="cal-nav-btn">&#8250;</button>
+              <button class="cal-current-btn">Current Month</button>
+            </div>
+          </div>
+          <div class="calendar">
+            <div class="cal-weekdays">
+              <div class="cal-weekday">Sun</div><div class="cal-weekday">Mon</div><div class="cal-weekday">Tue</div>
+              <div class="cal-weekday">Wed</div><div class="cal-weekday">Thu</div><div class="cal-weekday">Fri</div><div class="cal-weekday">Sat</div>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+              <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+              <div class="cal-cell"><div class="cal-cell-num">01</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">02</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">03</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">04</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">05</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">06</div>
+                <div class="cal-event green"><div class="cal-event-title">✓ Refuse</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+                <div class="cal-event green" style="border-left-color:#059669;background:#ECFDF5"><div class="cal-event-title" style="color:#059669">✓ Recycling</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+              </div>
+              <div class="cal-cell"><div class="cal-cell-num">07</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">08</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">09</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">10</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">11</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">12</div>
+                <div class="cal-cell-num" style="font-size:10px;color:#9CA3AF;margin-bottom:2px"></div>
+                <div class="cal-event green"><div class="cal-event-title">✓ Refuse</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+                <div class="cal-event green" style="border-left-color:#059669;background:#ECFDF5"><div class="cal-event-title" style="color:#059669">✓ Recycling</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+              </div>
+              <div class="cal-cell"><div class="cal-cell-num">13</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">14</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">15</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">16</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">17</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">18</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">19</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">20</div>
+                <div class="cal-event"><div class="cal-event-title">Refuse</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+                <div class="cal-event" style="border-left-color:#059669;background:#F0FDF4"><div class="cal-event-title" style="color:#059669">Recycling</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+                <div class="cal-event" style="border-left-color:#D97706;background:#FFFBEB"><div class="cal-event-title" style="color:#92400E">Garden</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+              </div>
+              <div class="cal-cell"><div class="cal-cell-num">21</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">22</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">23</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">24</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">25</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">26</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">27</div>
+                <div class="cal-event"><div class="cal-event-title">Refuse</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+              </div>
+              <div class="cal-cell"><div class="cal-cell-num">28</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">29</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">30</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">31</div></div>
+              <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+              <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+              <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#ECFDF5;border-left:3px solid #33A542;border-radius:2px"></div>Collected</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#EEF1F8;border-left:3px solid #20315A;border-radius:2px"></div>Scheduled</div>
+          </div>
+        </div><!-- /ctab-opcal-cust -->
+
+        <!-- TAB: Billing Calendar (customer level) -->
+        <div class="cust-tab-panel" id="ctab-bilcal-cust" style="padding:20px 24px;">
+          <div class="cal-header">
+            <div class="cal-title">Billing Schedule — All Services</div>
+            <div class="cal-nav">
+              <button class="cal-nav-btn">&#8249;</button>
+              <span class="cal-month">May 2026</span>
+              <button class="cal-nav-btn">&#8250;</button>
+              <button class="cal-current-btn">Current Month</button>
+            </div>
+          </div>
+          <div class="calendar">
+            <div class="cal-weekdays">
+              <div class="cal-weekday">Sun</div><div class="cal-weekday">Mon</div><div class="cal-weekday">Tue</div>
+              <div class="cal-weekday">Wed</div><div class="cal-weekday">Thu</div><div class="cal-weekday">Fri</div><div class="cal-weekday">Sat</div>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+              <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+              <div class="cal-cell"><div class="cal-cell-num">01</div>
+                <div class="billing-cal-event paid"><div class="billing-cal-event-title">✓ Paid — All</div><div class="billing-cal-event-sub">£400.00 · 4 contracts</div></div>
+              </div>
+              <div class="cal-cell"><div class="cal-cell-num">02</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">03</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">04</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">05</div>
+                <div class="billing-cal-event"><div class="billing-cal-event-title">Invoice Due</div><div class="billing-cal-event-sub">£400.00 · 4 contracts</div></div>
+              </div>
+              <div class="cal-cell"><div class="cal-cell-num">06</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">07</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">08</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">09</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">10</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">11</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">12</div>
+                <div class="billing-cal-event overdue"><div class="billing-cal-event-title">⚠ Overdue</div><div class="billing-cal-event-sub">£200.00 · Refuse + Garden</div></div>
+              </div>
+              <div class="cal-cell"><div class="cal-cell-num">13</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">14</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">15</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">16</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">17</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">18</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">19</div>
+                <div class="billing-cal-event extension"><div class="billing-cal-event-title">Extension granted</div><div class="billing-cal-event-sub">£200.00 · New due: Jun 2</div></div>
+              </div>
+              <div class="cal-cell"><div class="cal-cell-num">20</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">21</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">22</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">23</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">24</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">25</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">26</div>
+                <div class="billing-cal-event"><div class="billing-cal-event-title">Invoice Due</div><div class="billing-cal-event-sub">£400.00 · 4 contracts</div></div>
+              </div>
+              <div class="cal-cell"><div class="cal-cell-num">27</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">28</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">29</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">30</div></div>
+              <div class="cal-cell"><div class="cal-cell-num">31</div></div>
+              <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+              <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+              <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#ECFDF5;border-left:3px solid #33A542;border-radius:2px"></div>Paid</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#FEF3C7;border-left:3px solid #F59E0B;border-radius:2px"></div>Invoice Due</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#FEE2E2;border-left:3px solid #EF4444;border-radius:2px"></div>Overdue</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#EDE9FE;border-left:3px solid #7C3AED;border-radius:2px"></div>Extension Granted</div>
+          </div>
+        </div><!-- /ctab-bilcal-cust -->
+
+        <!-- TAB: Billing Details (customer level, grouped by month) -->
+        <div class="cust-tab-panel" id="ctab-bildetails-cust" style="padding:20px 24px;">
+          <div class="billing-summary" style="margin-bottom:20px">
+            <div class="billing-stat"><div class="billing-stat-label">Total Outstanding</div><div class="billing-stat-value red">£200.00</div><div class="billing-stat-sub">2 invoices across all contracts</div></div>
+            <div class="billing-stat"><div class="billing-stat-label">Last Payment</div><div class="billing-stat-value green">£400.00</div><div class="billing-stat-sub">May 1, 2026 — all contracts</div></div>
+            <div class="billing-stat"><div class="billing-stat-label">Annual Rate (all)</div><div class="billing-stat-value">£4,800.00</div><div class="billing-stat-sub">4 contracts · £1,200 each</div></div>
+            <div class="billing-stat"><div class="billing-stat-label">Payment Status</div><div class="billing-stat-value" style="font-size:14px;margin-top:4px"><span class="billing-badge badge-overdue">Past-Due</span></div><div class="billing-stat-sub">Extension expires Jun 2</div></div>
+          </div>
+
+          <!-- Month group: May 2026 -->
+          <div class="billing-month-group">
+            <div class="billing-month-header" onclick="toggleMonth(this)">
+              <div class="billing-month-title">May 2026</div>
+              <div style="display:flex;align-items:center;gap:20px">
+                <div class="billing-month-meta">
+                  <span class="billing-month-total">£400.00</span>
+                  <span class="billing-month-count">4 invoices</span>
+                  <span class="billing-badge badge-overdue" style="font-size:10px">2 Overdue</span>
+                </div>
+                <div class="billing-month-actions" onclick="event.stopPropagation()">
+                  <button class="dl-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> All contracts</button>
+                  <button class="dl-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Refuse only</button>
+                  <button class="dl-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Recycling only</button>
+                </div>
+                <svg class="billing-month-chevron open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+            </div>
+            <div class="billing-month-body open">
+              <div class="billing-table">
+                <div class="billing-table-header">
+                  <span>Invoice #</span><span>Service Contract</span><span>Amount</span><span>Due Date</span><span>Paid Date</span><span>Status</span>
+                </div>
+                <div class="billing-row">
+                  <div class="billing-col" style="font-weight:500">#2000219</div>
+                  <div class="billing-col">Refuse · EuroBin · 1100L</div>
+                  <div class="billing-col">£100.00</div><div class="billing-col">01 May 2026</div><div class="billing-col">01 May 2026</div>
+                  <div class="billing-col"><span class="billing-badge badge-paid">Paid</span></div>
+                </div>
+                <div class="billing-row">
+                  <div class="billing-col" style="font-weight:500">#2000220</div>
+                  <div class="billing-col">Refuse · Bin · 180L</div>
+                  <div class="billing-col">£100.00</div><div class="billing-col">01 May 2026</div><div class="billing-col">01 May 2026</div>
+                  <div class="billing-col"><span class="billing-badge badge-paid">Paid</span></div>
+                </div>
+                <div class="billing-row">
+                  <div class="billing-col" style="font-weight:500">#2000221</div>
+                  <div class="billing-col">Recycling · Bin · 240L</div>
+                  <div class="billing-col">£100.00</div><div class="billing-col">01 May 2026</div><div class="billing-col">01 May 2026</div>
+                  <div class="billing-col"><span class="billing-badge badge-paid">Paid</span></div>
+                </div>
+                <div class="billing-row">
+                  <div class="billing-col" style="font-weight:500">#2000222</div>
+                  <div class="billing-col">Garden · Bin · 140L</div>
+                  <div class="billing-col">£100.00</div><div class="billing-col">01 May 2026</div><div class="billing-col">01 May 2026</div>
+                  <div class="billing-col"><span class="billing-badge badge-paid">Paid</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Month group: June 2026 -->
+          <div class="billing-month-group">
+            <div class="billing-month-header" onclick="toggleMonth(this)">
+              <div class="billing-month-title">June 2026</div>
+              <div style="display:flex;align-items:center;gap:20px">
+                <div class="billing-month-meta">
+                  <span class="billing-month-total">£400.00</span>
+                  <span class="billing-month-count">4 invoices</span>
+                  <span class="billing-badge badge-extension" style="font-size:10px">2 Extended</span>
+                </div>
+                <div class="billing-month-actions" onclick="event.stopPropagation()">
+                  <button class="dl-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> All contracts</button>
+                  <button class="dl-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Refuse only</button>
+                  <button class="dl-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Recycling only</button>
+                </div>
+                <svg class="billing-month-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+            </div>
+            <div class="billing-month-body">
+              <div class="billing-table">
+                <div class="billing-table-header">
+                  <span>Invoice #</span><span>Service Contract</span><span>Amount</span><span>Due Date</span><span>Paid Date</span><span>Status</span>
+                </div>
+                <div class="billing-row">
+                  <div class="billing-col" style="font-weight:500">#2000225</div>
+                  <div class="billing-col">Refuse · EuroBin · 1100L</div>
+                  <div class="billing-col">£100.00</div><div class="billing-col">05 Jun 2026</div><div class="billing-col">—</div>
+                  <div class="billing-col"><span class="billing-badge badge-extension">Extended</span></div>
+                </div>
+                <div class="billing-row">
+                  <div class="billing-col" style="font-weight:500">#2000226</div>
+                  <div class="billing-col">Refuse · Bin · 180L</div>
+                  <div class="billing-col">£100.00</div><div class="billing-col">05 Jun 2026</div><div class="billing-col">—</div>
+                  <div class="billing-col"><span class="billing-badge badge-extension">Extended</span></div>
+                </div>
+                <div class="billing-row">
+                  <div class="billing-col" style="font-weight:500">#2000227</div>
+                  <div class="billing-col">Recycling · Bin · 240L</div>
+                  <div class="billing-col">£100.00</div><div class="billing-col">05 Jun 2026</div><div class="billing-col">—</div>
+                  <div class="billing-col"><span class="billing-badge badge-due">Ready to Bill</span></div>
+                </div>
+                <div class="billing-row">
+                  <div class="billing-col" style="font-weight:500">#2000228</div>
+                  <div class="billing-col">Garden · Bin · 140L</div>
+                  <div class="billing-col">£100.00</div><div class="billing-col">05 Jun 2026</div><div class="billing-col">—</div>
+                  <div class="billing-col"><span class="billing-badge badge-due">Ready to Bill</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /ctab-bildetails-cust -->
+
+      </div><!-- /cust-tabs-wrap -->
   </div>
 </div>
 
@@ -1147,6 +1467,21 @@ document.getElementById('saveModal').addEventListener('click', function(e){ if(e
     // Activate selected
     el.classList.add('active');
     document.getElementById('tab-' + tabId).classList.add('active');
+  }
+
+
+  function switchCustTab(tabId, el) {
+    document.querySelectorAll('.cust-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.cust-tab-panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('ctab-' + tabId).classList.add('active');
+  }
+
+  function toggleMonth(headerEl) {
+    const body = headerEl.nextElementSibling;
+    const chevron = headerEl.querySelector('.billing-month-chevron');
+    const isOpen = body.classList.toggle('open');
+    chevron.classList.toggle('open', isOpen);
   }
 
 </script>
