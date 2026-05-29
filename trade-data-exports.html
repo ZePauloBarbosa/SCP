@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Export — Trade UK Mock</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #242833; font-size: 14px; }
+
+/* ── TOP NAV ── */
+.top-nav { height: 70px; background: #242833; display: flex; align-items: center; padding: 0 24px; }
+.nav-logo { color: #fff; font-weight: 700; font-size: 15px; margin-right: 40px; display: flex; align-items: center; gap: 8px; }
+.nav-logo-icon { width: 28px; height: 28px; background: #33A542; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; }
+.nav-link { color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 500; letter-spacing: 0.8px; text-transform: uppercase; padding: 0 18px; height: 70px; display: flex; align-items: center; gap: 7px; cursor: pointer; border-bottom: 3px solid transparent; }
+.nav-link.active { color: #fff; border-bottom-color: #33A542; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.client-tag { background: rgba(255,255,255,0.12); color: #fff; font-size: 12px; padding: 4px 12px; border-radius: 4px; font-weight: 500; }
+
+/* ── SUB NAV ── */
+.sub-nav { height: 48px; background: #fff; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; padding: 0 24px; }
+.sub-nav-link { font-size: 14px; font-weight: 400; color: #6B7280; height: 48px; display: flex; align-items: center; padding: 0 16px; cursor: pointer; border-bottom: 3px solid transparent; }
+.sub-nav-link.active { color: #33A542; border-bottom-color: #33A542; font-weight: 500; }
+
+/* ── PAGE ── */
+.page { max-width: 820px; margin: 0 auto; padding: 36px 24px; }
+.page-title { font-size: 26px; font-weight: 600; color: #20315A; margin-bottom: 24px; }
+
+/* ── MOCK BANNER ── */
+.mock-banner { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 4px; padding: 8px 16px; font-size: 12px; color: #92400E; margin-bottom: 20px; }
+
+/* ── PANEL ── */
+.panel { background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; margin-bottom: 16px; overflow: hidden; }
+.panel-title { font-size: 16px; font-weight: 600; color: #20315A; padding: 20px 24px 16px; border-bottom: 1px solid #E5E7EB; }
+.panel-body { padding: 20px 24px; }
+
+/* ── REPORT TYPE DROPDOWN ── */
+.report-select-wrap { position: relative; display: inline-block; min-width: 280px; }
+.report-select {
+  width: 100%; height: 40px;
+  border: none; border-bottom: 2px solid #20315A;
+  padding: 0 32px 0 0;
+  font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 400; color: #242833;
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2320315A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;
+  appearance: none; cursor: pointer; outline: none;
+}
+
+.divider { border: none; border-top: 1px solid #E5E7EB; margin: 20px 0; }
+
+/* ── REPORT CONFIG SECTION ── */
+.config-label { font-size: 13px; font-weight: 500; color: #242833; margin-bottom: 14px; }
+
+.config-row { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+
+/* Date range picker */
+.date-range-wrap { display: flex; align-items: center; gap: 8px; }
+.date-input {
+  height: 34px; border: 1px solid #E5E7EB; border-radius: 5px;
+  padding: 0 10px; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 300;
+  color: #242833; background: #fff; width: 130px; outline: none;
+  transition: border-color 0.15s;
+}
+.date-input:focus { border-color: #20315A; }
+.date-sep { font-size: 13px; color: #9CA3AF; font-weight: 300; }
+.date-range-btn {
+  height: 34px; padding: 0 10px; border: 1px solid #E5E7EB; border-radius: 5px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;
+  font-family: 'Montserrat', sans-serif; font-size: 12px; color: #6B7280; cursor: pointer;
+  padding-right: 26px;
+}
+
+/* ── CUSTOMER SEARCH ── */
+.cust-search-wrap { position: relative; width: 100%; }
+.cust-search-input {
+  width: 100%; height: 40px;
+  border: 1px solid #E5E7EB; border-radius: 5px;
+  padding: 0 12px 0 36px;
+  font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 300; color: #242833;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;
+  outline: none; transition: border-color 0.15s;
+}
+.cust-search-input:focus { border-color: #20315A; }
+.cust-search-input::placeholder { color: #9CA3AF; }
+
+/* Customer search filters row (matching customers page) */
+.search-filters { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.filter-select-sm {
+  height: 34px; border: 1px solid #E5E7EB; border-radius: 5px;
+  padding: 0 26px 0 10px;
+  font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 300; color: #6B7280;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat calc(100% - 7px) center;
+  appearance: none; cursor: pointer;
+}
+
+/* Customer search results dropdown */
+.cust-results { border: 1px solid #E5E7EB; border-radius: 5px; background: #fff; margin-top: 4px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
+.cust-results.open { display: block; }
+.cust-result-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  padding: 10px 14px; cursor: pointer;
+  border-bottom: 1px solid #F3F4F6; transition: background 0.1s;
+}
+.cust-result-row:last-child { border-bottom: none; }
+.cust-result-row:hover { background: #EEF1F8; }
+.cust-result-row.selected { background: #EEF1F8; }
+.cust-result-name { font-size: 13px; font-weight: 500; color: #20315A; }
+.cust-result-type { font-size: 11px; font-weight: 300; color: #9CA3AF; margin-top: 1px; }
+.cust-result-address { font-size: 12px; font-weight: 300; color: #6B7280; }
+.cust-result-acct { font-size: 11px; font-weight: 300; color: #9CA3AF; margin-top: 1px; }
+
+/* Selected customer pill */
+.selected-customer {
+  display: none; align-items: center; gap: 10px;
+  padding: 10px 14px; background: #EEF1F8; border: 1px solid #D1D8EC;
+  border-radius: 5px; margin-top: 8px;
+}
+.selected-customer.show { display: flex; }
+.selected-cust-name { font-size: 13px; font-weight: 600; color: #20315A; }
+.selected-cust-meta { font-size: 11px; font-weight: 300; color: #6B7280; }
+.clear-btn { margin-left: auto; background: none; border: none; cursor: pointer; color: #9CA3AF; font-size: 16px; line-height: 1; transition: color 0.1s; }
+.clear-btn:hover { color: #20315A; }
+
+/* ── RECIPIENTS SECTION ── */
+.recipients-label { font-size: 13px; font-weight: 500; color: #242833; margin-bottom: 14px; }
+.recipients-count { font-size: 13px; font-weight: 300; color: #9CA3AF; }
+
+.checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.checkbox-custom { width: 16px; height: 16px; border: 1.5px solid #D9D9E1; border-radius: 3px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.checkbox-custom.checked { background: #20315A; border-color: #20315A; }
+.checkbox-custom.checked::after { content: ''; display: block; width: 9px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px,-1px); }
+.checkbox-label { font-size: 13px; font-weight: 300; color: #242833; cursor: pointer; }
+
+.recipient-add-row { display: flex; gap: 10px; align-items: center; }
+.recipient-input {
+  flex: 1; height: 36px; border: 1px solid #E5E7EB; border-radius: 5px;
+  padding: 0 12px; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 300;
+  color: #242833; outline: none; transition: border-color 0.15s;
+}
+.recipient-input::placeholder { color: #9CA3AF; }
+.recipient-input:focus { border-color: #20315A; }
+.btn-add-recipient {
+  height: 36px; padding: 0 16px; border: 1.5px solid #20315A; border-radius: 5px;
+  background: #fff; font-family: 'Montserrat', sans-serif; font-size: 13px;
+  font-weight: 500; color: #20315A; cursor: pointer; white-space: nowrap;
+  transition: background 0.1s;
+}
+.btn-add-recipient:hover { background: #EEF1F8; }
+
+.recipient-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.recipient-tag {
+  display: flex; align-items: center; gap: 6px;
+  background: #EEF1F8; border: 1px solid #D1D8EC; border-radius: 14px;
+  padding: 3px 10px; font-size: 12px; font-weight: 400; color: #20315A;
+}
+.tag-remove { background: none; border: none; cursor: pointer; color: #9CA3AF; font-size: 14px; line-height: 1; padding: 0; transition: color 0.1s; }
+.tag-remove:hover { color: #EF4444; }
+
+/* ── EXPORT BUTTON ── */
+.export-row { display: flex; justify-content: center; padding-top: 8px; }
+.btn-export {
+  height: 40px; padding: 0 48px; border: none; border-radius: 5px;
+  background: #20315A; font-family: 'Montserrat', sans-serif; font-size: 14px;
+  font-weight: 600; color: #fff; cursor: pointer; transition: opacity 0.15s;
+  letter-spacing: 0.3px;
+}
+.btn-export:hover { opacity: 0.9; }
+.btn-export:disabled { opacity: 0.4; cursor: default; }
+
+/* ── RECENT EXPORTS ── */
+.recent-empty { font-size: 13px; font-weight: 300; color: #9CA3AF; padding: 4px 0 8px; }
+.recent-row {
+  display: grid; grid-template-columns: 160px 1fr 100px 120px 80px;
+  align-items: center; padding: 10px 0;
+  border-bottom: 1px solid #F3F4F6; font-size: 12px; font-weight: 300; color: #242833;
+}
+.recent-row:last-child { border-bottom: none; }
+.recent-type { font-weight: 500; color: #20315A; }
+.recent-customer { color: #6B7280; }
+.download-link { color: #20315A; font-weight: 500; text-decoration: none; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.download-link:hover { text-decoration: underline; }
+.recent-header { display: grid; grid-template-columns: 160px 1fr 100px 120px 80px; padding: 0 0 8px; border-bottom: 1px solid #E5E7EB; margin-bottom: 4px; }
+.recent-header span { font-size: 9px; font-weight: 700; color: #9CA3AF; letter-spacing: .8px; text-transform: uppercase; }
+
+/* ── SUCCESS TOAST ── */
+#toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #20315A; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 500; padding: 12px 24px; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.2); z-index: 600; transition: opacity 0.3s; opacity: 0; display: flex; align-items: center; gap: 8px; }
+
+/* ── CONDITIONAL CONFIG ── */
+.config-section { display: none; }
+.config-section.visible { display: block; }
+
+/* field label above inputs */
+.field-label { font-size: 11px; font-weight: 300; color: #9CA3AF; margin-bottom: 5px; display: block; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-logo"><div class="nav-logo-icon">R</div>Routeware</div>
+  <div class="nav-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>DISPATCH</div>
+  <div class="nav-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>CUSTOMERS</div>
+  <div class="nav-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>FLEET</div>
+  <div class="nav-link active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>INSIGHTS</div>
+  <div class="nav-right">
+    <span class="client-tag">Lewisham</span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+</nav>
+
+<!-- SUB NAV -->
+<div class="sub-nav">
+  <div class="sub-nav-link">Fleet</div>
+  <div class="sub-nav-link">Waste Audit</div>
+  <div class="sub-nav-link">Community</div>
+  <div class="sub-nav-link active">Data Export</div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+  <div class="mock-banner">⚠️ <strong>Functional mock</strong> — Trade UK: Data Export page with Customer Billing Report option. Select "Customer Billing Report" from the dropdown to see the full flow.</div>
+
+  <div class="page-title">Data Export</div>
+
+  <!-- CREATE EXPORT PANEL -->
+  <div class="panel">
+    <div class="panel-title">Create Export</div>
+    <div class="panel-body">
+
+      <!-- Report type dropdown -->
+      <div class="report-select-wrap">
+        <select class="report-select" id="reportType" onchange="onReportTypeChange(this.value)">
+          <option value="">Select report type...</option>
+          <optgroup label="── Operational ──">
+            <option value="fault">Fault Codes</option>
+            <option value="route">Route Segment Report</option>
+            <option value="service">Service History</option>
+            <option value="customer">Customer Export</option>
+          </optgroup>
+          <optgroup label="── Trade (UK) ──">
+            <option value="wtn">Customer Billing Report — WTN</option>
+            <option value="invoice">Customer Billing Report — Invoice</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <hr class="divider">
+
+      <!-- DEFAULT CONFIG (non-billing reports) -->
+      <div class="config-section" id="config-default">
+        <div class="config-label">Report Configuration</div>
+        <div class="config-row">
+          <div>
+            <span class="field-label">Vehicle Type</span>
+            <select class="filter-select-sm"><option>All Vehicle Types</option></select>
+          </div>
+          <div>
+            <span class="field-label">Vehicle</span>
+            <select class="filter-select-sm"><option>All Vehicles</option></select>
+          </div>
+          <div>
+            <span class="field-label">Date Range</span>
+            <div class="date-range-wrap">
+              <input class="date-input" type="text" value="05/01/2026">
+              <span class="date-sep">–</span>
+              <input class="date-input" type="text" value="05/01/2026">
+              <button class="date-range-btn">▾</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BILLING REPORT CONFIG (WTN / Invoice) -->
+      <div class="config-section" id="config-billing">
+        <div class="config-label">Report Configuration</div>
+
+        <!-- Date range -->
+        <div style="margin-bottom:18px">
+          <span class="field-label">Date Range</span>
+          <div class="date-range-wrap">
+            <input class="date-input" type="text" value="04/01/2026" id="dateFrom">
+            <span class="date-sep">–</span>
+            <input class="date-input" type="text" value="03/31/2027" id="dateTo">
+            <button class="date-range-btn">UK Financial Year</button>
+          </div>
+        </div>
+
+        <!-- Customer search -->
+        <div style="margin-bottom:6px">
+          <span class="field-label">Customer</span>
+          <div class="cust-search-wrap">
+            <input
+              class="cust-search-input"
+              id="custSearch"
+              type="text"
+              placeholder="Search by Customer / Location / Address / UPRN"
+              oninput="onCustSearch(this.value)"
+              onfocus="onCustFocus()"
+              autocomplete="off"
+            >
+            <!-- Search filters row (matching Customers page) -->
+            <div class="search-filters">
+              <input type="text" class="filter-select-sm" style="width:140px;padding:0 10px;appearance:none" placeholder="Account Number">
+              <select class="filter-select-sm"><option>Property Type</option><option>Business</option><option>Residential</option></select>
+              <select class="filter-select-sm"><option>Build Status</option><option>Built</option><option>Pending</option></select>
+            </div>
+
+            <!-- Dropdown results -->
+            <div class="cust-results" id="custResults">
+              <div class="cust-result-row" onclick="selectCustomer('Customer Billing 7', 'Business', '6601 Kelly St, San Diego, CA 92111', '10094270120')">
+                <div>
+                  <div class="cust-result-name">Customer Billing 7</div>
+                  <div class="cust-result-type">Business</div>
+                </div>
+                <div>
+                  <div class="cust-result-address">6601 Kelly St, San Diego, CA 92111</div>
+                  <div class="cust-result-acct">Acct: 10094270120</div>
+                </div>
+              </div>
+              <div class="cust-result-row" onclick="selectCustomer('Customer Billing 11', 'Business', 'Calea Mănăștur 77, Cluj-Napoca, Romania', '10094270135')">
+                <div>
+                  <div class="cust-result-name">Customer Billing 11</div>
+                  <div class="cust-result-type">Business</div>
+                </div>
+                <div>
+                  <div class="cust-result-address">Calea Mănăștur 77, Cluj-Napoca, Romania</div>
+                  <div class="cust-result-acct">Acct: 10094270135</div>
+                </div>
+              </div>
+              <div class="cust-result-row" onclick="selectCustomer('Customer Billing 10', 'Business', '6601 Kelly St, San Diego, CA 92111', '10094270108')">
+                <div>
+                  <div class="cust-result-name">Customer Billing 10</div>
+                  <div class="cust-result-type">Business</div>
+                </div>
+                <div>
+                  <div class="cust-result-address">6601 Kelly St, San Diego, CA 92111</div>
+                  <div class="cust-result-acct">Acct: 10094270108</div>
+                </div>
+              </div>
+              <div class="cust-result-row" onclick="selectCustomer('Customer Billing 13', 'Business', 'Calea Mănăștur 77, Cluj-Napoca, Romania', '10094270113')">
+                <div>
+                  <div class="cust-result-name">Customer Billing 13</div>
+                  <div class="cust-result-type">Business</div>
+                </div>
+                <div>
+                  <div class="cust-result-address">Calea Mănăștur 77, Cluj-Napoca, Romania</div>
+                  <div class="cust-result-acct">Acct: 10094270113</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Selected customer pill -->
+            <div class="selected-customer" id="selectedCustomer">
+              <div>
+                <div class="selected-cust-name" id="selCustName">—</div>
+                <div class="selected-cust-meta" id="selCustMeta">—</div>
+              </div>
+              <button class="clear-btn" onclick="clearCustomer()" title="Clear selection">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- REPORT RECIPIENTS -->
+      <div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:14px">
+          <span class="recipients-label">Report Recipients</span>
+          <span class="recipients-count" id="recipCount">0/10</span>
+        </div>
+
+        <div class="checkbox-row">
+          <div class="checkbox-custom" id="emailMeCheck" onclick="toggleEmailMe(this)"></div>
+          <span class="checkbox-label" onclick="toggleEmailMe(document.getElementById('emailMeCheck'))">Email To Me</span>
+        </div>
+
+        <div class="recipient-add-row">
+          <input class="recipient-input" id="recipientInput" type="email" placeholder="Recipient Email" onkeydown="if(event.key==='Enter') addRecipient()">
+          <button class="btn-add-recipient" onclick="addRecipient()">Add Recipient</button>
+        </div>
+
+        <div class="recipient-tags" id="recipientTags"></div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- EXPORT BUTTON -->
+      <div class="export-row">
+        <button class="btn-export" id="exportBtn" onclick="doExport()">Export</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RECENT EXPORTS PANEL -->
+  <div class="panel">
+    <div class="panel-title">Recent Exports</div>
+    <div class="panel-body" id="recentExportsBody">
+      <div class="recent-empty" id="recentEmpty">No Recent Exports</div>
+      <div id="recentList" style="display:none">
+        <div class="recent-header">
+          <span>Report Type</span>
+          <span>Customer</span>
+          <span>Period</span>
+          <span>Generated</span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- TOAST -->
+<div id="toast">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastMsg">Export generated successfully.</span>
+</div>
+
+<script>
+let selectedCust = null;
+let recipients = [];
+let emailMe = false;
+let recentExports = [];
+
+// ── REPORT TYPE CHANGE ──
+function onReportTypeChange(val) {
+  const defaultCfg = document.getElementById('config-default');
+  const billingCfg = document.getElementById('config-billing');
+  if (val === 'wtn' || val === 'invoice') {
+    defaultCfg.classList.remove('visible');
+    billingCfg.classList.add('visible');
+  } else if (val) {
+    billingCfg.classList.remove('visible');
+    defaultCfg.classList.add('visible');
+  } else {
+    defaultCfg.classList.remove('visible');
+    billingCfg.classList.remove('visible');
+  }
+}
+
+// ── CUSTOMER SEARCH ──
+function onCustSearch(val) {
+  if (selectedCust) return;
+  const results = document.getElementById('custResults');
+  if (val.length > 0) {
+    results.classList.add('open');
+    // filter visible rows
+    const rows = results.querySelectorAll('.cust-result-row');
+    rows.forEach(row => {
+      const name = row.querySelector('.cust-result-name').textContent.toLowerCase();
+      const addr = row.querySelector('.cust-result-address').textContent.toLowerCase();
+      const acct = row.querySelector('.cust-result-acct').textContent.toLowerCase();
+      row.style.display = (name.includes(val.toLowerCase()) || addr.includes(val.toLowerCase()) || acct.includes(val.toLowerCase())) ? '' : 'none';
+    });
+  } else {
+    results.classList.remove('open');
+  }
+}
+
+function onCustFocus() {
+  if (!selectedCust) {
+    const val = document.getElementById('custSearch').value;
+    if (val.length > 0) document.getElementById('custResults').classList.add('open');
+  }
+}
+
+function selectCustomer(name, type, address, acct) {
+  selectedCust = { name, type, address, acct };
+  document.getElementById('custSearch').value = name;
+  document.getElementById('custResults').classList.remove('open');
+  document.getElementById('selCustName').textContent = name + ' — ' + type;
+  document.getElementById('selCustMeta').textContent = address + ' · Acct: ' + acct;
+  document.getElementById('selectedCustomer').classList.add('show');
+  document.getElementById('custSearch').blur();
+}
+
+function clearCustomer() {
+  selectedCust = null;
+  document.getElementById('custSearch').value = '';
+  document.getElementById('selectedCustomer').classList.remove('show');
+}
+
+// close results on outside click
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.cust-search-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('custResults').classList.remove('open');
+  }
+});
+
+// ── RECIPIENTS ──
+function toggleEmailMe(el) {
+  emailMe = !emailMe;
+  el.classList.toggle('checked', emailMe);
+  updateRecipCount();
+}
+
+function addRecipient() {
+  const input = document.getElementById('recipientInput');
+  const val = input.value.trim();
+  if (!val || recipients.length >= 10) return;
+  if (recipients.includes(val)) { input.value = ''; return; }
+  recipients.push(val);
+  input.value = '';
+  renderTags();
+  updateRecipCount();
+}
+
+function removeRecipient(email) {
+  recipients = recipients.filter(r => r !== email);
+  renderTags();
+  updateRecipCount();
+}
+
+function renderTags() {
+  const wrap = document.getElementById('recipientTags');
+  wrap.innerHTML = recipients.map(r =>
+    `<div class="recipient-tag">${r}<button class="tag-remove" onclick="removeRecipient('${r}')" title="Remove">✕</button></div>`
+  ).join('');
+}
+
+function updateRecipCount() {
+  const total = recipients.length + (emailMe ? 1 : 0);
+  document.getElementById('recipCount').textContent = total + '/10';
+}
+
+// ── EXPORT ──
+function doExport() {
+  const type = document.getElementById('reportType').value;
+  if (!type) { showToast('Please select a report type.'); return; }
+
+  const isBilling = type === 'wtn' || type === 'invoice';
+  if (isBilling && !selectedCust) { showToast('Please select a customer to generate this report.'); return; }
+
+  // Simulate generating
+  const btn = document.getElementById('exportBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = 'Export';
+
+    const typeLabel = type === 'wtn' ? 'WTN' : type === 'invoice' ? 'Invoice' : type.charAt(0).toUpperCase() + type.slice(1);
+    const from = document.getElementById('dateFrom') ? document.getElementById('dateFrom').value : '05/01/2026';
+    const to = document.getElementById('dateTo') ? document.getElementById('dateTo').value : '05/01/2026';
+    const custName = selectedCust ? selectedCust.name : 'All customers';
+
+    addRecentExport(typeLabel, custName, from + ' – ' + to);
+    showToast('Export generated successfully.');
+  }, 1200);
+}
+
+function addRecentExport(type, customer, period) {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  recentExports.unshift({ type, customer, period, dateStr });
+
+  document.getElementById('recentEmpty').style.display = 'none';
+  const list = document.getElementById('recentList');
+  list.style.display = 'block';
+
+  list.innerHTML = `<div class="recent-header">
+    <span>Report Type</span><span>Customer</span><span>Period</span><span>Generated</span><span></span>
+  </div>` + recentExports.map(r => `
+    <div class="recent-row">
+      <div class="recent-type">${r.type}</div>
+      <div class="recent-customer">${r.customer}</div>
+      <div style="font-size:11px;color:#6B7280">${r.period}</div>
+      <div style="font-size:11px;color:#9CA3AF">${r.dateStr}</div>
+      <div><a class="download-link" href="#">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download
+      </a></div>
+    </div>`).join('');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; }, 2800);
+}
+</script>
+</body>
+</html>
