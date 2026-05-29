@@ -239,6 +239,83 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .modal-option-label { font-size:13px; font-weight:600; color:#20315A; margin-bottom:2px; }
 .modal-option-desc { font-size:11px; font-weight:300; color:#6B7280; line-height:1.4; }
 .modal-footer { padding:14px 24px; border-top:1px solid #E5E7EB; display:flex; justify-content:flex-end; gap:10px; background:#FAFAFC; }
+
+/* ── SERVICE CONTRACT TABS ── */
+.svc-tabs { display: flex; gap: 0; border-bottom: 2px solid #E5E7EB; margin-bottom: 20px; }
+.svc-tab {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #6B7280;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.svc-tab:hover { color: #20315A; }
+.svc-tab.active { color: #20315A; border-bottom-color: #20315A; font-weight: 600; }
+
+/* ── TAB PANELS ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── OPERATIONAL CALENDAR ── */
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.cal-title { font-size: 15px; font-weight: 600; color: #20315A; }
+.cal-nav { display: flex; align-items: center; gap: 8px; }
+.cal-month { font-size: 14px; font-weight: 500; color: #242833; min-width: 80px; text-align: center; }
+.cal-nav-btn { width: 30px; height: 30px; border: 1px solid #E5E7EB; border-radius: 4px; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6B7280; transition: all 0.1s; }
+.cal-nav-btn:hover { border-color: #20315A; color: #20315A; }
+.cal-current-btn { height: 30px; padding: 0 12px; border: 1px solid #E5E7EB; border-radius: 4px; background: #fff; font-family: 'Montserrat', sans-serif; font-size: 12px; color: #6B7280; cursor: pointer; }
+
+.calendar { background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; overflow: hidden; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: #fff; border-bottom: 1px solid #E5E7EB; }
+.cal-weekday { padding: 10px 12px; font-size: 11px; font-weight: 700; color: #9CA3AF; letter-spacing: .6px; text-transform: uppercase; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-cell { min-height: 90px; border-right: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB; padding: 8px 10px; position: relative; }
+.cal-cell:nth-child(7n) { border-right: none; }
+.cal-cell.empty { background: #FAFAFC; }
+.cal-cell-num { font-size: 13px; font-weight: 400; color: #6B7280; margin-bottom: 4px; }
+.cal-event { background: #EEF1F8; border-left: 3px solid #20315A; border-radius: 3px; padding: 4px 6px; margin-top: 4px; }
+.cal-event-title { font-size: 10px; font-weight: 600; color: #20315A; }
+.cal-event-sub { font-size: 10px; font-weight: 300; color: #6B7280; margin-top: 1px; }
+.cal-event.green { background: #ECFDF5; border-left-color: #33A542; }
+.cal-event.green .cal-event-title { color: #059669; }
+
+/* ── BILLING CALENDAR ── */
+.billing-cal-event { background: #FEF3C7; border-left: 3px solid #F59E0B; border-radius: 3px; padding: 4px 6px; margin-top: 4px; }
+.billing-cal-event.paid { background: #ECFDF5; border-left-color: #33A542; }
+.billing-cal-event.overdue { background: #FEE2E2; border-left-color: #EF4444; }
+.billing-cal-event.extension { background: #EDE9FE; border-left-color: #7C3AED; }
+.billing-cal-event-title { font-size: 10px; font-weight: 600; color: #92400E; }
+.billing-cal-event.paid .billing-cal-event-title { color: #059669; }
+.billing-cal-event.overdue .billing-cal-event-title { color: #B91C1C; }
+.billing-cal-event.extension .billing-cal-event-title { color: #5B21B6; }
+.billing-cal-event-sub { font-size: 10px; font-weight: 300; color: #6B7280; margin-top: 1px; }
+
+/* ── BILLING DETAILS ── */
+.billing-summary { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+.billing-stat { background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; padding: 16px 20px; }
+.billing-stat-label { font-size: 11px; font-weight: 300; color: #9CA3AF; margin-bottom: 6px; }
+.billing-stat-value { font-size: 20px; font-weight: 600; color: #20315A; }
+.billing-stat-value.red { color: #EF4444; }
+.billing-stat-value.green { color: #059669; }
+.billing-stat-sub { font-size: 11px; font-weight: 300; color: #9CA3AF; margin-top: 3px; }
+
+.billing-table { background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; overflow: hidden; }
+.billing-table-header { display: grid; grid-template-columns: 120px 1fr 100px 120px 120px 100px; padding: 0 20px; height: 36px; align-items: center; border-bottom: 1px solid #E5E7EB; }
+.billing-table-header span { font-size: 9px; font-weight: 700; color: #9CA3AF; letter-spacing: .8px; text-transform: uppercase; }
+.billing-row { display: grid; grid-template-columns: 120px 1fr 100px 120px 120px 100px; padding: 0 20px; height: 48px; align-items: center; border-bottom: 1px solid #F3F4F6; transition: background 0.1s; }
+.billing-row:last-child { border-bottom: none; }
+.billing-row:hover { background: #FAFAFC; }
+.billing-col { font-size: 12px; font-weight: 300; color: #242833; }
+.billing-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px; }
+.badge-paid { background: #ECFDF5; color: #059669; }
+.badge-due { background: #FEF3C7; color: #92400E; }
+.badge-overdue { background: #FEE2E2; color: #B91C1C; }
+.badge-extension { background: #EDE9FE; color: #5B21B6; }
+
 </style>
 </head>
 <body>
@@ -628,6 +705,16 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       </div>
     </div>
 
+    <!-- TABS -->
+    <div class="svc-tabs">
+      <div class="svc-tab active" onclick="switchTab('details', this)">Service Details</div>
+      <div class="svc-tab" onclick="switchTab('opcal', this)">Operational Calendar</div>
+      <div class="svc-tab" onclick="switchTab('bilcal', this)">Billing Calendar</div>
+      <div class="svc-tab" onclick="switchTab('bildetails', this)">Billing Details</div>
+    </div>
+
+    <!-- TAB: Service Details -->
+    <div class="tab-panel active" id="tab-details">
     <!-- Service Details -->
     <div class="svc-detail-card">
       <div class="svc-card-body">
@@ -688,6 +775,224 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       <button class="btn-cancel" onclick="goTo('details')">Cancel</button>
       <button class="btn-save" onclick="openSaveModal()">Save</button>
     </div>
+    </div><!-- /tab-details -->
+
+    <!-- TAB: Operational Calendar -->
+    <div class="tab-panel" id="tab-opcal">
+      <div class="cal-header">
+        <div class="cal-title">Collection Schedule — Refuse · Bin · 180 Litre</div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn">&#8249;</button>
+          <span class="cal-month">May 2026</span>
+          <button class="cal-nav-btn">&#8250;</button>
+          <button class="cal-current-btn">Current Month</button>
+        </div>
+      </div>
+      <div class="calendar">
+        <div class="cal-weekdays">
+          <div class="cal-weekday">Sun</div><div class="cal-weekday">Mon</div><div class="cal-weekday">Tue</div>
+          <div class="cal-weekday">Wed</div><div class="cal-weekday">Thu</div><div class="cal-weekday">Fri</div><div class="cal-weekday">Sat</div>
+        </div>
+        <div class="cal-grid">
+          <!-- Row 1 -->
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+          <div class="cal-cell"><div class="cal-cell-num">01</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">02</div></div>
+          <!-- Row 2 -->
+          <div class="cal-cell"><div class="cal-cell-num">03</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">04</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">05</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">06</div>
+            <div class="cal-event green"><div class="cal-event-title">✓ Collected</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+          </div>
+          <div class="cal-cell"><div class="cal-cell-num">07</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">08</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">09</div></div>
+          <!-- Row 3 -->
+          <div class="cal-cell"><div class="cal-cell-num">10</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">11</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">12</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">13</div>
+            <div class="cal-event green"><div class="cal-event-title">✓ Collected</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+          </div>
+          <div class="cal-cell"><div class="cal-cell-num">14</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">15</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">16</div></div>
+          <!-- Row 4 -->
+          <div class="cal-cell"><div class="cal-cell-num">17</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">18</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">19</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">20</div>
+            <div class="cal-event"><div class="cal-event-title">Scheduled</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+          </div>
+          <div class="cal-cell"><div class="cal-cell-num">21</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">22</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">23</div></div>
+          <!-- Row 5 -->
+          <div class="cal-cell"><div class="cal-cell-num">24</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">25</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">26</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">27</div>
+            <div class="cal-event"><div class="cal-event-title">Scheduled</div><div class="cal-event-sub">WEDNESDAY CREW</div></div>
+          </div>
+          <div class="cal-cell"><div class="cal-cell-num">28</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">29</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">30</div></div>
+          <!-- Row 6 -->
+          <div class="cal-cell"><div class="cal-cell-num">31</div></div>
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:16px;align-items:center;">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#ECFDF5;border-left:3px solid #33A542;border-radius:2px"></div>Collected</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#EEF1F8;border-left:3px solid #20315A;border-radius:2px"></div>Scheduled</div>
+      </div>
+    </div><!-- /tab-opcal -->
+
+    <!-- TAB: Billing Calendar -->
+    <div class="tab-panel" id="tab-bilcal">
+      <div class="cal-header">
+        <div class="cal-title">Billing Schedule — May 2026</div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn">&#8249;</button>
+          <span class="cal-month">May 2026</span>
+          <button class="cal-nav-btn">&#8250;</button>
+          <button class="cal-current-btn">Current Month</button>
+        </div>
+      </div>
+      <div class="calendar">
+        <div class="cal-weekdays">
+          <div class="cal-weekday">Sun</div><div class="cal-weekday">Mon</div><div class="cal-weekday">Tue</div>
+          <div class="cal-weekday">Wed</div><div class="cal-weekday">Thu</div><div class="cal-weekday">Fri</div><div class="cal-weekday">Sat</div>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+          <div class="cal-cell"><div class="cal-cell-num">01</div>
+            <div class="billing-cal-event paid"><div class="billing-cal-event-title">✓ Paid</div><div class="billing-cal-event-sub">Invoice #2000219 · £100.00</div></div>
+          </div>
+          <div class="cal-cell"><div class="cal-cell-num">02</div></div>
+          <!-- Row 2 -->
+          <div class="cal-cell"><div class="cal-cell-num">03</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">04</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">05</div>
+            <div class="billing-cal-event"><div class="billing-cal-event-title">Invoice Due</div><div class="billing-cal-event-sub">Invoice #2000225 · £100.00</div></div>
+          </div>
+          <div class="cal-cell"><div class="cal-cell-num">06</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">07</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">08</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">09</div></div>
+          <!-- Row 3 -->
+          <div class="cal-cell"><div class="cal-cell-num">10</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">11</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">12</div>
+            <div class="billing-cal-event overdue"><div class="billing-cal-event-title">⚠ Overdue</div><div class="billing-cal-event-sub">Invoice #2000225 · £100.00</div></div>
+          </div>
+          <div class="cal-cell"><div class="cal-cell-num">13</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">14</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">15</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">16</div></div>
+          <!-- Row 4 -->
+          <div class="cal-cell"><div class="cal-cell-num">17</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">18</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">19</div>
+            <div class="billing-cal-event extension"><div class="billing-cal-event-title">Extension granted</div><div class="billing-cal-event-sub">New due: Jun 2 · £100.00</div></div>
+          </div>
+          <div class="cal-cell"><div class="cal-cell-num">20</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">21</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">22</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">23</div></div>
+          <!-- Row 5 -->
+          <div class="cal-cell"><div class="cal-cell-num">24</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">25</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">26</div>
+            <div class="billing-cal-event"><div class="billing-cal-event-title">Invoice Due</div><div class="billing-cal-event-sub">Invoice #2000231 · £100.00</div></div>
+          </div>
+          <div class="cal-cell"><div class="cal-cell-num">27</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">28</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">29</div></div>
+          <div class="cal-cell"><div class="cal-cell-num">30</div></div>
+          <!-- Row 6 -->
+          <div class="cal-cell"><div class="cal-cell-num">31</div></div>
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+          <div class="cal-cell empty"></div><div class="cal-cell empty"></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#ECFDF5;border-left:3px solid #33A542;border-radius:2px"></div>Paid</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#FEF3C7;border-left:3px solid #F59E0B;border-radius:2px"></div>Invoice Due</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#FEE2E2;border-left:3px solid #EF4444;border-radius:2px"></div>Overdue</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:#6B7280"><div style="width:12px;height:12px;background:#EDE9FE;border-left:3px solid #7C3AED;border-radius:2px"></div>Extension Granted</div>
+      </div>
+    </div><!-- /tab-bilcal -->
+
+    <!-- TAB: Billing Details -->
+    <div class="tab-panel" id="tab-bildetails">
+      <div class="billing-summary">
+        <div class="billing-stat">
+          <div class="billing-stat-label">Current Balance</div>
+          <div class="billing-stat-value red">£200.00</div>
+          <div class="billing-stat-sub">2 invoices outstanding</div>
+        </div>
+        <div class="billing-stat">
+          <div class="billing-stat-label">Last Payment</div>
+          <div class="billing-stat-value green">£100.00</div>
+          <div class="billing-stat-sub">May 1, 2026</div>
+        </div>
+        <div class="billing-stat">
+          <div class="billing-stat-label">Rate (Annual)</div>
+          <div class="billing-stat-value">£1,200.00</div>
+          <div class="billing-stat-sub">£100.00 / month</div>
+        </div>
+        <div class="billing-stat">
+          <div class="billing-stat-label">Payment Status</div>
+          <div class="billing-stat-value red" style="font-size:14px;margin-top:4px"><span class="billing-badge badge-overdue">Past-Due</span></div>
+          <div class="billing-stat-sub">Extension expires Jun 2</div>
+        </div>
+      </div>
+      <div class="billing-table">
+        <div class="billing-table-header">
+          <span>Invoice #</span><span>Description</span><span>Amount</span><span>Due Date</span><span>Paid Date</span><span>Status</span>
+        </div>
+        <div class="billing-row">
+          <div class="billing-col" style="font-weight:500">#2000219</div>
+          <div class="billing-col">Monthly collection — May 2026</div>
+          <div class="billing-col">£100.00</div>
+          <div class="billing-col">01 May 2026</div>
+          <div class="billing-col">01 May 2026</div>
+          <div class="billing-col"><span class="billing-badge badge-paid">Paid</span></div>
+        </div>
+        <div class="billing-row">
+          <div class="billing-col" style="font-weight:500">#2000225</div>
+          <div class="billing-col">Monthly collection — Jun 2026</div>
+          <div class="billing-col">£100.00</div>
+          <div class="billing-col">05 May 2026</div>
+          <div class="billing-col">—</div>
+          <div class="billing-col"><span class="billing-badge badge-extension">Extended</span></div>
+        </div>
+        <div class="billing-row">
+          <div class="billing-col" style="font-weight:500">#2000231</div>
+          <div class="billing-col">Monthly collection — Jul 2026</div>
+          <div class="billing-col">£100.00</div>
+          <div class="billing-col">26 May 2026</div>
+          <div class="billing-col">—</div>
+          <div class="billing-col"><span class="billing-badge badge-due">Ready to Bill</span></div>
+        </div>
+        <div class="billing-row">
+          <div class="billing-col" style="font-weight:500">#2000211</div>
+          <div class="billing-col">Monthly collection — Apr 2026</div>
+          <div class="billing-col">£100.00</div>
+          <div class="billing-col">01 Apr 2026</div>
+          <div class="billing-col">03 Apr 2026</div>
+          <div class="billing-col"><span class="billing-badge badge-paid">Paid</span></div>
+        </div>
+      </div>
+    </div><!-- /tab-bildetails -->
+
   </div>
 </div>
 
@@ -831,6 +1136,17 @@ document.getElementById('saveModal').addEventListener('click', function(e){ if(e
     } else if (empty) {
       empty.style.display = 'none';
     }
+  }
+
+
+  // ── TAB SWITCHING ──
+  function switchTab(tabId, el) {
+    // Deactivate all tabs and panels
+    document.querySelectorAll('.svc-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    // Activate selected
+    el.classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
   }
 
 </script>
