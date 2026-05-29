@@ -216,6 +216,109 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .btn-cancel:hover { border-color: #9CA3AF; }
 .btn-save { height: 36px; padding: 0 28px; border: none; border-radius: 5px; background: #20315A; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #fff; cursor: pointer; font-weight: 500; transition: opacity 0.1s; }
 .btn-save:hover { opacity: 0.9; }
+
+/* ── SAVE CONFIRMATION MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 460px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #E5E7EB;
+}
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #20315A;
+  margin-bottom: 4px;
+}
+.modal-subtitle {
+  font-size: 12px;
+  font-weight: 300;
+  color: #6B7280;
+}
+.modal-body {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.modal-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.modal-option:hover {
+  border-color: #20315A;
+  background: #F7F9FC;
+}
+.modal-option.selected {
+  border-color: #20315A;
+  background: #EEF1F8;
+}
+.modal-radio {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #D1D5DB;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+}
+.modal-option.selected .modal-radio {
+  border-color: #20315A;
+}
+.modal-option.selected .modal-radio::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #20315A;
+  border-radius: 50%;
+}
+.modal-option-text {}
+.modal-option-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #20315A;
+  margin-bottom: 2px;
+}
+.modal-option-desc {
+  font-size: 11px;
+  font-weight: 300;
+  color: #6B7280;
+  line-height: 1.4;
+}
+.modal-footer {
+  padding: 14px 24px;
+  border-top: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #FAFAFC;
+}
 </style>
 </head>
 <body>
@@ -544,7 +647,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 
     <div class="edit-footer">
       <button class="btn-cancel" onclick="closeEdit()">Cancel</button>
-      <button class="btn-save">Save</button>
+      <button class="btn-save" onclick="openSaveModal()">Save</button>
     </div>
 
   </div><!-- /right-pane -->
@@ -615,6 +718,110 @@ function toggleGroup(headerEl) {
   const isOpen = contracts.classList.toggle('open');
   chevron.classList.toggle('open', isOpen);
 }
+
+  // ── SAVE MODAL ──
+  let saveOption = 'single';
+
+  function openSaveModal() {
+    const contract = contracts[currentContract];
+    // Set subtitle to current contract label
+    document.getElementById('modalSubtitle').textContent = 'Editing: ' + contract.label;
+    // Set type option label dynamically
+    const wasteType = contract.wasteType;
+    document.getElementById('optTypeLabel').textContent = 'All ' + wasteType + ' contracts';
+    // Count how many contracts share this waste type
+    const typeCount = contracts.filter(c => c.wasteType === wasteType).length;
+    document.getElementById('optTypeDesc').textContent =
+      'Changes apply to all ' + typeCount + ' ' + wasteType.toLowerCase() +
+      ' service contract' + (typeCount !== 1 ? 's' : '') + ' for this location.';
+    // Reset to default selection
+    selectSaveOption('single');
+    document.getElementById('saveModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('saveModal').classList.remove('open');
+  }
+
+  function selectSaveOption(option) {
+    saveOption = option;
+    ['single','type','all'].forEach(o => {
+      document.getElementById('opt-' + o).classList.toggle('selected', o === option);
+    });
+  }
+
+  function confirmSave() {
+    // In the real implementation this would persist changes
+    // For the mock, just close and show a brief confirmation
+    closeModal();
+    const messages = {
+      single: 'Saved changes to this service contract.',
+      type: 'Saved changes to all ' + contracts[currentContract].wasteType + ' contracts.',
+      all: 'Saved changes to all service contracts.'
+    };
+    showToast(messages[saveOption]);
+  }
+
+  function showToast(msg) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'toast';
+      toast.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#20315A;color:#fff;font-family:Montserrat,sans-serif;font-size:13px;font-weight:500;padding:12px 24px;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:600;transition:opacity 0.3s;';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    setTimeout(() => { toast.style.opacity = '0'; }, 2800);
+  }
+
+  // Close modal on overlay click
+  document.getElementById('saveModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
 </script>
+
+<!-- SAVE CONFIRMATION MODAL -->
+<div class="modal-overlay" id="saveModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Apply changes to</div>
+      <div class="modal-subtitle" id="modalSubtitle">Editing: Refuse · Bin · 180 Litre · Every Other Week</div>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-option selected" id="opt-single" onclick="selectSaveOption('single')">
+        <div class="modal-radio"></div>
+        <div class="modal-option-text">
+          <div class="modal-option-label">This service contract only</div>
+          <div class="modal-option-desc">Changes apply only to the currently selected contract.</div>
+        </div>
+      </div>
+
+      <div class="modal-option" id="opt-type" onclick="selectSaveOption('type')">
+        <div class="modal-radio"></div>
+        <div class="modal-option-text">
+          <div class="modal-option-label" id="optTypeLabel">All Refuse contracts</div>
+          <div class="modal-option-desc" id="optTypeDesc">Changes apply to all service contracts of this type for this location.</div>
+        </div>
+      </div>
+
+      <div class="modal-option" id="opt-all" onclick="selectSaveOption('all')">
+        <div class="modal-radio"></div>
+        <div class="modal-option-text">
+          <div class="modal-option-label">All service contracts</div>
+          <div class="modal-option-desc">Changes apply to every service contract across all types for this location.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="confirmSave()">Save changes</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
