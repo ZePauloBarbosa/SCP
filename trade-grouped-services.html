@@ -363,6 +363,27 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .billing-month-chevron { transition: transform 0.2s; color: #6B7280; }
 .billing-month-chevron.open { transform: rotate(180deg); }
 
+/* ── CHANGE HISTORY TAB ── */
+.ch-table { width: 100%; border-collapse: collapse; }
+.ch-table-header { display: grid; grid-template-columns: 160px 180px 200px 200px 140px; padding: 0 20px; height: 36px; align-items: center; background: #F4F6FA; border-bottom: 1px solid #E5E7EB; }
+.ch-table-header span { font-size: 10px; font-weight: 700; color: #9CA3AF; letter-spacing: .8px; text-transform: uppercase; }
+.ch-row { display: grid; grid-template-columns: 160px 180px 200px 200px 140px; padding: 0 20px; min-height: 48px; align-items: center; border-bottom: 1px solid #F3F4F6; background: #fff; transition: background 0.1s; }
+.ch-row:last-child { border-bottom: none; }
+.ch-row:hover { background: #FAFAFC; }
+.ch-cell { font-size: 12px; font-weight: 300; color: #242833; }
+.ch-cell-time { font-size: 12px; font-weight: 300; color: #9CA3AF; }
+.ch-arrow { color: #9CA3AF; font-size: 11px; font-weight: 300; }
+.ch-from { color: #6B7280; text-decoration: line-through; }
+.ch-to { color: #059669; font-weight: 500; }
+.ch-contract-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 400; color: #20315A; background: #EEF1F8; border-radius: 4px; padding: 2px 8px; }
+.ch-combined-row { background: #FFFBEB; }
+.ch-combined-row:hover { background: #FEF3C7; }
+.ch-empty { padding: 48px 24px; text-align: center; font-size: 13px; font-weight: 300; color: #9CA3AF; }
+
+/* contract-scoped change history (Edit Service — drop contract col) */
+.ch-table-header-contract { grid-template-columns: 160px 180px 220px 220px 130px; }
+.ch-row-contract { grid-template-columns: 160px 180px 220px 220px 130px; }
+
 </style>
 </head>
 <body>
@@ -615,6 +636,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
           <div class="cust-tab" onclick="switchCustTab('opcal-cust', this)">Operational Calendar</div>
           <div class="cust-tab" onclick="switchCustTab('bilcal-cust', this)">Billing Calendar</div>
           <div class="cust-tab" onclick="switchCustTab('bildetails-cust', this)">Billing Details</div>
+          <div class="cust-tab" onclick="switchCustTab('changehistory-cust', this)">Change History</div>
         </div>
 
         <!-- TAB: Service Details (existing location table) -->
@@ -980,7 +1002,77 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
           </div>
         </div><!-- /ctab-bildetails-cust -->
 
-      </div><!-- /cust-tabs-wrap -->
+        <!-- TAB: Change History (customer level — all contracts) -->
+        <div class="cust-tab-panel" id="ctab-changehistory-cust" style="padding:20px 24px;">
+          <div class="panel" style="margin-bottom:0;overflow:hidden;">
+            <div class="ch-table-header">
+              <span>Date / Time</span>
+              <span>Field Changed</span>
+              <span>Change</span>
+              <span>Service Contract</span>
+              <span>Changed By</span>
+            </div>
+            <!-- Combined row: background contract switch -->
+            <div class="ch-row ch-combined-row">
+              <div>
+                <div class="ch-cell" style="font-weight:500">28 May 2026</div>
+                <div class="ch-cell-time">14:32</div>
+              </div>
+              <div class="ch-cell" style="color:#92400E;font-weight:500">Pickup Frequency</div>
+              <div>
+                <span class="ch-from">Every Week</span>
+                <span class="ch-arrow"> → </span>
+                <span class="ch-to">Every Other Week</span>
+                <div style="font-size:10px;font-weight:300;color:#9CA3AF;margin-top:2px">Contract ended · new contract started</div>
+              </div>
+              <div><span class="ch-contract-badge">Refuse · Bin · 180L</span></div>
+              <div class="ch-cell">J. Roberts</div>
+            </div>
+            <!-- Individual field changes -->
+            <div class="ch-row">
+              <div>
+                <div class="ch-cell" style="font-weight:500">20 May 2026</div>
+                <div class="ch-cell-time">09:15</div>
+              </div>
+              <div class="ch-cell">Equipment Size</div>
+              <div>
+                <span class="ch-from">240 Litre</span>
+                <span class="ch-arrow"> → </span>
+                <span class="ch-to">360 Litre</span>
+              </div>
+              <div><span class="ch-contract-badge">Recycling · Bin · 360L</span></div>
+              <div class="ch-cell">P. Barbosa</div>
+            </div>
+            <div class="ch-row">
+              <div>
+                <div class="ch-cell" style="font-weight:500">12 May 2026</div>
+                <div class="ch-cell-time">11:44</div>
+              </div>
+              <div class="ch-cell">Account Status</div>
+              <div>
+                <span class="ch-from">Suspended</span>
+                <span class="ch-arrow"> → </span>
+                <span class="ch-to">Active</span>
+              </div>
+              <div><span class="ch-contract-badge">Refuse · EuroBin · 1100L</span></div>
+              <div class="ch-cell">P. Barbosa</div>
+            </div>
+            <div class="ch-row">
+              <div>
+                <div class="ch-cell" style="font-weight:500">01 May 2026</div>
+                <div class="ch-cell-time">08:02</div>
+              </div>
+              <div class="ch-cell">Equipment Type</div>
+              <div>
+                <span class="ch-from">Bin</span>
+                <span class="ch-arrow"> → </span>
+                <span class="ch-to">EuroBin</span>
+              </div>
+              <div><span class="ch-contract-badge">Refuse · EuroBin · 1100L</span></div>
+              <div class="ch-cell">J. Roberts</div>
+            </div>
+          </div>
+        </div><!-- /ctab-changehistory-cust -->
   </div>
 </div>
 
@@ -1031,6 +1123,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       <div class="svc-tab" onclick="switchTab('opcal', this)">Operational Calendar</div>
       <div class="svc-tab" onclick="switchTab('bilcal', this)">Billing Calendar</div>
       <div class="svc-tab" onclick="switchTab('bildetails', this)">Billing Details</div>
+      <div class="svc-tab" onclick="switchTab('changehistory', this)">Change History</div>
     </div>
 
     <!-- TAB: Service Details -->
@@ -1313,8 +1406,54 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       </div>
     </div><!-- /tab-bildetails -->
 
-  </div>
-</div>
+    <!-- TAB: Change History (contract-scoped) -->
+    <div class="tab-panel" id="tab-changehistory">
+      <div style="padding:20px 0;">
+        <div class="panel" style="margin-bottom:0;overflow:hidden;">
+          <div class="ch-table-header ch-table-header-contract">
+            <span>Date / Time</span>
+            <span>Field Changed</span>
+            <span>From</span>
+            <span>To</span>
+            <span>Changed By</span>
+          </div>
+          <!-- Combined row for this contract -->
+          <div class="ch-row ch-row-contract ch-combined-row">
+            <div>
+              <div class="ch-cell" style="font-weight:500">28 May 2026</div>
+              <div class="ch-cell-time">14:32</div>
+            </div>
+            <div class="ch-cell" style="color:#92400E;font-weight:500">Pickup Frequency</div>
+            <div class="ch-cell ch-from">Every Week</div>
+            <div>
+              <div class="ch-to">Every Other Week</div>
+              <div style="font-size:10px;font-weight:300;color:#9CA3AF;margin-top:2px">Contract ended · new contract started</div>
+            </div>
+            <div class="ch-cell">J. Roberts</div>
+          </div>
+          <div class="ch-row ch-row-contract">
+            <div>
+              <div class="ch-cell" style="font-weight:500">12 May 2026</div>
+              <div class="ch-cell-time">11:44</div>
+            </div>
+            <div class="ch-cell">Account Status</div>
+            <div class="ch-cell ch-from">Suspended</div>
+            <div class="ch-to">Active</div>
+            <div class="ch-cell">P. Barbosa</div>
+          </div>
+          <div class="ch-row ch-row-contract">
+            <div>
+              <div class="ch-cell" style="font-weight:500">01 May 2026</div>
+              <div class="ch-cell-time">08:02</div>
+            </div>
+            <div class="ch-cell">Equipment Type</div>
+            <div class="ch-cell ch-from">Bin</div>
+            <div class="ch-to">EuroBin</div>
+            <div class="ch-cell">J. Roberts</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-changehistory -->
 
 <!-- SAVE MODAL -->
 <div class="modal-overlay" id="saveModal">
