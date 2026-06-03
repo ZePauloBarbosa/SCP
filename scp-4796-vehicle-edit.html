@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Edit Vehicle — SmartCity Portal Mock (SCP-4796)</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #20315A;
+    --navy-dark: #242833;
+    --green: #33A542;
+    --bg: #FAFAFC;
+    --white: #FFFFFF;
+    --border: #E5E7EB;
+    --text-primary: #242833;
+    --text-secondary: #6B7280;
+    --text-label: #9CA3AF;
+    --blue-badge: #0066A6;
+    --input-focus: #20315A;
+    --disabled: #D9D9E1;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    background: var(--navy-dark);
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 0;
+  }
+  .topnav-logo {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    margin-right: 48px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .topnav-logo svg { width: 28px; height: 28px; }
+  .topnav-links { display: flex; height: 70px; }
+  .topnav-link {
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    color: rgba(255,255,255,0.75);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    border-bottom: 4px solid transparent;
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .topnav-link:hover { color: #fff; }
+  .topnav-link.active { color: #fff; border-bottom-color: var(--green); }
+  .topnav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .topnav-tenant {
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  /* ── SUB NAV ── */
+  .subnav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    padding: 0 32px;
+    height: 48px;
+    align-items: center;
+    gap: 0;
+  }
+  .subnav-link {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+  }
+  .subnav-link.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+    font-weight: 500;
+  }
+
+  /* ── PAGE LAYOUT ── */
+  .page-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 32px 64px;
+  }
+  .page-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 28px;
+  }
+  .page-back svg { cursor: pointer; color: var(--navy); }
+
+  /* ── MOCK BADGE ── */
+  .mock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFF3CD;
+    border: 1px solid #F0C040;
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #856404;
+    margin-bottom: 20px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px 40px;
+  }
+
+  /* ── TWO-COLUMN LAYOUT ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 48px;
+  }
+  .form-col { display: flex; flex-direction: column; gap: 0; }
+
+  /* ── SECTION DIVIDER ── */
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-label);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* ── FORM FIELD ── */
+  .field { margin-bottom: 20px; }
+  .field-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-label);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .field-input {
+    width: 100%;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-primary);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-input:focus { border-color: var(--input-focus); }
+  .field-input::placeholder { color: var(--disabled); }
+  .field-input:disabled { background: #F5F6FA; color: var(--text-secondary); cursor: not-allowed; }
+
+  .field-select {
+    width: 100%;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0 32px 0 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-primary);
+    background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .field-select:focus { border-color: var(--input-focus); }
+
+  /* ── DEVICE TYPE CHECKBOXES ── */
+  .device-type-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-primary);
+    user-select: none;
+  }
+  .checkbox-item input[type="checkbox"] { display: none; }
+  .checkbox-box {
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+    border: 1px solid var(--disabled);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .checkbox-item input:checked ~ .checkbox-box {
+    background: var(--navy);
+    border-color: var(--navy);
+  }
+  .checkbox-item input:checked ~ .checkbox-box::after {
+    content: '';
+    display: block;
+    width: 9px;
+    height: 5px;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) translate(0px, -1px);
+  }
+
+  /* ── INPUT WITH ACTION ICON ── */
+  .input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-with-icon .field-input { padding-right: 38px; }
+  .input-icon {
+    position: absolute;
+    right: 10px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .input-icon:hover { background: var(--bg); color: var(--navy); }
+  .input-icon.gear { color: var(--navy); }
+
+  /* ── MANUFACTURER ROW (new pattern) ── */
+  .manufacturer-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: end;
+    margin-bottom: 20px;
+  }
+  .manufacturer-row .field { margin-bottom: 0; }
+
+  /* ── VISION AI SECTION ── */
+  .vision-ai-panel {
+    background: #F8F9FC;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .vision-ai-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .vision-ai-panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .vision-ai-panel-body { display: flex; flex-direction: column; gap: 14px; }
+  .vision-ai-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .vision-ai-id-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+  .vision-ai-id-row .field { margin-bottom: 0; }
+
+  /* ── SURFSIGHT DEPRECATED NOTICE ── */
+  .deprecated-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #FFF8E1;
+    border: 1px solid #F0C040;
+    border-left: 3px solid #F0C040;
+    border-radius: 5px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: #856404;
+    line-height: 1.5;
+  }
+  .deprecated-notice svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* ── NEW FIELD CALLOUT ── */
+  .new-field-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #EAF4FF;
+    border: 1px solid #9FC5F9;
+    color: var(--blue-badge);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+    text-transform: uppercase;
+  }
+
+  /* ── COG BUTTON ── */
+  .cog-btn {
+    height: 38px;
+    width: 38px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--navy);
+    transition: background 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .cog-btn:hover { background: #EEF1F8; border-color: var(--navy); }
+  .cog-btn .tooltip {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--navy-dark);
+    color: #fff;
+    font-size: 11px;
+    white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .cog-btn:hover .tooltip { opacity: 1; }
+
+  /* ── ANNOTATION CALLOUTS ── */
+  .annotation {
+    display: flex;
+    gap: 8px;
+    background: #EEF1F8;
+    border-left: 3px solid var(--navy);
+    border-radius: 0 5px 5px 0;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--navy);
+    line-height: 1.5;
+  }
+  .annotation strong { font-weight: 600; }
+
+  /* ── BUTTONS ── */
+  .btn-row { display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; }
+  .btn-primary {
+    height: 36px;
+    padding: 0 28px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #1a2849; }
+  .btn-secondary {
+    height: 36px;
+    padding: 0 28px;
+    background: transparent;
+    color: var(--navy);
+    border: 1px solid var(--navy);
+    border-radius: 5px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-secondary:hover { background: #EEF1F8; }
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(36,40,51,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    width: 520px;
+    max-width: 95vw;
+    transform: translateY(12px);
+    transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-title { font-size: 18px; font-weight: 600; color: var(--navy); }
+  .modal-close {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; cursor: pointer; color: var(--text-secondary);
+    transition: background 0.15s;
+    border: none; background: transparent;
+  }
+  .modal-close:hover { background: var(--bg); }
+  .modal-body { padding: 20px 24px; }
+  .modal-subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .modal-table-header {
+    display: grid;
+    grid-template-columns: 32px 1fr 1fr;
+    gap: 0 12px;
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+  }
+  .modal-table-header span {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: var(--text-label);
+    text-transform: uppercase;
+  }
+  .modal-camera-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 1fr;
+    gap: 0 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--bg);
+  }
+  .modal-camera-row .field-input {
+    height: 32px;
+    font-size: 13px;
+    padding: 0 8px;
+  }
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── VISION IOT GUID EXPLANATION ── */
+  .guid-note {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+
+  /* ── ACTIVE checkbox styling ── */
+  .active-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="topnav-logo">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" fill="#33A542" opacity="0.9"/>
+    </svg>
+    Routeware
+  </div>
+  <div class="topnav-links">
+    <a class="topnav-link">DISPATCH</a>
+    <a class="topnav-link">CUSTOMERS</a>
+    <a class="topnav-link active">FLEET</a>
+    <a class="topnav-link">INSIGHTS</a>
+  </div>
+  <div class="topnav-right">
+    <span class="topnav-tenant">Playlyfe</span>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="9" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+      <circle cx="10" cy="8" r="3" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+      <path d="M4 17c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+    </svg>
+  </div>
+</nav>
+
+<!-- SUB NAV -->
+<nav class="subnav">
+  <a class="subnav-link active">Vehicles</a>
+  <a class="subnav-link">Resources</a>
+  <a class="subnav-link">Containers</a>
+  <a class="subnav-link">Facilities</a>
+  <a class="subnav-link">Geo-Fences</a>
+  <a class="subnav-link">Alerts</a>
+</nav>
+
+<!-- PAGE -->
+<div class="page-content">
+
+  <div class="page-back">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-right:2px">
+      <path d="M13 4L7 10L13 16" stroke="#20315A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Edit Vehicle
+  </div>
+
+  <div class="mock-badge">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#856404" stroke-width="1.2"/><path d="M6 4v3M6 8.5v.5" stroke="#856404" stroke-width="1.2" stroke-linecap="round"/></svg>
+    REFERENCE MOCK — SCP-4796 · Howen Camera Integration · Vehicle Edit Page Changes
+  </div>
+
+  <div class="card">
+    <div class="form-grid">
+
+      <!-- LEFT COLUMN: Vehicle Info -->
+      <div class="form-col">
+        <p class="section-label">Vehicle Information</p>
+
+        <div class="field">
+          <label class="field-label">Vehicle Name</label>
+          <input class="field-input" type="text" value="Samsara Jared Test Vehicle" />
+        </div>
+
+        <div class="field">
+          <label class="field-label">Vehicle Type</label>
+          <select class="field-select">
+            <option>Residential</option>
+            <option>Commercial</option>
+            <option>Roll-Off</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Vehicle Subtype</label>
+          <select class="field-select">
+            <option>Side Load</option>
+            <option>Rear Load</option>
+            <option>Front Load</option>
+          </select>
+        </div>
+
+        <div class="active-row">
+          <label class="checkbox-item">
+            <input type="checkbox" checked />
+            <span class="checkbox-box"></span>
+            Active
+          </label>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Service Status</label>
+          <select class="field-select">
+            <option>Available</option>
+            <option>In Service</option>
+            <option>Out of Service</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Operational Facility</label>
+          <select class="field-select">
+            <option value="">— Select —</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Empty Vehicle Unit of Measure</label>
+          <select class="field-select">
+            <option>Ton</option>
+            <option>Pound</option>
+            <option>Kilogram</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Empty Vehicle Weight</label>
+          <input class="field-input" type="number" value="5000" />
+        </div>
+
+        <div class="field">
+          <label class="field-label">Servicing Side</label>
+          <select class="field-select">
+            <option>Right</option>
+            <option>Left</option>
+            <option>Both</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Confirmation Mode</label>
+          <select class="field-select">
+            <option>Trapezoid</option>
+            <option>Rectangle</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Device Configuration -->
+      <div class="form-col">
+        <p class="section-label">Device Configuration</p>
+
+        <!-- Device Type checkboxes -->
+        <div class="field">
+          <label class="field-label">Device Type</label>
+          <div class="device-type-row">
+            <label class="checkbox-item" id="chk-sca-label">
+              <input type="checkbox" id="chk-sca" checked onchange="updateDeviceType()"/>
+              <span class="checkbox-box"></span>
+              SmartCity App
+            </label>
+            <label class="checkbox-item" id="chk-tel-label">
+              <input type="checkbox" id="chk-tel" checked onchange="updateDeviceType()"/>
+              <span class="checkbox-box"></span>
+              Telematics Device
+            </label>
+            <label class="checkbox-item" id="chk-vai-label">
+              <input type="checkbox" id="chk-vai" checked onchange="updateDeviceType()"/>
+              <span class="checkbox-box"></span>
+              Vision AI
+            </label>
+          </div>
+        </div>
+
+        <!-- Telematics Device ID -->
+        <div class="field" id="tel-id-field">
+          <label class="field-label">Telematics Device ID</label>
+          <div class="input-with-icon">
+            <input class="field-input" type="text" value="GTK9-7DR-RRJ" id="tel-id-input"/>
+            <span class="input-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 9.5L9.5 4.5M9.5 4.5H6M9.5 4.5V8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- Telematics Device Manufacturer -->
+        <div class="field" id="tel-mfr-field">
+          <label class="field-label">Telematics Device Manufacturer</label>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;">
+            <select class="field-select" id="tel-mfr-select">
+              <option>Samsara</option>
+              <option>Geotab</option>
+              <option>Motive</option>
+            </select>
+            <div class="cog-btn" title="">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 10a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M11.89 4.11l1.06-1.06M3.05 12.95l1.06-1.06" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span class="tooltip">Configure Vehicle Cameras</span>
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- VISION AI PANEL — NEW / REDESIGNED             -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div id="vision-ai-panel" class="vision-ai-panel">
+          <div class="vision-ai-panel-header">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="9" rx="1.5" stroke="#20315A" stroke-width="1.3"/><circle cx="8" cy="8.5" r="2" stroke="#20315A" stroke-width="1.3"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1" stroke="#20315A" stroke-width="1.3"/></svg>
+            <span class="vision-ai-panel-title">Vision AI Device</span>
+            <span class="new-field-tag">Updated</span>
+          </div>
+
+          <div class="vision-ai-panel-body">
+
+            <!-- ① Manufacturer dropdown — NEW -->
+            <div class="field" style="margin-bottom:0">
+              <label class="field-label">
+                Vision AI Device Manufacturer
+                <span class="new-field-tag">New</span>
+              </label>
+              <select class="field-select" id="vai-mfr-select" onchange="onVisionMfrChange(this.value)">
+                <option value="">— Select Manufacturer —</option>
+                <option value="samsara">Samsara</option>
+                <option value="howen" selected>Howen</option>
+              </select>
+            </div>
+
+            <!-- ② Vision AI Device ID + cog — UPDATED -->
+            <div class="vision-ai-id-row">
+              <div class="field" style="margin-bottom:0">
+                <label class="field-label" id="vai-id-label">
+                  Vision AI Device ID
+                  <span id="vai-id-hint" style="font-size:10px;color:var(--text-secondary);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px;">(Howen camera serial)</span>
+                </label>
+                <div class="input-with-icon">
+                  <input class="field-input" type="text" id="vai-device-id" placeholder="e.g. HW-8C4A2B1D3F" />
+                  <span class="input-icon">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                  </span>
+                </div>
+                <p class="guid-note" id="vai-guid-note">After saving, SmartCity registers this serial with Vision IoT and stores the returned GUID internally. You do not need to enter the GUID manually.</p>
+              </div>
+              <div class="cog-btn" onclick="openCameraModal()" title="">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 10a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M11.89 4.11l1.06-1.06M3.05 12.95l1.06-1.06" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                <span class="tooltip">Configure Vehicle Cameras</span>
+              </div>
+            </div>
+
+            <!-- ③ Vision IoT GUID (read-only, shown after registration) -->
+            <div class="field" style="margin-bottom:0" id="vai-guid-field">
+              <label class="field-label">
+                Vision IoT Device ID
+                <span class="new-field-tag">New</span>
+              </label>
+              <div class="input-with-icon">
+                <input class="field-input" type="text" value="viot-f4a2c1b9-3d7e-4a2f-91bc-7e8d2b1a5c3f" readonly style="color:var(--text-secondary);background:#F5F6FA;font-size:12px;" />
+                <span class="input-icon">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="4" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4 4V3a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 01-1 1h-1" stroke="currentColor" stroke-width="1.3"/></svg>
+                </span>
+              </div>
+              <p class="guid-note">Auto-assigned by Vision IoT after initial vehicle registration. Read-only.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- DEPRECATED SURFSIGHT NOTICE -->
+        <div class="deprecated-notice">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="margin-top:1px"><path d="M7 1L13 12H1L7 1z" stroke="#856404" stroke-width="1.2"/><path d="M7 5.5v3M7 10v.5" stroke="#856404" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span><strong>Surfsight Camera ID field is being retired.</strong> Surfsight cameras should now be configured using the Vision AI Device section above. Existing Surfsight IDs have been migrated and are read-only below.</span>
+        </div>
+
+        <div class="field" style="opacity:0.5;">
+          <label class="field-label">Surfsight Camera ID <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;">(deprecated)</span></label>
+          <input class="field-input" type="text" value="" placeholder="Migrated to Vision AI" disabled />
+        </div>
+
+        <!-- ANNOTATION -->
+        <div class="annotation">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><circle cx="7" cy="7" r="6" stroke="#20315A" stroke-width="1.2"/><path d="M7 4.5v3M7 9v.5" stroke="#20315A" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span><strong>Architecture note:</strong> The cog wheel on both Telematics Device Manufacturer and Vision AI Device ID triggers the same "Configure Vehicle Cameras" modal, scoped to that device's camera list. Manufacturer selection determines which API populates the camera list.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SAVE ROW -->
+    <div class="btn-row">
+      <button class="btn-secondary">Cancel</button>
+      <button class="btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- CONFIGURE VEHICLE CAMERAS MODAL -->
+<div class="modal-overlay" id="camera-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Configure Vehicle Cameras</span>
+      <button class="modal-close" onclick="closeCameraModal()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-subtitle">Cameras returned from the Howen API for this vehicle. Enable/disable and set display aliases.</p>
+      <div class="modal-table-header">
+        <span></span>
+        <span>Camera</span>
+        <span>Alias</span>
+      </div>
+      <div id="camera-rows">
+        <!-- rows injected by JS -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="height:34px;padding:0 20px;font-size:13px;" onclick="closeCameraModal()">Cancel</button>
+      <button class="btn-primary" style="height:34px;padding:0 20px;font-size:13px;" onclick="closeCameraModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Camera data per manufacturer
+  const cameraData = {
+    samsara: [
+      { name: 'DashcamDriverFacing', alias: 'Driver Facing', checked: true },
+      { name: 'DashcamRoadFacing', alias: 'Road Facing', checked: true },
+    ],
+    howen: [
+      { name: 'CH1 (Front)', alias: 'Front Facing', checked: true },
+      { name: 'CH2 (Rear)', alias: 'Rear Facing', checked: true },
+      { name: 'CH3 (Driver)', alias: 'Driver Facing', checked: true },
+      { name: 'CH4 (Hopper)', alias: 'Hopper Camera', checked: false },
+    ],
+  };
+
+  function onVisionMfrChange(val) {
+    const hint = document.getElementById('vai-id-hint');
+    const note = document.getElementById('vai-guid-note');
+    if (val === 'howen') {
+      hint.textContent = '(Howen camera serial)';
+      note.textContent = 'After saving, SmartCity registers this serial with Vision IoT and stores the returned GUID internally.';
+    } else if (val === 'samsara') {
+      hint.textContent = '(Samsara Gateway ID)';
+      note.textContent = 'After saving, SmartCity registers this device with Vision IoT and stores the returned GUID internally.';
+    } else {
+      hint.textContent = '';
+      note.textContent = '';
+    }
+  }
+
+  function openCameraModal() {
+    const mfr = document.getElementById('vai-mfr-select').value || 'howen';
+    const cameras = cameraData[mfr] || [];
+    const container = document.getElementById('camera-rows');
+    container.innerHTML = cameras.map((cam, i) => `
+      <div class="modal-camera-row">
+        <label class="checkbox-item" style="margin:0">
+          <input type="checkbox" ${cam.checked ? 'checked' : ''} />
+          <span class="checkbox-box"></span>
+        </label>
+        <span style="font-size:13px;color:var(--text-primary);font-weight:400;">${cam.name}</span>
+        <input class="field-input" type="text" value="${cam.alias}" style="height:32px;font-size:13px;padding:0 8px;" />
+      </div>
+    `).join('');
+    document.getElementById('camera-modal').classList.add('open');
+  }
+
+  function closeCameraModal() {
+    document.getElementById('camera-modal').classList.remove('open');
+  }
+
+  // Close on overlay click
+  document.getElementById('camera-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeCameraModal();
+  });
+
+  // Keyboard escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCameraModal(); });
+
+  // Checkbox interactivity
+  document.querySelectorAll('.checkbox-item input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      // visual handled by CSS :checked
+    });
+  });
+</script>
+</body>
+</html>
