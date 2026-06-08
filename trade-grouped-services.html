@@ -384,7 +384,61 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .ch-table-header-contract { grid-template-columns: 160px 180px 220px 220px 130px; }
 .ch-row-contract { grid-template-columns: 160px 180px 220px 220px 130px; }
 
-</style>
+
+    /* ── Deep link quick actions ────────────────────────── */
+    .contract-actions { flex-direction: column; align-items: flex-end; gap: 4px; }
+    .contract-deep-links { display: flex; align-items: center; gap: 6px; }
+    .deep-link-btn { background: none; border: none; padding: 0; font-size: 11px;
+      font-weight: 500; color: #20315A; cursor: pointer; text-decoration: underline;
+      text-underline-offset: 2px; font-family: inherit; }
+    .deep-link-btn:hover { color: #33A542; }
+    .deep-link-sep { font-size: 11px; color: #CBD5E1; }
+    .contract-icon-btns { display: flex; align-items: center; gap: 6px; }
+
+    /* ── Rates collapsible section ───────────────────────── */
+    .rates-section { border: 1px solid #E5E7EB; border-radius: 5px; margin-top: 12px; overflow: hidden; }
+    .rates-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between;
+      background: #F9FAFB; border: none; padding: 10px 14px; cursor: pointer; font-family: inherit; }
+    .rates-toggle-left { display: flex; align-items: center; gap: 8px; }
+    .rates-badge { font-size: 10px; font-weight: 600; color: #fff; background: #7C3AED;
+      border-radius: 3px; padding: 1px 6px; letter-spacing: 0.3px; }
+    .rates-label { font-size: 13px; font-weight: 600; color: #242833; }
+    .rates-chevron { transition: transform 0.2s; color: #6B7280; }
+    .rates-chevron.open { transform: rotate(180deg); }
+    .rates-body { display: none; padding: 16px 14px; background: #fff; border-top: 1px solid #E5E7EB; }
+    .rates-body.open { display: block; }
+    .rates-embed-shell { background: #F5F3FF; border: 1px dashed #A78BFA; border-radius: 4px;
+      padding: 16px; text-align: center; }
+    .rates-embed-label { font-size: 11px; font-weight: 600; color: #7C3AED; margin-bottom: 6px; }
+    .rates-embed-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+    .rates-embed-item { display: flex; flex-direction: column; align-items: flex-start;
+      background: #fff; border: 1px solid #DDD6FE; border-radius: 4px; padding: 8px 12px; min-width: 140px; }
+    .rates-embed-item-label { font-size: 10px; color: #7C3AED; font-weight: 500; margin-bottom: 2px; }
+    .rates-embed-item-val { font-size: 13px; font-weight: 600; color: #242833; }
+
+    /* ── Route confirmation prompt ───────────────────────── */
+    .route-confirm-prompt { display: flex; align-items: center; gap: 10px; background: #FFFBEB;
+      border: 1px solid #FCD34D; border-radius: 4px; padding: 9px 12px; margin-bottom: 14px; font-size: 12px; color: #92400E; }
+    .route-confirm-text { flex: 1; }
+    .route-confirm-btn { background: #FCD34D; border: none; border-radius: 3px; padding: 3px 10px;
+      font-size: 11px; font-weight: 600; color: #78350F; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .route-confirm-btn:hover { background: #F59E0B; }
+
+    /* ── Rate code mismatch warning ──────────────────────── */
+    .mismatch-warning { display: flex; align-items: flex-start; gap: 10px; background: #FEF2F2;
+      border: 1px solid #FCA5A5; border-radius: 5px; padding: 12px 14px; margin-bottom: 12px; }
+    .mismatch-icon { font-size: 16px; color: #DC2626; flex-shrink: 0; margin-top: 1px; }
+    .mismatch-body { flex: 1; }
+    .mismatch-title { font-size: 13px; font-weight: 600; color: #991B1B; margin-bottom: 3px; }
+    .mismatch-desc { font-size: 12px; color: #B91C1C; margin-bottom: 6px; }
+    .mismatch-link { font-size: 12px; font-weight: 600; color: #7C3AED; cursor: pointer;
+      text-decoration: underline; background: none; border: none; padding: 0; font-family: inherit; }
+    .mismatch-link:hover { color: #5B21B6; }
+    .mismatch-close { background: none; border: none; color: #9CA3AF; cursor: pointer;
+      font-size: 14px; padding: 0; flex-shrink: 0; }
+    .mismatch-close:hover { color: #4B5563; }
+
+    </style>
 </head>
 <body>
 
@@ -682,8 +736,15 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value route-na">Not available</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Ref_10094270120</div></div>
                 <div class="contract-actions">
-                  <button class="icon-btn edit-btn" onclick="openEdit(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <div class="contract-deep-links">
+                    <button class="deep-link-btn" onclick="openEdit(0)">Update billing details</button>
+                    <span class="deep-link-sep">·</span>
+                    <button class="deep-link-btn" onclick="openEdit(0)">Update routes</button>
+                  </div>
+                  <div class="contract-icon-btns">
+                    <button class="icon-btn edit-btn" onclick="openEdit(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                   <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                  </div><!-- /contract-icon-btns -->
                 </div>
               </div>
               <div class="contract-row">
@@ -692,8 +753,15 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value route-assigned">WEDNESDAY CREW</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">REF_100942701201</div></div>
                 <div class="contract-actions">
-                  <button class="icon-btn edit-btn" onclick="openEdit(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <div class="contract-deep-links">
+                    <button class="deep-link-btn" onclick="openEdit(1)">Update billing details</button>
+                    <span class="deep-link-sep">·</span>
+                    <button class="deep-link-btn" onclick="openEdit(1)">Update routes</button>
+                  </div>
+                  <div class="contract-icon-btns">
+                    <button class="icon-btn edit-btn" onclick="openEdit(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                   <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                  </div><!-- /contract-icon-btns -->
                 </div>
               </div>
             </div>
@@ -712,8 +780,15 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value route-na">Not available</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Rec_10094270120</div></div>
                 <div class="contract-actions">
-                  <button class="icon-btn edit-btn" onclick="openEdit(2)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <div class="contract-deep-links">
+                    <button class="deep-link-btn" onclick="openEdit(2)">Update billing details</button>
+                    <span class="deep-link-sep">·</span>
+                    <button class="deep-link-btn" onclick="openEdit(2)">Update routes</button>
+                  </div>
+                  <div class="contract-icon-btns">
+                    <button class="icon-btn edit-btn" onclick="openEdit(2)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                   <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                  </div><!-- /contract-icon-btns -->
                 </div>
               </div>
             </div>
@@ -732,8 +807,15 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value route-na">Not available</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">GDN_10094270120</div></div>
                 <div class="contract-actions">
-                  <button class="icon-btn edit-btn" onclick="openEdit(3)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <div class="contract-deep-links">
+                    <button class="deep-link-btn" onclick="openEdit(3)">Update billing details</button>
+                    <span class="deep-link-sep">·</span>
+                    <button class="deep-link-btn" onclick="openEdit(3)">Update routes</button>
+                  </div>
+                  <div class="contract-icon-btns">
+                    <button class="icon-btn edit-btn" onclick="openEdit(3)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                   <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                  </div><!-- /contract-icon-btns -->
                 </div>
               </div>
             </div>
@@ -1153,6 +1235,27 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
             <div class="toggle-sml" onclick="this.classList.toggle('on')"><div class="toggle-sml-knob"></div></div>
             <span class="notif-label">Customer Notifications</span>
           </div>
+          <!-- Rates (Elements micro-frontend embed) -->
+          <div class="rates-section">
+            <button class="rates-toggle" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.rates-chevron').classList.toggle('open')">
+              <div class="rates-toggle-left">
+                <span class="rates-badge">Elements</span>
+                <span class="rates-label">Rates</span>
+              </div>
+              <svg class="rates-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="rates-body">
+              <div class="rates-embed-shell">
+                <div class="rates-embed-label">Rate Manager — Elements (embedded)</div>
+                <div class="rates-embed-row">
+                  <div class="rates-embed-item"><span class="rates-embed-item-label">Rate Code</span><span class="rates-embed-item-val">DOM-1100-WK</span></div>
+                  <div class="rates-embed-item"><span class="rates-embed-item-label">Annual Rate</span><span class="rates-embed-item-val">£468.00</span></div>
+                  <div class="rates-embed-item"><span class="rates-embed-item-label">Term Type</span><span class="rates-embed-item-val">Permanent</span></div>
+                  <div class="rates-embed-item"><span class="rates-embed-item-label">Proration</span><span class="rates-embed-item-val">Enabled</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="freq-row">
             <div class="freq-label">Pickup Frequency Type</div>
             <div class="freq-val" id="fFreq">Every Week <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg> <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
@@ -1175,6 +1278,11 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
     <!-- Routes -->
     <div class="routes-card">
       <div class="routes-title">Routes</div>
+      <div class="route-confirm-prompt" id="routeConfirmPrompt" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span class="route-confirm-text">Service details have changed — please confirm routes are still correct before saving.</span>
+        <button class="route-confirm-btn" onclick="document.getElementById('routeConfirmPrompt').style.display='none'">✓ Confirmed</button>
+      </div>
       <div class="days-grid">
         <div class="day-row"><div class="day-checkbox"></div><span class="day-name">Monday</span><div class="route-select-wrap"><select class="route-select"><option>Route Templates</option></select></div></div>
         <div class="day-row"><div class="day-checkbox"></div><span class="day-name">Tuesday</span><div class="route-select-wrap"><select class="route-select"><option>Route Templates</option></select></div></div>
@@ -1186,6 +1294,17 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       </div>
     </div>
 
+
+    <!-- Rate code mismatch warning -->
+    <div class="mismatch-warning" id="mismatchWarning" style="display:none">
+      <span class="mismatch-icon">⚠</span>
+      <div class="mismatch-body">
+        <div class="mismatch-title">Rate code mismatch</div>
+        <div class="mismatch-desc">No matching rate code found in Elements for the current equipment / frequency combination.</div>
+        <button class="mismatch-link" onclick="document.getElementById('mismatchWarning').style.display='none'">Create rate code in Elements →</button>
+      </div>
+      <button class="mismatch-close" onclick="document.getElementById('mismatchWarning').style.display='none'">✕</button>
+    </div>
     <div class="edit-footer">
       <button class="btn-cancel" onclick="goTo('details')">Cancel</button>
       <button class="btn-save" onclick="openSaveModal()">Save</button>
@@ -1627,6 +1746,41 @@ document.getElementById('saveModal').addEventListener('click', function(e){ if(e
     const isOpen = body.classList.toggle('open');
     chevron.classList.toggle('open', isOpen);
   }
+
+
+  // ── Trade mock: new interaction handlers ───────────────────────────────────
+  function showRouteConfirm() {
+    var el = document.getElementById('routeConfirmPrompt');
+    if (el) el.style.display = 'flex';
+  }
+  function showMismatch() {
+    var el = document.getElementById('mismatchWarning');
+    if (el) el.style.display = 'flex';
+    showRouteConfirm();
+  }
+  // Wire frequency row click to show both prompts (mock interaction)
+  document.addEventListener('DOMContentLoaded', function() {
+    var fFreq = document.getElementById('fFreq');
+    if (fFreq) {
+      fFreq.addEventListener('click', function() {
+        // Toggle between normal state and mismatch state for demo
+        var warn = document.getElementById('mismatchWarning');
+        if (warn) {
+          if (warn.style.display === 'none' || warn.style.display === '') {
+            showMismatch();
+          } else {
+            warn.style.display = 'none';
+          }
+        }
+      });
+      fFreq.style.cursor = 'pointer';
+      fFreq.title = 'Click to simulate rate code mismatch warning';
+    }
+    // Wire any equipment field in the form to show route confirm
+    document.querySelectorAll('.form-field-svc select, .freq-row').forEach(function(el) {
+      el.addEventListener('change', showRouteConfirm);
+    });
+  });
 
 </script>
 </body>
