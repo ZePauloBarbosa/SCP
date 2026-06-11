@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Path Editor — Save Modal</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #20315A;
+    --green: #33A542;
+    --dark: #242833;
+    --page-bg: #FAFAFC;
+    --border: #E5E7EB;
+    --muted: #6B7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--page-bg);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* ---- Editor shell (context backdrop) ---- */
+  .editor {
+    position: relative;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+  }
+  .editor-header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    z-index: 2;
+  }
+  .editor-header .panel-title { font-size: 20px; font-weight: 600; color: var(--dark); }
+  .editor-header .path-title {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-size: 20px; font-weight: 500; color: var(--dark);
+  }
+  .editor-header .close {
+    position: absolute; right: 24px; top: 20px;
+    font-size: 22px; color: var(--muted); cursor: pointer; line-height: 1;
+  }
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 76px 24px 24px;
+    background: #fff;
+  }
+  .sidebar h3 { font-size: 18px; font-weight: 600; margin-bottom: 24px; }
+  .layer-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; font-size: 15px; color: var(--dark); }
+  .layer-row .box { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; }
+  .layer-group { padding: 14px 0; border-top: 1px solid var(--border); font-size: 15px; display: flex; justify-content: space-between; }
+  .apply-btn {
+    position: absolute; bottom: 24px; left: 24px; width: 252px;
+    background: var(--navy); color: #fff; border: none; border-radius: 8px;
+    padding: 16px; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer;
+  }
+  .map {
+    background:
+      repeating-linear-gradient(0deg, #ededf1 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(90deg, #ededf1 0 1px, transparent 1px 40px),
+      #e8e8ee;
+    position: relative;
+  }
+
+  /* ---- Overlay + modal ---- */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(20, 24, 35, 0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+  }
+  .modal {
+    background: #fff;
+    border-radius: 14px;
+    width: 460px;
+    max-width: calc(100% - 40px);
+    padding: 40px 40px 32px;
+    box-shadow: 0 20px 48px rgba(20, 24, 35, 0.22);
+  }
+  .modal h2 {
+    font-size: 34px; font-weight: 600; color: var(--dark);
+    margin-bottom: 22px; letter-spacing: -0.5px;
+  }
+  .modal p {
+    font-size: 19px; line-height: 1.45; color: var(--dark);
+  }
+  .modal .divider {
+    border: none; border-top: 1px solid var(--border);
+    margin: 26px 0 22px;
+  }
+  .modal-actions { display: flex; flex-direction: column; gap: 14px; }
+  .btn {
+    font-family: inherit; font-size: 19px; font-weight: 500;
+    padding: 16px; border-radius: 8px; cursor: pointer;
+    width: 100%; text-align: center; transition: filter .12s ease;
+  }
+  .btn:hover { filter: brightness(0.94); }
+  .btn-secondary {
+    background: #fff; color: var(--navy);
+    border: 1px solid var(--navy);
+  }
+  .btn-primary {
+    background: var(--navy); color: #fff; border: 1px solid var(--navy);
+  }
+</style>
+</head>
+<body>
+  <div class="editor">
+    <div class="editor-header">
+      <span class="panel-title">Travel Path Editor</span>
+      <span class="path-title">Luis Regression Travel Path 3</span>
+      <span class="close">&times;</span>
+    </div>
+
+    <aside class="sidebar">
+      <h3>Map Layers</h3>
+      <div class="layer-row"><span class="box"></span> Route Stops</div>
+      <div class="layer-row" style="padding-left:30px; color:var(--muted);">Show Order Numbers</div>
+      <div class="layer-group"><span>City Locations</span><span>&#9662;</span></div>
+      <div class="layer-group"><span>Geo-Fences</span><span>&#9662;</span></div>
+      <button class="apply-btn">Apply</button>
+    </aside>
+
+    <div class="map">
+      <div class="overlay">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <h2 id="modal-title">Save Travel Path</h2>
+          <p>Saving will update the active travel path with your edits.</p>
+          <p style="margin-top:16px;">Choose <strong>Save Travel Path</strong> to save your changes only. Choose <strong>Save &amp; Resequence</strong> to also re-order the route stops to match the travel path you&rsquo;re saving.</p>
+          <hr class="divider">
+          <div class="modal-actions">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-primary">Save Travel Path</button>
+            <button class="btn btn-primary">Save &amp; Resequence</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
