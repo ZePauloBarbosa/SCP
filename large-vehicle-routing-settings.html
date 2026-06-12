@@ -171,12 +171,11 @@
         <div class="close" id="closeX">×</div>
         <div class="modal-title">Regenerate Service Network</div>
         <div class="modal-body">
-          You've enabled Large Vehicle Routing. The service network must be regenerated for the
-          restrictions to take effect. Existing travel paths will not change until the network is regenerated.
+          You've enabled Large Vehicle Routing. The changes will take effect when the service network is regenerated.
         </div>
       </div>
       <div class="modal-foot">
-        <button class="btn btn-primary" id="gotoBtn">Go to Service Network</button>
+        <button class="btn btn-primary" id="okBtn">OK</button>
       </div>
     </div>
   </div>
@@ -191,7 +190,7 @@
     };
     function hide(){ overlay.classList.remove('show'); }
     document.getElementById('closeX').onclick = hide;
-    document.getElementById('gotoBtn').onclick = hide;
+    document.getElementById('okBtn').onclick = hide;
   </script>
 </body>
 </html>
