@@ -442,6 +442,19 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .modal-option.disabled{opacity:.55;cursor:not-allowed;pointer-events:none;}
 .modal-scope-note{font-size:11px;font-weight:300;color:#9CA3AF;padding:4px 2px 0;}
 .icon-btn.billing-btn svg{stroke:#20315A;}
+.modal-option-head{display:flex;align-items:center;gap:8px;}
+.aff-toggle{margin-left:auto;background:none;border:none;cursor:pointer;padding:2px;color:#6B7280;display:flex;}
+.aff-toggle svg{transition:transform .15s;}
+.aff-toggle.open svg{transform:rotate(180deg);}
+.modal-affected{display:none;margin-top:8px;border-top:1px solid #E5E7EB;padding-top:8px;}
+.modal-affected.open{display:block;}
+.affected-row{display:flex;align-items:center;gap:10px;font-size:11px;color:#242833;padding:4px 0;}
+.affected-ref{font-weight:600;color:#20315A;min-width:130px;}
+.affected-label{flex:1;font-weight:300;color:#6B7280;}
+.affected-field{font-size:10px;background:#EEF1F8;border:1px solid #E5E7EB;border-radius:8px;padding:1px 6px;color:#6B7280;white-space:nowrap;}
+.affected-empty{font-size:11px;color:#9CA3AF;font-weight:300;}
+.modal-scope-note.ok{color:#33A542;}
+.fv.changed,.freq-val.changed{box-shadow:inset 0 -2px 0 #C0392B;border-radius:2px;}
 </style>
 </head>
 <body>
@@ -1576,13 +1589,20 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       </div>
       <div class="modal-option" id="opt-type" onclick="selectSaveOption('type')">
         <div class="modal-radio"></div>
-        <div><div class="modal-option-label" id="optTypeLabel">All Refuse contracts</div><div class="modal-option-desc" id="optTypeDesc">Applies to all service contracts of this type for this location (route changes only).</div></div>
+        <div style="flex:1">
+          <div class="modal-option-head">
+            <div class="modal-option-label" id="optTypeLabel">All Refuse contracts</div>
+            <button class="aff-toggle" id="affChevron" onclick="toggleAffected(event)" title="Show affected contracts"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          </div>
+          <div class="modal-option-desc" id="optTypeDesc">Applies to all service contracts of this type for this location (route changes only).</div>
+          <div class="modal-affected" id="affectedList"></div>
+        </div>
       </div>
       <div class="modal-option disabled" id="opt-all" title="Removed per 12 Jun Trade call">
         <div class="modal-radio"></div>
         <div><div class="modal-option-label" style="text-decoration:line-through;color:#9CA3AF;">All service contracts</div><div class="modal-option-desc">Removed for now — bulk apply across all types can orphan contracts on mixed routes.</div></div>
       </div>
-      <div class="modal-scope-note">Bulk apply (“All [waste type]”) is available for route changes only.</div>
+      <div class="modal-scope-note" id="scopeDynamicNote">Bulk apply (“All [waste type]”) is available for route changes only.</div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -1600,6 +1620,7 @@ const contracts = [
   { label:'Garden · Bin · 140 Litre · Every Two Weeks', serviceType:'Domestic', equipType:'Bin', equipSize:'140 Litre Container', wasteType:'Garden', count:'1', ref:'GDN_10094270120', effDate:'01/04/2026', freq:'Every Two Weeks' }
 ];
 let currentContract = 0;
+let edit = { route:false, detail:false };
 
 // ── NAVIGATION ──
 function goTo(view) {
@@ -1633,6 +1654,9 @@ function openEdit(idx, destination) {
 
 function renderContract(idx) {
   const c = contracts[idx];
+  edit = { route:false, detail:false };
+  document.querySelectorAll('.fv.changed, .freq-val.changed').forEach(function(e){ e.classList.remove('changed'); });
+  var _rp = document.getElementById('routeConfirmPrompt'); if(_rp) _rp.style.display='none';
   document.getElementById('serviceNavSelect').value = idx;
   document.getElementById('navCounter').textContent = (idx+1) + ' of ' + contracts.length;
   document.getElementById('navPrev').style.opacity = idx === 0 ? '0.35' : '1';
@@ -1669,16 +1693,47 @@ let saveOption = 'single';
 function openSaveModal() {
   const c = contracts[currentContract];
   document.getElementById('modalSubtitle').textContent = 'Editing: ' + c.label;
-  document.getElementById('optTypeLabel').textContent = 'All ' + c.wasteType + ' contracts';
   const typeCount = contracts.filter(x => x.wasteType === c.wasteType).length;
-  document.getElementById('optTypeDesc').textContent = 'Changes apply to all ' + typeCount + ' ' + c.wasteType.toLowerCase() + ' service contract' + (typeCount!==1?'s':'') + ' for this location.';
+  document.getElementById('optTypeLabel').textContent = 'All ' + c.wasteType + ' contracts';
+  const bulkAllowed = edit.route && !edit.detail;
+  const optType = document.getElementById('opt-type');
+  const desc = document.getElementById('optTypeDesc');
+  const note = document.getElementById('scopeDynamicNote');
+  buildAffected(c);
+  if (bulkAllowed) {
+    optType.classList.remove('disabled');
+    desc.textContent = 'Applies the route change to all ' + typeCount + ' ' + c.wasteType.toLowerCase() + ' contract' + (typeCount!==1?'s':'') + ' on this location.';
+    note.textContent = 'Route change detected \u2014 bulk apply to all ' + c.wasteType + ' contracts is available.';
+    note.className = 'modal-scope-note ok';
+  } else {
+    optType.classList.add('disabled');
+    desc.textContent = edit.detail ? 'Disabled \u2014 service-detail changes are single-contract only.' : 'Make a route change to enable bulk apply.';
+    note.textContent = (edit.detail ? 'Service-detail change detected \u2014 ' : (edit.route ? '' : 'No changes yet \u2014 ')) + 'bulk apply is available for route changes only.';
+    note.className = 'modal-scope-note';
+    document.getElementById('affectedList').classList.remove('open');
+    document.getElementById('affChevron').classList.remove('open');
+  }
   selectSaveOption('single');
   document.getElementById('saveModal').classList.add('open');
 }
 function closeModal() { document.getElementById('saveModal').classList.remove('open'); }
 function selectSaveOption(opt) {
+  const el = document.getElementById('opt-'+opt);
+  if (el && el.classList.contains('disabled')) return;
   saveOption = opt;
   ['single','type','all'].forEach(o => document.getElementById('opt-'+o).classList.toggle('selected', o===opt));
+}
+function toggleAffected(ev) {
+  ev.stopPropagation();
+  document.getElementById('affectedList').classList.toggle('open');
+  document.getElementById('affChevron').classList.toggle('open');
+}
+function buildAffected(c) {
+  const list = document.getElementById('affectedList');
+  if (!list) return;
+  const affected = contracts.map((x,i)=>({x:x,i:i})).filter(o => o.x.wasteType===c.wasteType && o.i!==currentContract);
+  if (affected.length===0) { list.innerHTML = '<div class="affected-empty">No other ' + c.wasteType + ' contracts at this location.</div>'; return; }
+  list.innerHTML = affected.map(o => '<div class="affected-row"><span class="affected-ref">' + o.x.ref + '</span><span class="affected-label">' + o.x.label + '</span><span class="affected-field">route / collection day</span></div>').join('');
 }
 function confirmSave() {
   closeModal();
@@ -1692,6 +1747,14 @@ function showToast(msg) {
   setTimeout(()=>{ t.style.opacity='0'; }, 2800);
 }
 document.getElementById('saveModal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+  // ── DYNAMIC BULK: change detection ──
+  ['fServiceType','fEquipType','fEquipSize','fWasteType','fCount','fFreq','fEffDate'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) { el.style.cursor='pointer'; el.title='Click to simulate changing this field'; el.addEventListener('click', function(){ el.classList.add('changed'); edit.detail=true; var p=document.getElementById('routeConfirmPrompt'); if(p) p.style.display='flex'; }); }
+  });
+  document.querySelectorAll('.route-select').forEach(function(s){ s.addEventListener('change', function(){ edit.route=true; }); });
+  document.querySelectorAll('.day-checkbox').forEach(function(cb){ cb.style.cursor='pointer'; cb.addEventListener('click', function(){ cb.classList.toggle('checked'); edit.route=true; }); });
 
   // ── PAST-DUE FILTER ──
   function togglePastDue(toggleEl) {
