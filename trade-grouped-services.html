@@ -438,7 +438,11 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       font-size: 14px; padding: 0; flex-shrink: 0; }
     .mismatch-close:hover { color: #4B5563; }
 
-    </style>
+    .v2-badge{display:inline-block;margin-left:6px;font-size:9px;font-weight:700;letter-spacing:.04em;color:#6B7280;background:#EEF1F8;border:1px solid #E5E7EB;border-radius:8px;padding:1px 6px;vertical-align:middle;text-transform:uppercase;}
+.modal-option.disabled{opacity:.55;cursor:not-allowed;pointer-events:none;}
+.modal-scope-note{font-size:11px;font-weight:300;color:#9CA3AF;padding:4px 2px 0;}
+.icon-btn.billing-btn svg{stroke:#20315A;}
+</style>
 </head>
 <body>
 
@@ -480,11 +484,6 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       <input class="filter-input" type="text" placeholder="Account Number">
       <select class="filter-select"><option>Customer Type</option><option>Business</option><option>Residential</option></select>
       <select class="filter-select"><option>2 statuses</option><option>Active</option><option>Inactive</option></select>
-      <div class="filter-divider"></div>
-      <div class="past-due-toggle-wrap">
-        <div class="toggle" id="pastDueToggle" onclick="togglePastDue(this)"><div class="toggle-knob"></div></div>
-        <span class="past-due-label">Past-Due</span>
-      </div>
     </div>
 
     <div class="cust-table">
@@ -687,10 +686,10 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       <div class="cust-tabs-wrap">
         <div class="cust-tabs">
           <div class="cust-tab active" onclick="switchCustTab('svcdetails', this)">Service Details</div>
-          <div class="cust-tab" onclick="switchCustTab('opcal-cust', this)">Operational Calendar</div>
-          <div class="cust-tab" onclick="switchCustTab('bilcal-cust', this)">Billing Calendar</div>
+          <div class="cust-tab" onclick="switchCustTab('opcal-cust', this)">Operational Calendar <span class="v2-badge">V2</span></div>
+          <div class="cust-tab" onclick="switchCustTab('bilcal-cust', this)">Billing Calendar <span class="v2-badge">V2</span></div>
           <div class="cust-tab" onclick="switchCustTab('bildetails-cust', this)">Billing Details</div>
-          <div class="cust-tab" onclick="switchCustTab('changehistory-cust', this)">Change History</div>
+          <div class="cust-tab" onclick="switchCustTab('changehistory-cust', this)">Change History <span class="v2-badge">V2</span></div>
         </div>
 
         <!-- TAB: Service Details (existing location table) -->
@@ -736,13 +735,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value route-na">Not available</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Ref_10094270120</div></div>
                 <div class="contract-actions">
-                  <div class="contract-deep-links">
-                    <button class="deep-link-btn" onclick="openEdit(0, 'billing')">Update billing details</button>
-                    <span class="deep-link-sep">·</span>
-                    <button class="deep-link-btn" onclick="openEdit(0, 'routes')">Update routes</button>
-                  </div>
                   <div class="contract-icon-btns">
-                    <button class="icon-btn edit-btn" onclick="openEdit(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="icon-btn billing-btn" title="Update billing details" onclick="openEdit(0, 'billing')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                    <button class="icon-btn edit-btn" title="Update routes" onclick="openEdit(0, 'routes')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                   <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                   </div><!-- /contract-icon-btns -->
                 </div>
@@ -753,13 +748,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value route-assigned">WEDNESDAY CREW</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">REF_100942701201</div></div>
                 <div class="contract-actions">
-                  <div class="contract-deep-links">
-                    <button class="deep-link-btn" onclick="openEdit(1, 'billing')">Update billing details</button>
-                    <span class="deep-link-sep">·</span>
-                    <button class="deep-link-btn" onclick="openEdit(1, 'routes')">Update routes</button>
-                  </div>
                   <div class="contract-icon-btns">
-                    <button class="icon-btn edit-btn" onclick="openEdit(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="icon-btn billing-btn" title="Update billing details" onclick="openEdit(1, 'billing')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                    <button class="icon-btn edit-btn" title="Update routes" onclick="openEdit(1, 'routes')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                   <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                   </div><!-- /contract-icon-btns -->
                 </div>
@@ -780,13 +771,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value route-na">Not available</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Rec_10094270120</div></div>
                 <div class="contract-actions">
-                  <div class="contract-deep-links">
-                    <button class="deep-link-btn" onclick="openEdit(2, 'billing')">Update billing details</button>
-                    <span class="deep-link-sep">·</span>
-                    <button class="deep-link-btn" onclick="openEdit(2, 'routes')">Update routes</button>
-                  </div>
                   <div class="contract-icon-btns">
-                    <button class="icon-btn edit-btn" onclick="openEdit(2)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="icon-btn billing-btn" title="Update billing details" onclick="openEdit(2, 'billing')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                    <button class="icon-btn edit-btn" title="Update routes" onclick="openEdit(2, 'routes')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                   <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                   </div><!-- /contract-icon-btns -->
                 </div>
@@ -807,13 +794,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <div class="contract-col-value route-na">Not available</div>
                 <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">GDN_10094270120</div></div>
                 <div class="contract-actions">
-                  <div class="contract-deep-links">
-                    <button class="deep-link-btn" onclick="openEdit(3, 'billing')">Update billing details</button>
-                    <span class="deep-link-sep">·</span>
-                    <button class="deep-link-btn" onclick="openEdit(3, 'routes')">Update routes</button>
-                  </div>
                   <div class="contract-icon-btns">
-                    <button class="icon-btn edit-btn" onclick="openEdit(3)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="icon-btn billing-btn" title="Update billing details" onclick="openEdit(3, 'billing')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                    <button class="icon-btn edit-btn" title="Update routes" onclick="openEdit(3, 'routes')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                   <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                   </div><!-- /contract-icon-btns -->
                 </div>
@@ -1204,10 +1187,10 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
     <!-- TABS -->
     <div class="svc-tabs">
       <div class="svc-tab active" onclick="switchTab('details', this)">Service Details</div>
-      <div class="svc-tab" onclick="switchTab('opcal', this)">Operational Calendar</div>
-      <div class="svc-tab" onclick="switchTab('bilcal', this)">Billing Calendar</div>
+      <div class="svc-tab" onclick="switchTab('opcal', this)">Operational Calendar <span class="v2-badge">V2</span></div>
+      <div class="svc-tab" onclick="switchTab('bilcal', this)">Billing Calendar <span class="v2-badge">V2</span></div>
       <div class="svc-tab" onclick="switchTab('bildetails', this)">Billing Details</div>
-      <div class="svc-tab" onclick="switchTab('changehistory', this)">Change History</div>
+      <div class="svc-tab" onclick="switchTab('changehistory', this)">Change History <span class="v2-badge">V2</span></div>
     </div>
 
     <!-- TAB: Service Details -->
@@ -1593,12 +1576,13 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       </div>
       <div class="modal-option" id="opt-type" onclick="selectSaveOption('type')">
         <div class="modal-radio"></div>
-        <div><div class="modal-option-label" id="optTypeLabel">All Refuse contracts</div><div class="modal-option-desc" id="optTypeDesc">Changes apply to all service contracts of this type for this location.</div></div>
+        <div><div class="modal-option-label" id="optTypeLabel">All Refuse contracts</div><div class="modal-option-desc" id="optTypeDesc">Applies to all service contracts of this type for this location (route changes only).</div></div>
       </div>
-      <div class="modal-option" id="opt-all" onclick="selectSaveOption('all')">
+      <div class="modal-option disabled" id="opt-all" title="Removed per 12 Jun Trade call">
         <div class="modal-radio"></div>
-        <div><div class="modal-option-label">All service contracts</div><div class="modal-option-desc">Changes apply to every service contract across all types for this location.</div></div>
+        <div><div class="modal-option-label" style="text-decoration:line-through;color:#9CA3AF;">All service contracts</div><div class="modal-option-desc">Removed for now — bulk apply across all types can orphan contracts on mixed routes.</div></div>
       </div>
+      <div class="modal-scope-note">Bulk apply (“All [waste type]”) is available for route changes only.</div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
