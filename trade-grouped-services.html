@@ -1598,10 +1598,6 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
           <div class="modal-affected" id="affectedList"></div>
         </div>
       </div>
-      <div class="modal-option disabled" id="opt-all" title="Removed per 12 Jun Trade call">
-        <div class="modal-radio"></div>
-        <div><div class="modal-option-label" style="text-decoration:line-through;color:#9CA3AF;">All service contracts</div><div class="modal-option-desc">Removed for now — bulk apply across all types can orphan contracts on mixed routes.</div></div>
-      </div>
       <div class="modal-scope-note" id="scopeDynamicNote">Bulk apply (“All [waste type]”) is available for route changes only.</div>
     </div>
     <div class="modal-footer">
@@ -1721,7 +1717,7 @@ function selectSaveOption(opt) {
   const el = document.getElementById('opt-'+opt);
   if (el && el.classList.contains('disabled')) return;
   saveOption = opt;
-  ['single','type','all'].forEach(o => document.getElementById('opt-'+o).classList.toggle('selected', o===opt));
+  ['single','type'].forEach(o => document.getElementById('opt-'+o).classList.toggle('selected', o===opt));
 }
 function toggleAffected(ev) {
   ev.stopPropagation();
@@ -1737,7 +1733,7 @@ function buildAffected(c) {
 }
 function confirmSave() {
   closeModal();
-  const msgs = { single:'Saved changes to this service contract.', type:'Saved changes to all '+contracts[currentContract].wasteType+' contracts.', all:'Saved changes to all service contracts.' };
+  const msgs = { single:'Saved changes to this service contract.', type:'Saved changes to all '+contracts[currentContract].wasteType+' contracts.' };
   showToast(msgs[saveOption]);
 }
 function showToast(msg) {
