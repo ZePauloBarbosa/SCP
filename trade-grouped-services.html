@@ -405,16 +405,68 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
     .rates-label { font-size: 13px; font-weight: 600; color: #242833; }
     .rates-chevron { transition: transform 0.2s; color: #6B7280; }
     .rates-chevron.open { transform: rotate(180deg); }
-    .rates-body { display: none; padding: 16px 14px; background: #fff; border-top: 1px solid #E5E7EB; }
+    .rates-body { display: none; padding: 0; background: #fff; border-top: 1px solid #E5E7EB; }
     .rates-body.open { display: block; }
-    .rates-embed-shell { background: #F5F3FF; border: 1px dashed #A78BFA; border-radius: 4px;
-      padding: 16px; text-align: center; }
-    .rates-embed-label { font-size: 11px; font-weight: 600; color: #7C3AED; margin-bottom: 6px; }
-    .rates-embed-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
-    .rates-embed-item { display: flex; flex-direction: column; align-items: flex-start;
-      background: #fff; border: 1px solid #DDD6FE; border-radius: 4px; padding: 8px 12px; min-width: 140px; }
-    .rates-embed-item-label { font-size: 10px; color: #7C3AED; font-weight: 500; margin-bottom: 2px; }
-    .rates-embed-item-val { font-size: 13px; font-weight: 600; color: #242833; }
+
+    /* Rates — state switcher (mock only) */
+    .rates-state-bar { display: flex; gap: 0; border-bottom: 1px solid #E5E7EB; background: #F9FAFB; padding: 8px 14px; }
+    .rates-state-btn { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+      border: 1px solid #E5E7EB; background: #fff; color: #6B7280; padding: 3px 10px; cursor: pointer;
+      font-family: inherit; transition: all 0.1s; }
+    .rates-state-btn:first-child { border-radius: 3px 0 0 3px; }
+    .rates-state-btn:last-child { border-radius: 0 3px 3px 0; border-left: none; }
+    .rates-state-btn:not(:first-child):not(:last-child) { border-left: none; }
+    .rates-state-btn.active { background: #20315A; color: #fff; border-color: #20315A; }
+    .rates-state-label { font-size: 10px; color: #9CA3AF; align-self: center; margin-left: auto; font-style: italic; }
+
+    /* Rates — loading state */
+    .rates-loading { padding: 24px 14px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .rates-loading-spinner { width: 24px; height: 24px; border: 2px solid #E5E7EB; border-top-color: #7C3AED;
+      border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .rates-loading-text { font-size: 12px; color: #9CA3AF; }
+
+    /* Rates — vaporware / empty state */
+    .rates-vaporware { padding: 24px 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+    .rates-vaporware-icon { width: 36px; height: 36px; background: #F5F3FF; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; }
+    .rates-vaporware-title { font-size: 13px; font-weight: 600; color: #6B7280; }
+    .rates-vaporware-sub { font-size: 11px; color: #9CA3AF; max-width: 260px; line-height: 1.5; }
+
+    /* Rates — live state: action bar + table */
+    .rates-action-bar { display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px 8px; }
+    .rates-action-left { font-size: 11px; color: #6B7280; }
+    .rates-action-btns { display: flex; gap: 6px; }
+    .rates-btn-edit { height: 28px; padding: 0 12px; background: #fff; border: 1px solid #20315A;
+      border-radius: 4px; font-family: inherit; font-size: 12px; font-weight: 600; color: #20315A;
+      cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.1s; }
+    .rates-btn-edit:hover { background: #EEF1F8; }
+    .rates-btn-new { height: 28px; padding: 0 12px; background: #20315A; border: 1px solid #20315A;
+      border-radius: 4px; font-family: inherit; font-size: 12px; font-weight: 600; color: #fff;
+      cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.1s; }
+    .rates-btn-new:hover { background: #162545; }
+    .rates-btn-icon { flex-shrink: 0; }
+
+    /* Rates — rate rows table */
+    .rates-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .rates-table thead tr { background: #F9FAFB; border-top: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB; }
+    .rates-table th { padding: 6px 14px; text-align: left; font-size: 10px; font-weight: 700;
+      color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .rates-table td { padding: 8px 14px; color: #242833; border-bottom: 1px solid #F3F4F6; vertical-align: middle; }
+    .rates-table tr:last-child td { border-bottom: none; }
+    .rates-table tr:hover td { background: #FAFAFC; }
+    .rates-type-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 6px;
+      border-radius: 3px; letter-spacing: 0.3px; }
+    .rates-type-hauling { background: #EEF1F8; color: #20315A; }
+    .rates-type-tax { background: #F0FDF4; color: #166534; }
+    .rates-type-fee { background: #FEF3C7; color: #92400E; }
+    .rates-type-addon { background: #F5F3FF; color: #6D28D9; }
+    .rates-deep-link { color: #7C3AED; font-size: 11px; cursor: pointer; text-decoration: none;
+      display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+    .rates-deep-link:hover { text-decoration: underline; }
+    .rates-embed-note { font-size: 10px; color: #A78BFA; padding: 6px 14px 10px;
+      display: flex; align-items: center; gap: 5px; border-top: 1px solid #F3F4F6; }
 
     /* ── Route confirmation prompt ───────────────────────── */
     .route-confirm-prompt { display: flex; align-items: center; gap: 10px; background: #FFFBEB;
@@ -1231,23 +1283,99 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
             <div class="toggle-sml" onclick="this.classList.toggle('on')"><div class="toggle-sml-knob"></div></div>
             <span class="notif-label">Customer Notifications</span>
           </div>
-          <!-- Rates (Elements micro-frontend embed) -->
+          <!-- Rates (Elements micro-frontend embed) — SCP-4913 -->
           <div class="rates-section">
             <button class="rates-toggle" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.rates-chevron').classList.toggle('open')">
               <div class="rates-toggle-left">
                 <span class="rates-badge">Elements</span>
                 <span class="rates-label">Rates</span>
               </div>
-              <svg class="rates-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              <svg class="rates-chevron open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
             </button>
-            <div class="rates-body">
-              <div class="rates-embed-shell">
-                <div class="rates-embed-label">Rate Manager — Elements (embedded)</div>
-                <div class="rates-embed-row">
-                  <div class="rates-embed-item"><span class="rates-embed-item-label">Rate Code</span><span class="rates-embed-item-val">DOM-1100-WK</span></div>
-                  <div class="rates-embed-item"><span class="rates-embed-item-label">Annual Rate</span><span class="rates-embed-item-val">£468.00</span></div>
-                  <div class="rates-embed-item"><span class="rates-embed-item-label">Term Type</span><span class="rates-embed-item-val">Permanent</span></div>
-                  <div class="rates-embed-item"><span class="rates-embed-item-label">Proration</span><span class="rates-embed-item-val">Enabled</span></div>
+            <div class="rates-body open">
+              <!-- Mock state switcher (not shipped — for review only) -->
+              <div class="rates-state-bar">
+                <button class="rates-state-btn" onclick="setRatesState('loading')">Loading</button>
+                <button class="rates-state-btn" onclick="setRatesState('empty')">Empty / Vaporware</button>
+                <button class="rates-state-btn active" onclick="setRatesState('live')">Live (Elements ready)</button>
+                <span class="rates-state-label">Mock states — not shipped</span>
+              </div>
+
+              <!-- STATE: Loading -->
+              <div class="rates-loading" id="ratesLoading" style="display:none">
+                <div class="rates-loading-spinner"></div>
+                <div class="rates-loading-text">Loading rates from Elements…</div>
+              </div>
+
+              <!-- STATE: Empty / vaporware -->
+              <div class="rates-vaporware" id="ratesVaporware" style="display:none">
+                <div class="rates-vaporware-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                </div>
+                <div class="rates-vaporware-title">Rates unavailable</div>
+                <div class="rates-vaporware-sub">The Elements rate manager is not yet available for this contract. Rates will appear here once Elements is configured.</div>
+              </div>
+
+              <!-- STATE: Live — Elements embed with rows + action buttons -->
+              <div id="ratesLive">
+                <div class="rates-action-bar">
+                  <span class="rates-action-left">3 rate codes · contract <strong>RBC-2024-LDN</strong></span>
+                  <div class="rates-action-btns">
+                    <button class="rates-btn-edit" title="Opens rate editor in Elements">
+                      <svg class="rates-btn-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      Edit Rate
+                    </button>
+                    <button class="rates-btn-new" title="Creates new rate code in Elements">
+                      <svg class="rates-btn-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      New Rate
+                    </button>
+                  </div>
+                </div>
+                <table class="rates-table">
+                  <thead>
+                    <tr>
+                      <th>Rate Code</th>
+                      <th>Description</th>
+                      <th>Type</th>
+                      <th>Annual Rate</th>
+                      <th>Term</th>
+                      <th>Proration</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>DOM-1100-WK</strong></td>
+                      <td>Weekly domestic collection</td>
+                      <td><span class="rates-type-tag rates-type-hauling">Hauling</span></td>
+                      <td>£468.00</td>
+                      <td>Permanent</td>
+                      <td>Enabled</td>
+                      <td><a class="rates-deep-link">Edit in Elements <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a></td>
+                    </tr>
+                    <tr>
+                      <td><strong>TAX-LDN-VAT</strong></td>
+                      <td>London VAT (20%)</td>
+                      <td><span class="rates-type-tag rates-type-tax">Tax</span></td>
+                      <td>£93.60</td>
+                      <td>Permanent</td>
+                      <td>Enabled</td>
+                      <td><a class="rates-deep-link">Edit in Elements <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a></td>
+                    </tr>
+                    <tr>
+                      <td><strong>FEE-CSTR-ADD</strong></td>
+                      <td>Caster / bin assist add-on</td>
+                      <td><span class="rates-type-tag rates-type-addon">Add-on</span></td>
+                      <td>£24.00</td>
+                      <td>Monthly</td>
+                      <td>Disabled</td>
+                      <td><a class="rates-deep-link">Edit in Elements <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="rates-embed-note">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Rate rows are rendered by the Elements micro-frontend. Edit Rate / New Rate open the Elements flow in a new context.
                 </div>
               </div>
             </div>
@@ -1617,6 +1745,20 @@ const contracts = [
 ];
 let currentContract = 0;
 let edit = { route:false, detail:false };
+
+// ── RATES STATE SWITCHER (mock only) ──
+function setRatesState(state) {
+  document.getElementById('ratesLoading').style.display   = state === 'loading'  ? 'flex'  : 'none';
+  document.getElementById('ratesVaporware').style.display = state === 'empty'    ? 'flex'  : 'none';
+  document.getElementById('ratesLive').style.display      = state === 'live'     ? 'block' : 'none';
+  document.querySelectorAll('.rates-state-btn').forEach(function(btn) {
+    btn.classList.toggle('active',
+      (state === 'loading' && btn.textContent.trim() === 'Loading') ||
+      (state === 'empty'   && btn.textContent.trim() === 'Empty / Vaporware') ||
+      (state === 'live'    && btn.textContent.trim() === 'Live (Elements ready)')
+    );
+  });
+}
 
 // ── NAVIGATION ──
 function goTo(view) {
