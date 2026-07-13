@@ -109,18 +109,20 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .group-count { margin-left:6px; font-size:11px; font-weight:400; color:#6B7280; background:#E5E7EB; border-radius:10px; padding:1px 7px; }
 .group-contracts { display:none; }
 .group-contracts.open { display:block; }
-.contract-header-row { display:grid; grid-template-columns:48px 120px 180px 60px 130px 140px 160px 1fr; align-items:center; padding:6px 24px 6px 48px; background:#EEF1F8; border-bottom:1px solid #E5E7EB; }
+.contract-header-row { display:grid; grid-template-columns:32px 110px 160px 120px 120px 70px 82px 82px 150px 1fr; align-items:center; padding:6px 0 6px 48px; background:#EEF1F8; border-bottom:1px solid #E5E7EB; }
 .contract-header-row span { font-size:9px; font-weight:700; color:#9CA3AF; letter-spacing:.8px; text-transform:uppercase; }
-.contract-row { display:grid; grid-template-columns:48px 120px 180px 60px 130px 140px 160px 1fr; align-items:center; padding:0 24px 0 48px; height:40px; background:#fff; border-bottom:1px solid #F3F4F6; transition:background 0.1s; }
+.contract-row { display:grid; grid-template-columns:32px 110px 160px 120px 120px 70px 82px 82px 150px 1fr; align-items:center; padding:0 0 0 48px; height:40px; background:#fff; border-bottom:1px solid #F3F4F6; transition:background 0.1s; }
 .contract-row:last-child { border-bottom:none; }
 .contract-row:hover { background:#FAFAFC; }
-.contract-svc-icon { width:30px; height:30px; background:#33A542; border-radius:4px; display:flex; align-items:center; justify-content:center; }
+.contract-svc-icon { width:24px; height:24px; background:#33A542; border-radius:3px; display:flex; align-items:center; justify-content:center; }
+.surcharge-badge { display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:600; color:#20315A; background:#EEF1F8; border:1px solid #C7D0E8; border-radius:10px; padding:1px 7px; }
+.surcharge-none { font-size:12px; color:#9CA3AF; }
 .contract-col-value { font-size:12px; font-weight:300; color:#242833; }
 .contract-active-badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:400; color:#059669; }
 .contract-active-dot { width:6px; height:6px; background:#059669; border-radius:50%; }
 .contract-ref { font-size:11px; font-weight:300; color:#9CA3AF; }
 .contract-actions { display:flex; align-items:center; gap:6px; justify-content:flex-end; }
-.contract-icon-btns { display:flex; align-items:center; gap:6px; }
+.contract-icon-btns { display:flex; align-items:center; gap:6px; justify-self:end; padding-right:16px; }
 .edit-btn { cursor:pointer; color:#9CA3AF; transition:color 0.1s; }
 .edit-btn:hover { color:#20315A; }
 .route-assigned { font-size:11px; font-weight:500; color:#20315A; }
@@ -534,11 +536,14 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                   <span class="group-type-dot dot-refuse"></span><span class="group-type-name">Refuse</span><span class="group-count">2</span>
                 </div>
                 <div class="group-contracts open">
-                  <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Route</span><span>Reference</span><span></span></div>
+                  <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Frequency</span><span>Route</span><span>Rate</span><span>Rental Rate</span><span>Surcharges</span><span>Reference</span><span></span></div>
                   <div class="contract-row">
-                    <div><div class="contract-svc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg></div></div>
-                    <div class="contract-col-value">Domestic</div><div class="contract-col-value">EuroBin · 1100 Litre</div><div class="contract-col-value">1</div><div class="contract-col-value">Every Week</div>
+                    <div><div class="contract-svc-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg></div></div>
+                    <div class="contract-col-value">Domestic</div><div class="contract-col-value">EuroBin · 1100 Litre</div><div class="contract-col-value">Every Week</div>
                     <div class="contract-col-value route-na">Not available</div>
+                    <div class="contract-col-value">£24.50</div>
+                    <div class="contract-col-value">£6.00</div>
+                    <div><div class="surcharge-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> 2</div></div>
                     <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Ref_10094270120</div></div>
                     <div class="contract-icon-btns">
                       <button class="icon-btn billing-btn" title="Service history &amp; billing" onclick="openEditBilling(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
@@ -547,9 +552,12 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                     </div>
                   </div>
                   <div class="contract-row">
-                    <div><div class="contract-svc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6l3 14h12l3-14"/><path d="M1 6h22M10 3h4"/></svg></div></div>
-                    <div class="contract-col-value">Domestic</div><div class="contract-col-value">Bin · 180 Litre</div><div class="contract-col-value">1</div><div class="contract-col-value">Every Other Week</div>
+                    <div><div class="contract-svc-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6l3 14h12l3-14"/><path d="M1 6h22M10 3h4"/></svg></div></div>
+                    <div class="contract-col-value">Domestic</div><div class="contract-col-value">Bin · 180 Litre</div><div class="contract-col-value">Every Other Week</div>
                     <div class="contract-col-value route-assigned">WEDNESDAY CREW</div>
+                    <div class="contract-col-value">£12.75</div>
+                    <div class="contract-col-value">£0.00</div>
+                    <div><span class="surcharge-none">—</span></div>
                     <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">REF_100942701201</div></div>
                     <div class="contract-icon-btns">
                       <button class="icon-btn billing-btn" title="Service history &amp; billing" onclick="openEditBilling(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
@@ -566,11 +574,14 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                   <span class="group-type-dot dot-recycling"></span><span class="group-type-name">Recycling</span><span class="group-count">1</span>
                 </div>
                 <div class="group-contracts open">
-                  <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Route</span><span>Reference</span><span></span></div>
+                  <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Frequency</span><span>Route</span><span>Rate</span><span>Rental Rate</span><span>Surcharges</span><span>Reference</span><span></span></div>
                   <div class="contract-row">
-                    <div><div class="contract-svc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div></div>
-                    <div class="contract-col-value">Domestic</div><div class="contract-col-value">Bin · 240 Litre</div><div class="contract-col-value">1</div><div class="contract-col-value">Every Week</div>
+                    <div><div class="contract-svc-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div></div>
+                    <div class="contract-col-value">Domestic</div><div class="contract-col-value">Bin · 240 Litre</div><div class="contract-col-value">Every Week</div>
                     <div class="contract-col-value route-na">Not available</div>
+                    <div class="contract-col-value">£18.00</div>
+                    <div class="contract-col-value">£0.00</div>
+                    <div><span class="surcharge-none">—</span></div>
                     <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Rec_10094270120</div></div>
                     <div class="contract-icon-btns">
                       <button class="icon-btn billing-btn" title="Service history &amp; billing" onclick="openEditBilling(2)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
@@ -587,11 +598,14 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                   <span class="group-type-dot dot-garden"></span><span class="group-type-name">Garden</span><span class="group-count">1</span>
                 </div>
                 <div class="group-contracts open">
-                  <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Count</span><span>Frequency</span><span>Route</span><span>Reference</span><span></span></div>
+                  <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Frequency</span><span>Route</span><span>Rate</span><span>Rental Rate</span><span>Surcharges</span><span>Reference</span><span></span></div>
                   <div class="contract-row">
-                    <div><div class="contract-svc-icon" style="background:#059669"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 4 3 7 9 6M12 12c0-5 5-8 9-6 0 4-3 7-9 6"/></svg></div></div>
-                    <div class="contract-col-value">Domestic</div><div class="contract-col-value">Bin · 140 Litre</div><div class="contract-col-value">1</div><div class="contract-col-value">Every Two Weeks</div>
+                    <div><div class="contract-svc-icon" style="background:#059669"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 4 3 7 9 6M12 12c0-5 5-8 9-6 0 4-3 7-9 6"/></svg></div></div>
+                    <div class="contract-col-value">Domestic</div><div class="contract-col-value">Bin · 140 Litre</div><div class="contract-col-value">Every Two Weeks</div>
                     <div class="contract-col-value route-na">Not available</div>
+                    <div class="contract-col-value">£9.00</div>
+                    <div class="contract-col-value">£0.00</div>
+                    <div><span class="surcharge-none">—</span></div>
                     <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">GDN_10094270120</div></div>
                     <div class="contract-icon-btns">
                       <button class="icon-btn billing-btn" title="Service history &amp; billing" onclick="openEditBilling(3)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
