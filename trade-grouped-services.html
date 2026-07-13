@@ -83,6 +83,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .location-summary:hover { background:#FAFAFC; }
 .loc-address-main { font-size:14px; font-weight:400; color:#242833; }
 .loc-address-sub { font-size:12px; font-weight:300; color:#9CA3AF; margin-top:2px; }
+.loc-meta-row { display:flex; align-items:center; gap:10px; margin-top:5px; flex-wrap:wrap; }
+.loc-meta-item { font-size:10px; color:#9CA3AF; display:flex; align-items:center; gap:4px; }
+.loc-meta-tag { font-size:10px; font-weight:600; background:#F3F4F6; color:#6B7280; border-radius:3px; padding:1px 6px; }
 .status-account { font-size:11px; font-weight:300; color:#9CA3AF; }
 .service-icons { display:flex; gap:6px; align-items:center; }
 .svc-icon { width:40px; height:40px; background:#33A542; border-radius:4px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; }
@@ -500,7 +503,15 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
           <div>
             <div class="location-summary" onclick="toggleLocation(this)">
               <div style="font-size:14px;font-weight:300">1</div>
-              <div><div class="loc-address-main">1, WELFORD MEWS, LONDON, SE23 3FB</div><div class="loc-address-sub">RD04 - Residential - Terraced</div></div>
+              <div>
+                <div class="loc-address-main">1, WELFORD MEWS, LONDON, SE23 3FB</div>
+                <div class="loc-address-sub">RD04 - Residential - Terraced</div>
+                <div class="loc-meta-row">
+                  <span class="loc-meta-item">Region: <span class="loc-meta-tag">UK-SE</span></span>
+                  <span class="loc-meta-item">Service Area: <span class="loc-meta-tag">LEW</span></span>
+                  <span class="loc-meta-item">Tax Group: <span class="loc-meta-tag">UK STD 20%</span></span>
+                </div>
+              </div>
               <div><div style="font-size:14px;font-weight:400">Active</div><div class="status-account">10094270120</div></div>
               <div class="service-icons">
                 <div class="svc-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg><span class="svc-icon-label">Active</span></div>
