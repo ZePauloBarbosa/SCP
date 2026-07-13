@@ -215,21 +215,6 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .rates-chevron.open { transform:rotate(180deg); }
 .rates-body { display:none; padding:0; background:#fff; border-top:1px solid #E5E7EB; }
 .rates-body.open { display:block; }
-.rates-state-bar { display:flex; gap:0; border-bottom:1px solid #E5E7EB; background:#F9FAFB; padding:8px 14px; }
-.rates-state-btn { font-size:10px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; border:1px solid #E5E7EB; background:#fff; color:#6B7280; padding:3px 10px; cursor:pointer; font-family:inherit; }
-.rates-state-btn:first-child { border-radius:3px 0 0 3px; }
-.rates-state-btn:last-child { border-radius:0 3px 3px 0; border-left:none; }
-.rates-state-btn:not(:first-child):not(:last-child) { border-left:none; }
-.rates-state-btn.active { background:#20315A; color:#fff; border-color:#20315A; }
-.rates-state-label { font-size:10px; color:#9CA3AF; align-self:center; margin-left:auto; font-style:italic; }
-.rates-loading { padding:24px 14px; display:flex; flex-direction:column; align-items:center; gap:10px; }
-.rates-loading-spinner { width:24px; height:24px; border:2px solid #E5E7EB; border-top-color:#7C3AED; border-radius:50%; animation:spin 0.7s linear infinite; }
-@keyframes spin { to { transform:rotate(360deg); } }
-.rates-loading-text { font-size:12px; color:#9CA3AF; }
-.rates-vaporware { padding:24px 14px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; }
-.rates-vaporware-icon { width:36px; height:36px; background:#F5F3FF; border-radius:50%; display:flex; align-items:center; justify-content:center; }
-.rates-vaporware-title { font-size:13px; font-weight:600; color:#6B7280; }
-.rates-vaporware-sub { font-size:11px; color:#9CA3AF; max-width:260px; line-height:1.5; }
 .rates-action-bar { display:flex; align-items:center; justify-content:space-between; padding:10px 14px 8px; }
 .rates-action-left { font-size:11px; color:#6B7280; }
 .rates-action-btns { display:flex; gap:6px; }
@@ -396,6 +381,46 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .modal-scope-note.ok { color:#33A542; }
 .fv.changed, .freq-val.changed { box-shadow:inset 0 -2px 0 #C0392B; border-radius:2px; }
 .icon-btn.billing-btn svg { stroke:#20315A; }
+/* Finance page */
+.fin-subnav { display:flex; gap:0; border-bottom:2px solid #E5E7EB; margin-bottom:24px; }
+.fin-subnav-link { padding:10px 20px; font-size:13px; font-weight:500; color:#6B7280; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; }
+.fin-subnav-link.active { color:#33A542; border-bottom-color:#33A542; font-weight:600; }
+.fin-card { background:#fff; border:1px solid #E5E7EB; border-radius:8px; overflow:hidden; }
+.fin-card-header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid #E5E7EB; }
+.btn-create-batch { height:38px; padding:0 20px; background:#20315A; color:#fff; border:none; border-radius:6px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.btn-create-batch:hover { background:#162545; }
+.fin-batch-tabs { display:flex; border-bottom:2px solid #E5E7EB; padding:0 24px; }
+.fin-batch-tab { padding:12px 4px; font-size:13px; font-weight:500; color:#6B7280; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; margin-right:24px; }
+.fin-batch-tab.active { color:#33A542; border-bottom-color:#33A542; font-weight:600; }
+.fin-table { width:100%; border-collapse:collapse; font-size:12px; }
+.fin-table th { padding:10px 16px; text-align:left; font-size:9px; font-weight:700; color:#9CA3AF; letter-spacing:.6px; text-transform:uppercase; background:#F9FAFB; border-bottom:1px solid #E5E7EB; white-space:nowrap; }
+.fin-table td { padding:14px 16px; border-bottom:1px solid #F3F4F6; color:#242833; vertical-align:middle; }
+.fin-table tr:last-child td { border-bottom:none; }
+.fin-table tfoot td { border-top:2px solid #E5E7EB; border-bottom:none; }
+.fin-table tr:hover td { background:#FAFAFC; }
+.fin-batch-id { color:#20315A; font-weight:600; cursor:pointer; text-decoration:none; }
+.fin-status { font-size:11px; font-weight:600; padding:2px 10px; border-radius:4px; }
+.fin-status.processed { background:#FEF3C7; color:#92400E; }
+.fin-status.unbilled { background:#EDE9FE; color:#5B21B6; }
+.fin-scope { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:3px; }
+.fin-scope.svc { background:#DCFCE7; color:#166534; }
+.fin-scope.ord { background:#DBEAFE; color:#1E40AF; }
+.fin-scope.inact { background:#FEE2E2; color:#991B1B; }
+.fin-override-badge { display:inline-block; font-size:9px; font-weight:700; background:#EDE9FE; color:#5B21B6; border-radius:3px; padding:1px 5px; margin-left:4px; vertical-align:middle; }
+.fin-row-actions { display:flex; align-items:center; gap:6px; justify-content:flex-end; }
+.fin-history-btn { background:none; border:none; cursor:pointer; color:#9CA3AF; padding:4px; display:flex; align-items:center; }
+.fin-history-btn:hover { color:#20315A; }
+/* Create Invoice modal */
+.ci-field-row { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.ci-label { font-size:14px; font-weight:500; color:#242833; white-space:nowrap; }
+.ci-date-input { display:flex; align-items:center; gap:8px; border:1px solid #E5E7EB; border-radius:6px; padding:9px 12px; width:240px; flex-shrink:0; }
+.ci-toggle { width:42px; height:24px; background:#CBD5E1; border-radius:12px; position:relative; cursor:pointer; flex-shrink:0; transition:background .2s; }
+.ci-toggle.on { background:#33A542; }
+.ci-toggle-knob { width:18px; height:18px; background:#fff; border-radius:50%; position:absolute; top:3px; left:3px; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.ci-toggle.on .ci-toggle-knob { left:21px; }
+.ci-location-card { display:flex; align-items:flex-start; gap:12px; border:1px solid #E5E7EB; border-radius:8px; padding:14px 16px; background:#fff; }
+.ci-sel-btn { height:28px; padding:0 12px; border:1px solid #E5E7EB; border-radius:4px; font-family:inherit; font-size:11px; font-weight:600; color:#6B7280; background:#fff; cursor:pointer; letter-spacing:.3px; }
+.ci-sel-btn:hover { background:#F4F6FA; }
 </style>
 </head>
 <body>
@@ -405,7 +430,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
   <div class="nav-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>DISPATCH</div>
   <div class="nav-link active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>CUSTOMERS</div>
   <div class="nav-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>FLEET</div>
-  <div class="nav-link">FINANCE</div>
+  <div class="nav-link" id="nav-finance" onclick="goToFinance()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>FINANCE</div>
   <div class="nav-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>INSIGHTS</div>
   <div class="nav-right">
     <span class="client-tag">Test Billing</span>
@@ -460,7 +485,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
     </div>
     <div class="panel">
       <div class="panel-title">Customer details
-        <button class="icon-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="icon-btn" title="Edit customer billing" onclick="openEditCustomer()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
       </div>
       <div class="info-grid">
         <div class="info-field"><label>Customer Name</label><span>Customer Billing 7</span></div>
@@ -623,9 +648,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
         <div class="cust-tab-panel" id="ctab-bildetails-cust">
           <div class="bil-details-header">
             <div class="bil-details-title">Customer Invoices</div>
-            <button class="btn-edit-billing" onclick="openEditCustomer()">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              Edit Customer Billing
+            <button class="btn-edit-billing" onclick="openCreateInvoice()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+              Create Invoice
             </button>
           </div>
           <!-- Invoice table -->
@@ -735,16 +760,8 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 <svg class="rates-chevron open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
               </button>
               <div class="rates-body open">
-                <div class="rates-state-bar">
-                  <button class="rates-state-btn" onclick="setRatesState('loading')">Loading</button>
-                  <button class="rates-state-btn" onclick="setRatesState('empty')">Empty</button>
-                  <button class="rates-state-btn active" onclick="setRatesState('live')">Live</button>
-                  <span class="rates-state-label">Mock states</span>
-                </div>
-                <div class="rates-loading" id="ratesLoading" style="display:none"><div class="rates-loading-spinner"></div><div class="rates-loading-text">Loading rates from Elements…</div></div>
-                <div class="rates-vaporware" id="ratesVaporware" style="display:none"><div class="rates-vaporware-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="rates-vaporware-title">Rates unavailable</div><div class="rates-vaporware-sub">Elements not yet configured for this contract.</div></div>
                 <div id="ratesLive">
-                  <div class="rates-action-bar"><span class="rates-action-left">3 rate codes · contract <strong>RBC-2024-LDN</strong></span><div class="rates-action-btns"><button class="rates-btn-edit">Edit Rate</button><button class="rates-btn-new">New Rate</button></div></div>
+                  <div class="rates-action-bar"><span class="rates-action-left">3 rate codes · contract <strong>RBC-2024-LDN</strong></span><div class="rates-action-btns"><button class="rates-btn-new">Update Rate</button></div></div>
                   <table class="rates-table"><thead><tr><th>Rate Code</th><th>Description</th><th>Type</th><th>Annual Rate</th><th>Term</th><th>Proration</th></tr></thead><tbody>
                     <tr><td><strong>DOM-1100-WK</strong></td><td>Weekly domestic collection</td><td><span class="rates-type-tag rates-type-hauling">Hauling</span></td><td>£468.00</td><td>Permanent</td><td>Enabled</td></tr>
                     <tr><td><strong>TAX-LDN-VAT</strong></td><td>London VAT (20%)</td><td><span class="rates-type-tag rates-type-tax">Tax</span></td><td>£93.60</td><td>Permanent</td><td>Enabled</td></tr>
@@ -1106,6 +1123,207 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
   </div>
 </div>
 
+<!-- ══ VIEW 4: FINANCE ══ -->
+<div class="page-view" id="view-finance">
+  <div style="padding:24px 32px;max-width:1280px;margin:0 auto">
+    <!-- Sub-nav -->
+    <div class="fin-subnav">
+      <div class="fin-subnav-link active">Billing Batches</div>
+      <div class="fin-subnav-link">Exports</div>
+    </div>
+    <!-- Card -->
+    <div class="fin-card">
+      <div class="fin-card-header">
+        <div style="font-size:18px;font-weight:600;color:#242833">Billing Batches</div>
+        <button class="btn-create-batch" onclick="openCreateBatch()">+ Create Batch</button>
+      </div>
+      <!-- Batch tabs -->
+      <div class="fin-batch-tabs">
+        <div class="fin-batch-tab active">Open Batches</div>
+        <div class="fin-batch-tab">Closed Batches</div>
+      </div>
+      <!-- Table -->
+      <table class="fin-table">
+        <thead><tr>
+          <th>Batch ID</th><th>Type</th><th>Status</th><th>Billing Cycle</th><th>Batch Date</th><th>Billing Through</th><th>Scope</th><th>Invoices</th><th>Total</th><th>Notifications</th><th></th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><a class="fin-batch-id">0000000112</a></td>
+            <td>Normal</td>
+            <td><span class="fin-status processed">Processed</span></td>
+            <td>28D : 28 Day — Monthly Advance</td>
+            <td>07/13/2026</td><td>07/11/2026</td>
+            <td><span class="fin-scope svc">SVC</span><span class="fin-scope ord">ORD</span></td>
+            <td>42</td><td>1,528.40</td><td>Not Sent</td>
+            <td><div class="fin-row-actions"><div class="ctx-wrap"><button class="ctx-trigger" onclick="toggleCtxMenu(event,'fin-ctx1')">⋮</button><div class="ctx-menu" id="fin-ctx1" style="right:24px"><div class="ctx-menu-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View Transactions</div><div class="ctx-menu-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> View Batch Billing History</div><div class="ctx-menu-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg> Compare Batch</div><div class="ctx-menu-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Reports</div><div class="ctx-divider"></div><div class="ctx-menu-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg> Finalize Batch</div><div class="ctx-menu-item danger"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.85"/></svg> Reverse</div></div></div><button class="fin-history-btn" title="History"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></td>
+          </tr>
+          <tr>
+            <td><a class="fin-batch-id">0000000111</a></td>
+            <td>Normal</td>
+            <td><span class="fin-status processed">Processed</span></td>
+            <td>QTR : Quarterly Advance <span class="fin-override-badge">OVERRIDE</span></td>
+            <td>07/01/2026</td><td>09/30/2026</td>
+            <td><span class="fin-scope svc">SVC</span></td>
+            <td></td><td></td><td></td>
+            <td><div class="fin-row-actions"><div class="ctx-wrap"><button class="ctx-trigger" onclick="toggleCtxMenu(event,'fin-ctx2')">⋮</button><div class="ctx-menu" id="fin-ctx2" style="right:24px"><div class="ctx-menu-item">View Transactions</div><div class="ctx-menu-item">View Batch Billing History</div><div class="ctx-menu-item">Compare Batch</div><div class="ctx-menu-item">Reports</div><div class="ctx-divider"></div><div class="ctx-menu-item">Finalize Batch</div><div class="ctx-menu-item danger">Reverse</div></div></div><button class="fin-history-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></td>
+          </tr>
+          <tr>
+            <td><a class="fin-batch-id">0000000110</a></td>
+            <td>Single</td>
+            <td><span class="fin-status processed">Processed</span></td>
+            <td>28D : 28 Day — Monthly Advance</td>
+            <td>06/16/2026</td><td>07/11/2026</td>
+            <td><span class="fin-scope svc">SVC</span></td>
+            <td></td><td></td><td></td>
+            <td><div class="fin-row-actions"><div class="ctx-wrap"><button class="ctx-trigger" onclick="toggleCtxMenu(event,'fin-ctx3')">⋮</button><div class="ctx-menu" id="fin-ctx3" style="right:24px"><div class="ctx-menu-item">View Transactions</div><div class="ctx-menu-item">View Batch Billing History</div><div class="ctx-menu-item">Compare Batch</div><div class="ctx-menu-item">Reports</div><div class="ctx-divider"></div><div class="ctx-menu-item">Finalize Batch</div><div class="ctx-menu-item danger">Reverse</div></div></div><button class="fin-history-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></td>
+          </tr>
+          <tr>
+            <td><a class="fin-batch-id">0000000108</a></td>
+            <td>Normal</td>
+            <td><span class="fin-status unbilled">Unbilled</span></td>
+            <td>28D : 28 Day — Monthly Advance</td>
+            <td>06/16/2026</td><td>06/13/2026</td>
+            <td><span class="fin-scope svc">SVC</span><span class="fin-scope ord">ORD</span><span class="fin-scope inact">INACT</span></td>
+            <td></td><td></td><td></td>
+            <td><div class="fin-row-actions"><div class="ctx-wrap"><button class="ctx-trigger" onclick="toggleCtxMenu(event,'fin-ctx4')">⋮</button><div class="ctx-menu" id="fin-ctx4" style="right:24px"><div class="ctx-menu-item">View Transactions</div><div class="ctx-menu-item">View Batch Billing History</div><div class="ctx-menu-item">Compare Batch</div><div class="ctx-menu-item">Reports</div><div class="ctx-divider"></div><div class="ctx-menu-item">Finalize Batch</div><div class="ctx-menu-item danger">Reverse</div></div></div><button class="fin-history-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></td>
+          </tr>
+          <tr>
+            <td><a class="fin-batch-id">0000000095</a></td>
+            <td>Normal</td>
+            <td><span class="fin-status processed">Processed</span></td>
+            <td>28D : 28 Day — Monthly Advance</td>
+            <td>05/19/2026</td><td>06/13/2026</td>
+            <td><span class="fin-scope svc">SVC</span><span class="fin-scope ord">ORD</span></td>
+            <td>40</td><td>1,444.20</td><td>Sent</td>
+            <td><div class="fin-row-actions"><div class="ctx-wrap"><button class="ctx-trigger" onclick="toggleCtxMenu(event,'fin-ctx5')">⋮</button><div class="ctx-menu" id="fin-ctx5" style="right:24px"><div class="ctx-menu-item">View Transactions</div><div class="ctx-menu-item">View Batch Billing History</div><div class="ctx-menu-item">Compare Batch</div><div class="ctx-menu-item">Reports</div><div class="ctx-divider"></div><div class="ctx-menu-item">Finalize Batch</div><div class="ctx-menu-item danger">Reverse</div></div></div><button class="fin-history-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></td>
+          </tr>
+        </tbody>
+        <tfoot><tr><td colspan="7" style="text-align:right;font-weight:600;color:#242833;padding:12px 16px">Total:</td><td style="font-weight:600;color:#242833;padding:12px 16px">91</td><td style="font-weight:600;color:#242833;padding:12px 16px">3,973.58</td><td colspan="2"></td></tr></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CREATE BILLING BATCH MODAL ══ -->
+<div class="modal-overlay" id="createBatchModal">
+  <div class="modal-lg" style="width:560px;max-height:90vh">
+    <div class="modal-header" style="border-bottom:1px solid #E5E7EB">
+      <div class="modal-title">Create Billing Batch</div>
+      <button class="modal-close-btn" onclick="closeXModal('createBatchModal')">✕</button>
+    </div>
+    <div class="modal-body-scroll" style="padding:28px 32px;display:flex;flex-direction:column;gap:22px">
+      <div class="ci-field-row">
+        <label class="ci-label">Billing Cycle</label>
+        <div style="width:280px;flex-shrink:0">
+          <select style="width:100%;height:40px;border:1px solid #E5E7EB;border-radius:6px;padding:0 12px;font-family:inherit;font-size:14px;color:#242833;appearance:none;background:#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\") no-repeat calc(100% - 10px) center">
+            <option>28D — 28 Day Monthly Advance</option>
+            <option>QTR — Quarterly Advance</option>
+            <option>ANN — Annual</option>
+          </select>
+          <div style="font-size:12px;color:#9CA3AF;margin-top:4px;text-align:right">Normal</div>
+        </div>
+      </div>
+      <div class="ci-field-row">
+        <label class="ci-label">Billing Date</label>
+        <div class="ci-date-input" style="width:280px"><input type="text" value="07/13/2026" style="border:none;outline:none;font-family:inherit;font-size:14px;color:#242833;width:100%"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      </div>
+      <div class="ci-field-row"><label class="ci-label">Override Due Date</label><div class="ci-toggle" onclick="this.classList.toggle('on')"><div class="ci-toggle-knob"></div></div></div>
+      <div class="ci-field-row">
+        <label class="ci-label">Bill Services Through</label>
+        <div class="ci-date-input" style="width:280px"><input type="text" value="07/13/2026" style="border:none;outline:none;font-family:inherit;font-size:14px;color:#242833;width:100%"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      </div>
+      <div class="ci-field-row">
+        <label class="ci-label">Posting Period</label>
+        <div class="ci-date-input" style="width:280px;background:#F9FAFB"><input type="text" value="202607" disabled style="border:none;outline:none;font-family:inherit;font-size:14px;color:#9CA3AF;background:transparent;width:100%"></div>
+      </div>
+      <div class="ci-field-row"><label class="ci-label">Bill Recurring Services</label><div class="ci-toggle on" onclick="this.classList.toggle('on')"><div class="ci-toggle-knob"></div></div></div>
+      <div class="ci-field-row"><label class="ci-label">Bill Service Orders</label><div class="ci-toggle on" onclick="this.classList.toggle('on')"><div class="ci-toggle-knob"></div></div></div>
+      <div class="ci-field-row">
+        <label class="ci-label" style="display:flex;align-items:center;gap:5px">Bill Service Inactivity <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></label>
+        <div class="ci-toggle on" onclick="this.classList.toggle('on')"><div class="ci-toggle-knob"></div></div>
+      </div>
+      <div class="ci-field-row">
+        <label class="ci-label">Regions</label>
+        <select style="width:280px;height:40px;border:1px solid #E5E7EB;border-radius:6px;padding:0 12px;font-family:inherit;font-size:14px;color:#242833;appearance:none;background:#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\") no-repeat calc(100% - 10px) center;flex-shrink:0">
+          <option>All</option><option>UK-SE</option><option>UK-NW</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer-edit">
+      <button class="btn-cancel" onclick="closeXModal('createBatchModal')">Cancel</button>
+      <button class="btn-save" onclick="closeXModal('createBatchModal');showToast('Billing batch created.')">Create Batch</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CREATE INVOICE MODAL ══ -->
+<div class="modal-overlay" id="createInvoiceModal">
+  <div class="modal-lg" style="width:560px;max-height:90vh">
+    <div class="modal-header" style="border-bottom:1px solid #E5E7EB">
+      <div class="modal-title">Create Invoice</div>
+      <button class="modal-close-btn" onclick="closeXModal('createInvoiceModal')">✕</button>
+    </div>
+    <div class="modal-body-scroll" style="padding:28px 32px;display:flex;flex-direction:column;gap:20px">
+      <!-- Date fields -->
+      <div class="ci-field-row">
+        <label class="ci-label">Billing Date</label>
+        <div class="ci-date-input"><input type="text" value="07/13/2026" style="border:none;outline:none;font-family:inherit;font-size:14px;color:#242833;width:100%"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      </div>
+      <div class="ci-field-row">
+        <label class="ci-label">Due Date</label>
+        <div class="ci-date-input"><input type="text" value="07/27/2026" style="border:none;outline:none;font-family:inherit;font-size:14px;color:#242833;width:100%"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      </div>
+      <div class="ci-field-row">
+        <label class="ci-label">Bill Services Through</label>
+        <div class="ci-date-input"><input type="text" value="07/13/2026" style="border:none;outline:none;font-family:inherit;font-size:14px;color:#242833;width:100%"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      </div>
+      <!-- Toggles -->
+      <div class="ci-field-row"><label class="ci-label">Bill Recurring Services</label><div class="ci-toggle on" onclick="this.classList.toggle('on')"><div class="ci-toggle-knob"></div></div></div>
+      <div class="ci-field-row"><label class="ci-label">Bill Service Orders</label><div class="ci-toggle" onclick="this.classList.toggle('on')"><div class="ci-toggle-knob"></div></div></div>
+      <div class="ci-field-row">
+        <label class="ci-label" style="display:flex;align-items:center;gap:5px">Bill Service Inactivity <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></label>
+        <div class="ci-toggle" onclick="this.classList.toggle('on')"><div class="ci-toggle-knob"></div></div>
+      </div>
+      <!-- Service Locations -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <label class="ci-label" style="margin:0;font-size:14px;font-weight:500;color:#242833">Service Locations</label>
+          <div style="display:flex;gap:8px">
+            <button class="ci-sel-btn">SELECT ALL</button>
+            <button class="ci-sel-btn">SELECT NONE</button>
+          </div>
+        </div>
+        <div class="ci-location-card">
+          <input type="checkbox" checked style="width:16px;height:16px;accent-color:#33A542;flex-shrink:0">
+          <div>
+            <div style="font-size:13px;font-weight:500;color:#242833">0001: 1 Welford Mews, London SE23 3FB</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Active · 3 services</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#9CA3AF;margin-top:8px">1 location selected</div>
+      </div>
+      <!-- Mark Orders RTB -->
+      <div class="ci-field-row">
+        <label class="ci-label" style="display:flex;align-items:center;gap:5px">Mark Orders Ready to Bill <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></label>
+        <div class="ci-toggle" onclick="this.classList.toggle('on')"><div class="ci-toggle-knob"></div></div>
+      </div>
+      <div class="ci-field-row">
+        <label class="ci-label" style="color:#9CA3AF">Order Date From</label>
+        <div class="ci-date-input" style="background:#F9FAFB"><input type="text" value="07/01/2026" disabled style="border:none;outline:none;font-family:inherit;font-size:14px;color:#9CA3AF;background:transparent;width:100%"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      </div>
+      <div class="ci-field-row">
+        <label class="ci-label" style="color:#9CA3AF">Order Date To</label>
+        <div class="ci-date-input" style="background:#F9FAFB"><input type="text" value="07/13/2026" disabled style="border:none;outline:none;font-family:inherit;font-size:14px;color:#9CA3AF;background:transparent;width:100%"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      </div>
+    </div>
+    <div class="modal-footer-edit">
+      <button class="btn-cancel" onclick="closeXModal('createInvoiceModal')">Cancel</button>
+      <button class="btn-save" onclick="closeXModal('createInvoiceModal');showToast('Invoice created successfully.')">Create Invoice</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── CONTRACT DATA ──
 const contracts = [
@@ -1116,17 +1334,6 @@ const contracts = [
 ];
 let currentContract = 0;
 let edit = { route:false, detail:false };
-
-// ── RATES STATE ──
-function setRatesState(state) {
-  document.getElementById('ratesLoading').style.display   = state === 'loading' ? 'flex' : 'none';
-  document.getElementById('ratesVaporware').style.display = state === 'empty'   ? 'flex' : 'none';
-  document.getElementById('ratesLive').style.display      = state === 'live'    ? 'block': 'none';
-  document.querySelectorAll('.rates-state-btn').forEach(function(btn) {
-    var t = btn.textContent.trim();
-    btn.classList.toggle('active', (state==='loading'&&t==='Loading')||(state==='empty'&&t==='Empty')||(state==='live'&&t==='Live'));
-  });
-}
 
 // ── NAVIGATION ──
 function goTo(view) {
@@ -1279,7 +1486,21 @@ function closeXModal(id) {
   document.getElementById(id).classList.remove('open');
 }
 // Close modal on overlay click
-['serviceHistoryModal','invoiceDetailModal','editCustomerModal','editLocationModal'].forEach(function(id){
+function goToFinance() {
+  document.querySelectorAll('.page-view').forEach(function(v){v.classList.remove('active');});
+  document.getElementById('view-finance').classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(function(l){l.classList.remove('active');});
+  document.getElementById('nav-finance').classList.add('active');
+  window.scrollTo(0,0);
+  hideAllCtxMenus();
+}
+function openCreateBatch() {
+  document.getElementById('createBatchModal').classList.add('open');
+}
+function openCreateInvoice() {
+  document.getElementById('createInvoiceModal').classList.add('open');
+}
+['serviceHistoryModal','invoiceDetailModal','editCustomerModal','editLocationModal','createInvoiceModal','createBatchModal'].forEach(function(id){
   var el = document.getElementById(id);
   if(el) el.addEventListener('click', function(e){ if(e.target===this) closeXModal(id); });
 });
