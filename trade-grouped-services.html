@@ -516,7 +516,6 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 <!-- ══ VIEW 2: CUSTOMER DETAILS ══ -->
 <div class="page-view" id="view-details">
   <div class="details-page">
-    <div class="mock-banner">⚠️ <strong>Functional mock</strong> — billing icon on each contract opens Edit Service → Billing Details tab · pencil on location row opens Edit Location · Billing Details tab has Edit Customer Billing button.</div>
     <div class="back-crumb" onclick="goTo('customers')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       Customers
@@ -1694,6 +1693,10 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
           <option>All</option><option>UK-SE</option><option>UK-NW</option>
         </select>
       </div>
+      <div class="ci-field-row">
+        <label class="ci-label">Generate Waste Transfer Note (WTN)</label>
+        <div class="ci-toggle" onclick="this.classList.toggle('on')"><div class="ci-toggle-knob"></div></div>
+      </div>
     </div>
     <div class="modal-footer-edit">
       <button class="btn-cancel" onclick="closeXModal('createBatchModal')">Cancel</button>
@@ -1769,6 +1772,10 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       <div class="ci-field-row">
         <label class="ci-label" style="color:#9CA3AF">Order Date To</label>
         <div class="ci-date-input" style="background:#F9FAFB"><input type="text" value="07/13/2026" disabled style="border:none;outline:none;font-family:inherit;font-size:14px;color:#9CA3AF;background:transparent;width:100%"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      </div>
+      <div class="ci-field-row">
+        <label class="ci-label">Generate Waste Transfer Note (WTN)</label>
+        <div class="ci-toggle" onclick="this.classList.toggle('on')"><div class="ci-toggle-knob"></div></div>
       </div>
     </div>
     <div class="modal-footer-edit">
