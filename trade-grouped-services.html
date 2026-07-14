@@ -77,9 +77,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .map-controls { position:absolute; left:12px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:4px; z-index:2; }
 .map-btn { width:28px; height:28px; background:#fff; border:1px solid #E5E7EB; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; color:#6B7280; box-shadow:0 1px 3px rgba(0,0,0,.1); }
 /* Service location table */
-.table-header-row { display:grid; grid-template-columns:80px 1fr 160px 220px 120px; padding:0 24px; height:40px; align-items:center; border-bottom:1px solid #E5E7EB; }
+.table-header-row { display:grid; grid-template-columns:48px 1fr 160px 220px 120px; padding:0 24px; height:40px; align-items:center; border-bottom:1px solid #E5E7EB; }
 .table-header-row span { font-size:10px; font-weight:700; color:#9CA3AF; letter-spacing:.8px; text-transform:uppercase; }
-.location-summary { display:grid; grid-template-columns:80px 1fr 160px 220px 120px; padding:0 24px; min-height:64px; align-items:center; cursor:pointer; background:#fff; transition:background 0.1s; }
+.location-summary { display:grid; grid-template-columns:48px 1fr 160px 220px 120px; padding:0 24px; min-height:64px; align-items:center; cursor:pointer; background:#fff; transition:background 0.1s; }
 .location-summary:hover { background:#FAFAFC; }
 .loc-address-main { font-size:14px; font-weight:400; color:#242833; }
 .loc-address-sub { font-size:12px; font-weight:300; color:#9CA3AF; margin-top:2px; }
@@ -95,6 +95,8 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .loc-options { display:flex; align-items:center; gap:6px; }
 .services-expanded { display:none; background:#FAFAFC; border-top:1px solid #E5E7EB; }
 .services-expanded.open { display:block; }
+.location-block { border:1px solid #E5E7EB; border-radius:8px; overflow:hidden; margin-bottom:12px; background:#fff; }
+.location-block:last-child { margin-bottom:0; }
 .service-type-group { border-bottom:1px solid #E5E7EB; }
 .service-type-group:last-child { border-bottom:none; }
 .service-group-header { display:flex; align-items:center; padding:0 24px 0 48px; height:44px; cursor:pointer; background:#F4F6FA; border-bottom:1px solid #E5E7EB; gap:10px; transition:background 0.1s; }
@@ -111,7 +113,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .group-contracts.open { display:block; }
 .contract-header-row { display:grid; grid-template-columns:32px 110px 160px 120px 120px 70px 82px 82px 150px 1fr; align-items:center; padding:6px 0 6px 48px; background:#EEF1F8; border-bottom:1px solid #E5E7EB; }
 .contract-header-row span { font-size:9px; font-weight:700; color:#9CA3AF; letter-spacing:.8px; text-transform:uppercase; }
-.contract-row { display:grid; grid-template-columns:32px 110px 160px 120px 120px 70px 82px 82px 150px 1fr; align-items:center; padding:0 0 0 48px; height:40px; background:#fff; border-bottom:1px solid #F3F4F6; transition:background 0.1s; }
+.contract-row { display:grid; grid-template-columns:32px 110px 160px 120px 120px 70px 82px 82px 150px 1fr; align-items:center; padding:0 0 0 48px; height:40px; background:#fff; border-bottom:1px solid #F3F4F6; transition:background 0.1s; cursor:pointer; }
 .contract-row:last-child { border-bottom:none; }
 .contract-row:hover { background:#FAFAFC; }
 .contract-svc-icon { width:24px; height:24px; background:#33A542; border-radius:3px; display:flex; align-items:center; justify-content:center; }
@@ -285,6 +287,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .modal-tab-panel.active { display:block; }
 .billing-section-badge { display:inline-block; margin-left:6px; font-size:9px; font-weight:700; color:#fff; background:#20315A; border-radius:3px; padding:1px 5px; text-transform:uppercase; vertical-align:middle; }
 /* Service History: Update History table */
+.sh-subtab { padding:8px 16px 10px; font-size:13px; font-weight:400; color:#6B7280; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; display:inline-flex; align-items:center; gap:5px; transition:color .15s, border-color .15s; }
+.sh-subtab:hover { color:#20315A; }
+.sh-subtab.active { color:#20315A; border-bottom-color:#20315A; font-weight:600; }
 .sh-table-wrap { overflow-x:auto; }
 .sh-table { width:100%; border-collapse:collapse; font-size:11px; min-width:900px; }
 .sh-table th { padding:8px 12px; text-align:left; font-size:9px; font-weight:700; color:#9CA3AF; letter-spacing:.6px; text-transform:uppercase; background:#F9FAFB; border-bottom:1px solid #E5E7EB; white-space:nowrap; }
@@ -428,7 +433,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 <nav class="top-nav">
   <div class="nav-logo"><div class="nav-logo-icon">R</div>Routeware</div>
   <div class="nav-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>DISPATCH</div>
-  <div class="nav-link active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>CUSTOMERS</div>
+  <div class="nav-link active" id="nav-customers" onclick="goToCustomers()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>CUSTOMERS</div>
   <div class="nav-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>FLEET</div>
   <div class="nav-link" id="nav-finance" onclick="goToFinance()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>FINANCE</div>
   <div class="nav-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>INSIGHTS</div>
@@ -523,11 +528,12 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
         <!-- TAB: Service Details -->
         <div class="cust-tab-panel active" id="ctab-svcdetails">
           <div class="table-header-row">
-            <span>Location<br>Number</span><span>Address</span><span>Status</span>
+            <span>#</span><span>Address</span><span>Status</span>
             <span>Services</span><span>Options</span>
           </div>
+          <div style="padding:12px 16px;display:flex;flex-direction:column;gap:0">
           <!-- Location row -->
-          <div>
+          <div class="location-block">
             <div class="location-summary" onclick="toggleLocation(this)">
               <div style="font-size:14px;font-weight:300">1</div>
               <div>
@@ -562,7 +568,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 </div>
                 <div class="group-contracts open">
                   <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Frequency</span><span>Route</span><span>Rate</span><span>Rental Rate</span><span>Surcharges</span><span>Reference</span><span></span></div>
-                  <div class="contract-row">
+                  <div class="contract-row" onclick="openEdit(0,'details')">
                     <div><div class="contract-svc-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg></div></div>
                     <div class="contract-col-value">Domestic</div><div class="contract-col-value">EuroBin · 1100 Litre</div><div class="contract-col-value">Every Week</div>
                     <div class="contract-col-value route-na">Not available</div>
@@ -571,12 +577,12 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                     <div><div class="surcharge-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> 2</div></div>
                     <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Ref_10094270120</div></div>
                     <div class="contract-icon-btns">
-                      <button class="icon-btn billing-btn" title="Service history &amp; billing" onclick="openEditBilling(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
-                      <button class="icon-btn edit-btn" title="Edit service" onclick="openEdit(0,'routes')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-                      <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                      <button class="icon-btn billing-btn" title="Billing details" onclick="event.stopPropagation();openEditBilling(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                      <button class="icon-btn edit-btn" title="Edit service" onclick="event.stopPropagation();openEdit(0,'details')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                      <button class="icon-btn" title="Delete service" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                     </div>
                   </div>
-                  <div class="contract-row">
+                  <div class="contract-row" onclick="openEdit(1,'details')">
                     <div><div class="contract-svc-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 6l3 14h12l3-14"/><path d="M1 6h22M10 3h4"/></svg></div></div>
                     <div class="contract-col-value">Domestic</div><div class="contract-col-value">Bin · 180 Litre</div><div class="contract-col-value">Every Other Week</div>
                     <div class="contract-col-value route-assigned">WEDNESDAY CREW</div>
@@ -585,9 +591,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                     <div><span class="surcharge-none">—</span></div>
                     <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">REF_100942701201</div></div>
                     <div class="contract-icon-btns">
-                      <button class="icon-btn billing-btn" title="Service history &amp; billing" onclick="openEditBilling(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
-                      <button class="icon-btn edit-btn" title="Edit service" onclick="openEdit(1,'routes')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-                      <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                      <button class="icon-btn billing-btn" title="Billing details" onclick="event.stopPropagation();openEditBilling(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                      <button class="icon-btn edit-btn" title="Edit service" onclick="event.stopPropagation();openEdit(1,'details')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                      <button class="icon-btn" title="Delete service" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                     </div>
                   </div>
                 </div>
@@ -600,7 +606,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 </div>
                 <div class="group-contracts open">
                   <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Frequency</span><span>Route</span><span>Rate</span><span>Rental Rate</span><span>Surcharges</span><span>Reference</span><span></span></div>
-                  <div class="contract-row">
+                  <div class="contract-row" onclick="openEdit(2,'details')">
                     <div><div class="contract-svc-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div></div>
                     <div class="contract-col-value">Domestic</div><div class="contract-col-value">Bin · 240 Litre</div><div class="contract-col-value">Every Week</div>
                     <div class="contract-col-value route-na">Not available</div>
@@ -609,9 +615,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                     <div><span class="surcharge-none">—</span></div>
                     <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Rec_10094270120</div></div>
                     <div class="contract-icon-btns">
-                      <button class="icon-btn billing-btn" title="Service history &amp; billing" onclick="openEditBilling(2)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
-                      <button class="icon-btn edit-btn" title="Edit service" onclick="openEdit(2,'routes')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-                      <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                      <button class="icon-btn billing-btn" title="Billing details" onclick="event.stopPropagation();openEditBilling(2)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                      <button class="icon-btn edit-btn" title="Edit service" onclick="event.stopPropagation();openEdit(2,'details')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                      <button class="icon-btn" title="Delete service" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                     </div>
                   </div>
                 </div>
@@ -624,7 +630,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                 </div>
                 <div class="group-contracts open">
                   <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Frequency</span><span>Route</span><span>Rate</span><span>Rental Rate</span><span>Surcharges</span><span>Reference</span><span></span></div>
-                  <div class="contract-row">
+                  <div class="contract-row" onclick="openEdit(3,'details')">
                     <div><div class="contract-svc-icon" style="background:#059669"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 4 3 7 9 6M12 12c0-5 5-8 9-6 0 4-3 7-9 6"/></svg></div></div>
                     <div class="contract-col-value">Domestic</div><div class="contract-col-value">Bin · 140 Litre</div><div class="contract-col-value">Every Two Weeks</div>
                     <div class="contract-col-value route-na">Not available</div>
@@ -633,15 +639,132 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
                     <div><span class="surcharge-none">—</span></div>
                     <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">GDN_10094270120</div></div>
                     <div class="contract-icon-btns">
-                      <button class="icon-btn billing-btn" title="Service history &amp; billing" onclick="openEditBilling(3)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
-                      <button class="icon-btn edit-btn" title="Edit service" onclick="openEdit(3,'routes')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-                      <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                      <button class="icon-btn billing-btn" title="Billing details" onclick="event.stopPropagation();openEditBilling(3)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                      <button class="icon-btn edit-btn" title="Edit service" onclick="event.stopPropagation();openEdit(3,'details')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                      <button class="icon-btn" title="Delete service" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          <!-- Location 2 -->
+          <div class="location-block">
+            <div class="location-summary" onclick="toggleLocation(this)">
+              <div style="font-size:14px;font-weight:300">2</div>
+              <div>
+                <div class="loc-address-main">14, MANOR LANE, LONDON, SE12 8LY</div>
+                <div class="loc-address-sub">CM02 - Commercial - Mixed Use</div>
+                <div class="loc-meta-row">
+                  <span class="loc-meta-item">Region: <span class="loc-meta-tag">UK-SE</span></span>
+                  <span class="loc-meta-item">Service Area: <span class="loc-meta-tag">LEW</span></span>
+                  <span class="loc-meta-item">Tax Group: <span class="loc-meta-tag">UK STD 20%</span></span>
+                </div>
+              </div>
+              <div><div style="font-size:14px;font-weight:400">Active</div><div class="status-account">10094271890</div></div>
+              <div class="service-icons">
+                <div class="svc-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg><span class="svc-icon-label">Active</span></div>
+                <div class="svc-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><span class="svc-icon-label">Active</span></div>
+                <div class="svc-icon" style="background:#6366F1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M5 3h14M5 21h14M12 3v18M3 12h18"/></svg><span class="svc-icon-label">Active</span></div>
+              </div>
+              <div class="loc-options">
+                <button class="chevron-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+                <button class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg></button>
+                <button class="icon-btn" title="Edit location billing"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                <button class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+                <button class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+              </div>
+            </div>
+            <div class="services-expanded">
+              <!-- REFUSE -->
+              <div class="service-type-group">
+                <div class="service-group-header" onclick="toggleGroup(this)">
+                  <span class="group-chevron open"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></span>
+                  <span class="group-type-dot dot-refuse"></span><span class="group-type-name">Refuse</span><span class="group-count">2</span>
+                </div>
+                <div class="group-contracts open">
+                  <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Frequency</span><span>Route</span><span>Rate</span><span>Rental Rate</span><span>Surcharges</span><span>Reference</span><span></span></div>
+                  <div class="contract-row" onclick="openEdit(0,'details')">
+                    <div><div class="contract-svc-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg></div></div>
+                    <div class="contract-col-value">Commercial</div><div class="contract-col-value">EuroBin · 1100 Litre</div><div class="contract-col-value">Every Week</div>
+                    <div class="contract-col-value route-assigned">MANOR RD CREW</div>
+                    <div class="contract-col-value">£28.00</div>
+                    <div class="contract-col-value">£8.00</div>
+                    <div><span class="surcharge-none">—</span></div>
+                    <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Ref_10094271890</div></div>
+                    <div class="contract-icon-btns">
+                      <button class="icon-btn billing-btn" title="Billing details" onclick="event.stopPropagation();openEditBilling(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                      <button class="icon-btn edit-btn" title="Edit service" onclick="event.stopPropagation();openEdit(0,'details')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                      <button class="icon-btn" title="Delete service" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                    </div>
+                  </div>
+                  <div class="contract-row" onclick="openEdit(0,'details')">
+                    <div><div class="contract-svc-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="4" y="8" width="16" height="14" rx="1"/><path d="M2 8h20M9 4h6"/></svg></div></div>
+                    <div class="contract-col-value">Commercial</div><div class="contract-col-value">FEL · 660 Litre</div><div class="contract-col-value">Every Two Weeks</div>
+                    <div class="contract-col-value route-assigned">MANOR RD CREW</div>
+                    <div class="contract-col-value">£19.50</div>
+                    <div class="contract-col-value">£5.00</div>
+                    <div><div class="surcharge-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> 1</div></div>
+                    <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Ref_10094271891</div></div>
+                    <div class="contract-icon-btns">
+                      <button class="icon-btn billing-btn" title="Billing details" onclick="event.stopPropagation();openEditBilling(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                      <button class="icon-btn edit-btn" title="Edit service" onclick="event.stopPropagation();openEdit(0,'details')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                      <button class="icon-btn" title="Delete service" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- RECYCLING -->
+              <div class="service-type-group">
+                <div class="service-group-header" onclick="toggleGroup(this)">
+                  <span class="group-chevron open"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></span>
+                  <span class="group-type-dot dot-recycling"></span><span class="group-type-name">Recycling</span><span class="group-count">1</span>
+                </div>
+                <div class="group-contracts open">
+                  <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Frequency</span><span>Route</span><span>Rate</span><span>Rental Rate</span><span>Surcharges</span><span>Reference</span><span></span></div>
+                  <div class="contract-row" onclick="openEdit(0,'details')">
+                    <div><div class="contract-svc-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div></div>
+                    <div class="contract-col-value">Commercial</div><div class="contract-col-value">Mixed Dry · 240 Litre</div><div class="contract-col-value">Every Week</div>
+                    <div class="contract-col-value route-na">Not available</div>
+                    <div class="contract-col-value">£14.50</div>
+                    <div class="contract-col-value">£0.00</div>
+                    <div><span class="surcharge-none">—</span></div>
+                    <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">Rec_10094271890</div></div>
+                    <div class="contract-icon-btns">
+                      <button class="icon-btn billing-btn" title="Billing details" onclick="event.stopPropagation();openEditBilling(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                      <button class="icon-btn edit-btn" title="Edit service" onclick="event.stopPropagation();openEdit(0,'details')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                      <button class="icon-btn" title="Delete service" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- BULKY -->
+              <div class="service-type-group">
+                <div class="service-group-header" onclick="toggleGroup(this)">
+                  <span class="group-chevron open"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></span>
+                  <span class="group-type-dot" style="background:#6366F1"></span><span class="group-type-name">Bulky</span><span class="group-count">1</span>
+                </div>
+                <div class="group-contracts open">
+                  <div class="contract-header-row"><span></span><span>Service Type</span><span>Equipment</span><span>Frequency</span><span>Route</span><span>Rate</span><span>Rental Rate</span><span>Surcharges</span><span>Reference</span><span></span></div>
+                  <div class="contract-row" onclick="openEdit(0,'details')">
+                    <div><div class="contract-svc-icon" style="background:#6366F1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 8H3M21 12H3M21 16H3"/></svg></div></div>
+                    <div class="contract-col-value">Commercial</div><div class="contract-col-value">Ad-hoc Collection</div><div class="contract-col-value">On Demand</div>
+                    <div class="contract-col-value route-na">Not available</div>
+                    <div class="contract-col-value">£45.00</div>
+                    <div class="contract-col-value">£0.00</div>
+                    <div><span class="surcharge-none">—</span></div>
+                    <div><div class="contract-active-badge"><span class="contract-active-dot"></span>Active</div><div class="contract-ref">BLK_10094271890</div></div>
+                    <div class="contract-icon-btns">
+                      <button class="icon-btn billing-btn" title="Billing details" onclick="event.stopPropagation();openEditBilling(0)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></button>
+                      <button class="icon-btn edit-btn" title="Edit service" onclick="event.stopPropagation();openEdit(0,'details')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                      <button class="icon-btn" title="Delete service" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div><!-- /location-list wrapper -->
         </div><!-- /ctab-svcdetails -->
 
         <!-- TAB: Billing Details (customer level) — NEW DESIGN -->
@@ -727,7 +850,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
     <!-- TABS (V2 tabs REMOVED) -->
     <div class="svc-tabs">
       <div class="svc-tab active" onclick="switchTab('details', this)">Service Details</div>
-      <div class="svc-tab" onclick="switchTab('bildetails', this)">Billing Details</div>
+      <div class="svc-tab" onclick="switchTab('bildetails', this)">Service History</div>
     </div>
     <!-- TAB: Service Details -->
     <div class="tab-panel active" id="tab-details">
@@ -761,10 +884,9 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
               </button>
               <div class="rates-body open">
                 <div id="ratesLive">
-                  <div class="rates-action-bar"><span class="rates-action-left">3 rate codes · contract <strong>RBC-2024-LDN</strong></span><div class="rates-action-btns"><button class="rates-btn-new">Update Rate</button></div></div>
+                  <div class="rates-action-bar"><span class="rates-action-left">2 rate codes · contract <strong>RBC-2024-LDN</strong></span><div class="rates-action-btns"><button class="rates-btn-new">Update Rate</button></div></div>
                   <table class="rates-table"><thead><tr><th>Rate Code</th><th>Description</th><th>Type</th><th>Annual Rate</th><th>Term</th><th>Proration</th></tr></thead><tbody>
                     <tr><td><strong>DOM-1100-WK</strong></td><td>Weekly domestic collection</td><td><span class="rates-type-tag rates-type-hauling">Hauling</span></td><td>£468.00</td><td>Permanent</td><td>Enabled</td></tr>
-                    <tr><td><strong>TAX-LDN-VAT</strong></td><td>London VAT (20%)</td><td><span class="rates-type-tag rates-type-tax">Tax</span></td><td>£93.60</td><td>Permanent</td><td>Enabled</td></tr>
                     <tr><td><strong>FEE-CSTR-ADD</strong></td><td>Caster / bin assist add-on</td><td><span class="rates-type-tag rates-type-addon">Add-on</span></td><td>£24.00</td><td>Monthly</td><td>Disabled</td></tr>
                   </tbody></table>
                   <div class="rates-embed-note"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Rate rows rendered by the Elements micro-frontend.</div>
@@ -814,31 +936,124 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
     <!-- TAB: Billing Details (per-service) -->
     <div class="tab-panel" id="tab-bildetails">
       <div style="padding:20px 0">
-        <div style="font-size:14px;font-weight:600;color:#20315A;margin-bottom:16px">Service Billing History</div>
-        <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden">
-          <table class="bh-table">
-            <thead><tr><th>Invoice ID</th><th>Invoice Date</th><th>Invoice Type</th><th>Charge Code</th><th>Charge Type</th><th>Dates</th><th>Qty</th><th>Amount</th><th>Tax</th><th>Total</th><th></th></tr></thead>
-            <tbody>
-              <tr>
-                <td style="font-weight:600;color:#20315A">INV-0000482</td><td>06/16/2026</td><td>Normal</td><td>REFUSE COLLECTION</td><td>Recurring service</td><td>06/14/2026–07/11/2026</td><td>1.00</td><td>£24.50</td><td>£2.11</td><td>£26.61</td>
-                <td><div class="ctx-wrap"><button class="ctx-trigger" onclick="toggleCtxMenu(event,'es-ctx1')">⋮</button><div class="ctx-menu" id="es-ctx1"><div class="ctx-menu-item" onclick="openInvoiceDetail('INV-0000482');hideAllCtxMenus()">View Details</div><div class="ctx-menu-item">Download Invoice</div><div class="ctx-menu-item">Email Invoice</div><div class="ctx-divider"></div><div class="ctx-menu-item danger">Reverse Invoice</div></div></div></td>
-              </tr>
-              <tr>
-                <td style="font-weight:600;color:#20315A">INV-0000441</td><td>05/16/2026</td><td>Normal</td><td>REFUSE COLLECTION</td><td>Recurring service</td><td>05/14/2026–06/10/2026</td><td>1.00</td><td>£24.50</td><td>£2.11</td><td>£26.61</td>
-                <td><div class="ctx-wrap"><button class="ctx-trigger" onclick="toggleCtxMenu(event,'es-ctx2')">⋮</button><div class="ctx-menu" id="es-ctx2"><div class="ctx-menu-item" onclick="openInvoiceDetail('INV-0000441');hideAllCtxMenus()">View Details</div><div class="ctx-menu-item">Download Invoice</div><div class="ctx-menu-item">Email Invoice</div><div class="ctx-divider"></div><div class="ctx-menu-item danger">Reverse Invoice</div></div></div></td>
-              </tr>
-              <tr>
-                <td style="font-weight:600;color:#20315A">INV-0000398</td><td>04/14/2026</td><td>Normal</td><td>REFUSE COLLECTION</td><td>Recurring service</td><td>04/12/2026–05/09/2026</td><td>1.00</td><td>£24.50</td><td>£2.11</td><td>£26.61</td>
-                <td><div class="ctx-wrap"><button class="ctx-trigger" onclick="toggleCtxMenu(event,'es-ctx3')">⋮</button><div class="ctx-menu" id="es-ctx3"><div class="ctx-menu-item" onclick="openInvoiceDetail('INV-0000398');hideAllCtxMenus()">View Details</div><div class="ctx-menu-item">Download Invoice</div><div class="ctx-menu-item">Email Invoice</div><div class="ctx-divider"></div><div class="ctx-menu-item danger">Reverse Invoice</div></div></div></td>
-              </tr>
-              <tr>
-                <td style="font-weight:600;color:#20315A">INV-0000355</td><td>03/17/2026</td><td>Normal</td><td>REFUSE COLLECTION</td><td>Recurring service</td><td>03/15/2026–04/11/2026</td><td>1.00</td><td>£24.50</td><td>£2.11</td><td>£26.61</td>
-                <td><div class="ctx-wrap"><button class="ctx-trigger" onclick="toggleCtxMenu(event,'es-ctx4')">⋮</button><div class="ctx-menu" id="es-ctx4"><div class="ctx-menu-item" onclick="openInvoiceDetail('INV-0000355');hideAllCtxMenus()">View Details</div><div class="ctx-menu-item">Download Invoice</div><div class="ctx-menu-item">Email Invoice</div><div class="ctx-divider"></div><div class="ctx-menu-item danger">Reverse Invoice</div></div></div></td>
-              </tr>
-            </tbody>
-          </table>
+
+        <!-- Sub-tab bar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="display:flex;gap:0;border-bottom:2px solid #E5E7EB;width:100%;align-items:flex-end">
+            <div id="sh-subtab-billing" class="sh-subtab active" onclick="switchShSubtab('billing')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+              Billing History
+            </div>
+            <div id="sh-subtab-update" class="sh-subtab" onclick="switchShSubtab('update')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              Update History
+            </div>
+            <div style="margin-left:auto;padding-bottom:8px;font-size:12px;color:#6B7280;white-space:nowrap">
+              Service Billed Through: <strong style="color:#20315A">07/05/2026</strong>
+            </div>
+          </div>
         </div>
-        <div class="edit-footer">
+
+        <!-- BILLING HISTORY panel -->
+        <div id="sh-panel-billing">
+          <!-- Toolbar -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+            <button style="height:32px;padding:0 14px;border:1px solid #E5E7EB;border-radius:6px;font-family:inherit;font-size:12px;font-weight:500;color:#20315A;background:#fff;cursor:pointer">Update Bill Through Date</button>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+              <span style="font-size:12px;color:#6B7280">Display Zero Amounts</span>
+              <div class="ci-toggle" onclick="this.classList.toggle('on')" style="width:36px;height:20px"><div class="ci-toggle-knob" style="width:14px;height:14px;top:3px;left:3px"></div></div>
+              <select style="height:32px;padding:0 28px 0 10px;border:1px solid #E5E7EB;border-radius:6px;font-family:inherit;font-size:12px;color:#242833;background:#fff;cursor:pointer;appearance:auto">
+                <option>All Types</option><option>Recurring service</option><option>Rental</option><option>Surcharge</option>
+              </select>
+              <button style="height:32px;padding:0 18px;background:#33A542;border:none;border-radius:6px;font-family:inherit;font-size:12px;font-weight:600;color:#fff;cursor:pointer">Load</button>
+            </div>
+          </div>
+          <!-- Table -->
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden">
+            <table class="bh-table" style="min-width:820px">
+              <thead><tr><th>Invoice ID</th><th>Invoice Date</th><th>Invoice Type</th><th>Charge Code</th><th>Charge Type</th><th>Dates</th><th>Qty</th><th>Amount</th><th>Tax</th><th>Total</th></tr></thead>
+              <tbody>
+                <tr><td style="font-weight:600;color:#20315A;white-space:nowrap">INV-0000482</td><td style="white-space:nowrap">06/16/2026</td><td>Normal</td><td style="color:#20315A;font-weight:500">REFUSE COLLECTION</td><td>Recurring service</td><td style="white-space:nowrap">06/14/2026–07/11/2026</td><td>1.00</td><td>£24.50</td><td>£2.11</td><td>£26.61</td></tr>
+                <tr><td style="font-weight:600;color:#20315A;white-space:nowrap">INV-0000482</td><td style="white-space:nowrap">06/16/2026</td><td>Normal</td><td style="color:#20315A;font-weight:500">BIN RENTAL</td><td>Recurring rental</td><td style="white-space:nowrap">06/14/2026–07/11/2026</td><td>1.00</td><td>£6.00</td><td>£0.52</td><td>£6.52</td></tr>
+                <tr><td style="font-weight:600;color:#20315A;white-space:nowrap">INV-0000482</td><td style="white-space:nowrap">06/16/2026</td><td>Normal</td><td style="color:#20315A;font-weight:500">FUEL SURCHARGE</td><td>Surcharge</td><td style="white-space:nowrap">06/14/2026–07/11/2026</td><td>1.00</td><td>£2.45</td><td>£0.21</td><td>£2.66</td></tr>
+                <tr style="border-bottom:2px solid #E5E7EB"><td style="font-weight:600;color:#20315A;white-space:nowrap">INV-0000482</td><td style="white-space:nowrap">06/16/2026</td><td>Normal</td><td style="color:#20315A;font-weight:500">ENVIRONMENTAL LEVY</td><td>Surcharge</td><td style="white-space:nowrap">06/14/2026–07/11/2026</td><td>1.00</td><td>£1.10</td><td>£0.09</td><td>£1.19</td></tr>
+                <tr><td style="font-weight:600;color:#20315A;white-space:nowrap">INV-0000441</td><td style="white-space:nowrap">05/19/2026</td><td>Normal</td><td style="color:#20315A;font-weight:500">REFUSE COLLECTION</td><td>Recurring service</td><td style="white-space:nowrap">05/17/2026–06/13/2026</td><td>1.00</td><td>£22.00</td><td>£1.89</td><td>£23.89</td></tr>
+                <tr><td style="font-weight:600;color:#20315A;white-space:nowrap">INV-0000441</td><td style="white-space:nowrap">05/19/2026</td><td>Normal</td><td style="color:#20315A;font-weight:500">BIN RENTAL</td><td>Recurring rental</td><td style="white-space:nowrap">05/17/2026–06/13/2026</td><td>1.00</td><td>£6.00</td><td>£0.52</td><td>£6.52</td></tr>
+                <tr><td style="font-weight:600;color:#20315A;white-space:nowrap">INV-0000441</td><td style="white-space:nowrap">05/19/2026</td><td>Normal</td><td style="color:#20315A;font-weight:500">FUEL SURCHARGE</td><td>Surcharge</td><td style="white-space:nowrap">05/17/2026–06/13/2026</td><td>1.00</td><td>£2.45</td><td>£0.21</td><td>£2.66</td></tr>
+                <tr style="border-bottom:2px solid #E5E7EB"><td style="font-weight:600;color:#20315A;white-space:nowrap">INV-0000441</td><td style="white-space:nowrap">05/19/2026</td><td>Normal</td><td style="color:#20315A;font-weight:500">ENVIRONMENTAL LEVY</td><td>Surcharge</td><td style="white-space:nowrap">05/17/2026–06/13/2026</td><td>1.00</td><td>£1.10</td><td>£0.09</td><td>£1.19</td></tr>
+                <tr><td style="font-weight:600;color:#20315A;white-space:nowrap">INV-0000398</td><td style="white-space:nowrap">04/21/2026</td><td>Normal</td><td style="color:#20315A;font-weight:500">REFUSE COLLECTION</td><td>Recurring service</td><td style="white-space:nowrap">04/19/2026–05/16/2026</td><td>1.00</td><td>£22.00</td><td>£1.89</td><td>£23.89</td></tr>
+                <tr style="border-bottom:2px solid #E5E7EB"><td style="font-weight:600;color:#20315A;white-space:nowrap">INV-0000398</td><td style="white-space:nowrap">04/21/2026</td><td>Normal</td><td style="color:#20315A;font-weight:500">BIN RENTAL</td><td>Recurring rental</td><td style="white-space:nowrap">04/19/2026–05/16/2026</td><td>1.00</td><td>£6.00</td><td>£0.52</td><td>£6.52</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- UPDATE HISTORY panel -->
+        <div id="sh-panel-update" style="display:none">
+          <div style="overflow-x:auto;background:#fff;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden">
+            <table class="sh-table" style="min-width:1000px">
+              <thead>
+                <tr>
+                  <th>Date<br>User</th>
+                  <th>Change Reason<br>Requested By</th>
+                  <th>Start Date<br>End Date</th>
+                  <th>Frequency<br>Status</th>
+                  <th>Qty</th><th>Rate</th><th>Rental Rate</th><th>Surcharges</th>
+                  <th>Inactivity Days<br>Daily Rate</th>
+                  <th>Term Type</th><th>PO Number</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div style="font-size:12px;font-weight:500;color:#242833">05/18/2026</div><div style="font-size:11px;color:#9CA3AF">Allen C.</div></td>
+                  <td><div style="font-size:12px;font-weight:600;color:#242833">RATE CHANGE</div><div style="font-size:11px;color:#9CA3AF">Sarah Whitmore</div></td>
+                  <td><div style="font-size:12px;color:#242833">07/13/2026</div><div style="font-size:11px;color:#9CA3AF">—</div></td>
+                  <td><div style="font-size:12px;color:#242833">Every Week</div><div style="margin-top:3px"><span style="font-size:10px;font-weight:600;background:#DCFCE7;color:#15803D;border-radius:4px;padding:2px 7px">Active</span></div></td>
+                  <td>1</td><td>24.50</td><td>6.00</td>
+                  <td><div class="surcharge-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> 2</div></td>
+                  <td><div style="font-size:12px;color:#242833">30 days</div><div style="font-size:11px;color:#9CA3AF">1.25 / day</div></td>
+                  <td>—</td><td>—</td>
+                  <td><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" style="cursor:pointer"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></td>
+                </tr>
+                <tr>
+                  <td><div style="font-size:12px;font-weight:500;color:#242833">04/07/2025</div><div style="font-size:11px;color:#9CA3AF">Allen C.</div></td>
+                  <td><div style="font-size:12px;font-weight:600;color:#242833">ADMIN INFO CHANGE</div><div style="font-size:11px;color:#9CA3AF">James Patel</div></td>
+                  <td><div style="font-size:12px;color:#242833">06/17/2024</div><div style="font-size:11px;color:#9CA3AF">07/12/2026</div></td>
+                  <td><div style="font-size:12px;color:#242833">Every Week</div><div style="margin-top:3px"><span style="font-size:10px;font-weight:600;background:#DCFCE7;color:#15803D;border-radius:4px;padding:2px 7px">Active</span></div></td>
+                  <td>1</td><td>22.00</td><td>6.00</td>
+                  <td><div class="surcharge-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> 2</div></td>
+                  <td><div style="font-size:12px;color:#242833">30 days</div><div style="font-size:11px;color:#9CA3AF">1.25 / day</div></td>
+                  <td>—</td><td>—</td>
+                  <td><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" style="cursor:pointer"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></td>
+                </tr>
+                <tr>
+                  <td><div style="font-size:12px;font-weight:500;color:#242833">04/14/2023</div><div style="font-size:11px;color:#9CA3AF">Allen C.</div></td>
+                  <td><div style="font-size:12px;font-weight:600;color:#242833">SVCINC</div><div style="font-size:11px;color:#9CA3AF">Sarah Whitmore</div></td>
+                  <td><div style="font-size:12px;color:#242833">10/10/2022</div><div style="font-size:11px;color:#9CA3AF">06/16/2024</div></td>
+                  <td><div style="font-size:12px;color:#242833">Every Other Week</div><div style="margin-top:3px"><span style="font-size:10px;font-weight:600;background:#DCFCE7;color:#15803D;border-radius:4px;padding:2px 7px">Active</span></div></td>
+                  <td>1</td><td>20.00</td><td>0.00</td>
+                  <td><div class="surcharge-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> 1</div></td>
+                  <td><div style="font-size:12px;color:#242833">14 days</div><div style="font-size:11px;color:#9CA3AF">0.90 / day</div></td>
+                  <td>—</td><td>—</td>
+                  <td><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" style="cursor:pointer"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></td>
+                </tr>
+                <tr>
+                  <td><div style="font-size:12px;font-weight:500;color:#242833">04/12/2022</div><div style="font-size:11px;color:#9CA3AF">Diane S.</div></td>
+                  <td><div style="font-size:12px;font-weight:600;color:#242833">RESTART</div><div style="font-size:11px;color:#9CA3AF">Dwayne Holt</div></td>
+                  <td><div style="font-size:12px;color:#242833">04/12/2022</div><div style="font-size:11px;color:#9CA3AF">10/09/2022</div></td>
+                  <td><div style="font-size:12px;color:#242833">On-call</div><div style="margin-top:3px"><span style="font-size:10px;font-weight:600;background:#DCFCE7;color:#15803D;border-radius:4px;padding:2px 7px">Active</span></div></td>
+                  <td>1</td><td>0.00</td><td>0.00</td>
+                  <td><span style="color:#9CA3AF">—</span></td>
+                  <td><span style="color:#9CA3AF">—</span></td>
+                  <td style="font-size:12px;color:#242833">Permanent</td><td>—</td>
+                  <td><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" style="cursor:pointer"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="edit-footer" style="margin-top:20px">
           <button class="btn-cancel" onclick="goTo('details')">Cancel</button>
           <button class="btn-save" onclick="openSaveModal()">Save</button>
         </div>
@@ -1013,7 +1228,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
             <div class="form-field"><label>Terms</label><select><option>Net 30</option><option>Net 15</option><option>Net 60</option><option>Due on Receipt</option></select></div>
             <div class="form-field"><label>Tax Group</label><select><option>UK Standard VAT 20%</option><option>UK Reduced 5%</option><option>Zero Rated</option></select></div>
             <div class="form-field"><label>Invoice Delivery</label><select><option>E-mail</option><option>Post</option><option>Portal</option></select></div>
-            <div class="form-field"><label>Invoice Grouping</label><select><option>By Location</option><option>By Service Type</option><option>Single Invoice</option></select></div>
+            <div class="form-field"><label>Invoice Grouping</label><select><option>Customer</option><option>Customer, PO Number</option><option>Customer, PO Number, VAT Group</option><option>Customer, Tax Group</option><option>Customer, Service Location</option><option>Customer, Service Location, PO Number</option></select></div>
             <div class="form-field"><label>Credit Limit</label><input type="text" value="£5,000.00"></div>
             <div class="form-field"><label>Billing Attention</label><input type="text" placeholder="Contact name or dept."></div>
           </div>
@@ -1290,18 +1505,27 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <label class="ci-label" style="margin:0;font-size:14px;font-weight:500;color:#242833">Service Locations</label>
           <div style="display:flex;gap:8px">
-            <button class="ci-sel-btn">SELECT ALL</button>
-            <button class="ci-sel-btn">SELECT NONE</button>
+            <button class="ci-sel-btn" onclick="ciSelectAll(true)">SELECT ALL</button>
+            <button class="ci-sel-btn" onclick="ciSelectAll(false)">SELECT NONE</button>
           </div>
         </div>
-        <div class="ci-location-card">
-          <input type="checkbox" checked style="width:16px;height:16px;accent-color:#33A542;flex-shrink:0">
-          <div>
-            <div style="font-size:13px;font-weight:500;color:#242833">0001: 1 Welford Mews, London SE23 3FB</div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Active · 3 services</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="ci-location-card" onclick="ciToggle(this)" style="cursor:pointer">
+            <input type="checkbox" checked id="ci-loc1" style="width:16px;height:16px;accent-color:#33A542;flex-shrink:0;pointer-events:none">
+            <div>
+              <div style="font-size:13px;font-weight:500;color:#242833">0001: 1 Welford Mews, London SE23 3FB</div>
+              <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Active · 3 services · Ref 10094270120</div>
+            </div>
+          </div>
+          <div class="ci-location-card" onclick="ciToggle(this)" style="cursor:pointer">
+            <input type="checkbox" checked id="ci-loc2" style="width:16px;height:16px;accent-color:#33A542;flex-shrink:0;pointer-events:none">
+            <div>
+              <div style="font-size:13px;font-weight:500;color:#242833">0002: 14 Manor Lane, London SE12 8LY</div>
+              <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Active · 4 services · Ref 10094271890</div>
+            </div>
           </div>
         </div>
-        <div style="font-size:12px;color:#9CA3AF;margin-top:8px">1 location selected</div>
+        <div id="ci-loc-counter" style="font-size:12px;color:#9CA3AF;margin-top:8px">2 locations selected</div>
       </div>
       <!-- Mark Orders RTB -->
       <div class="ci-field-row">
@@ -1486,6 +1710,14 @@ function closeXModal(id) {
   document.getElementById(id).classList.remove('open');
 }
 // Close modal on overlay click
+function goToCustomers() {
+  document.querySelectorAll('.page-view').forEach(function(v){v.classList.remove('active');});
+  document.getElementById('view-customers').classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(function(l){l.classList.remove('active');});
+  document.getElementById('nav-customers').classList.add('active');
+  window.scrollTo(0,0);
+  hideAllCtxMenus();
+}
 function goToFinance() {
   document.querySelectorAll('.page-view').forEach(function(v){v.classList.remove('active');});
   document.getElementById('view-finance').classList.add('active');
@@ -1497,8 +1729,40 @@ function goToFinance() {
 function openCreateBatch() {
   document.getElementById('createBatchModal').classList.add('open');
 }
+function switchShSubtab(tab) {
+  ['billing','update'].forEach(function(t) {
+    document.getElementById('sh-subtab-'+t).classList.toggle('active', t===tab);
+    var p = document.getElementById('sh-panel-'+t);
+    if(p) p.style.display = t===tab ? 'block' : 'none';
+  });
+}
 function openCreateInvoice() {
   document.getElementById('createInvoiceModal').classList.add('open');
+}
+function ciUpdateCounter() {
+  var checked = document.querySelectorAll('#createInvoiceModal input[type=checkbox]:checked').length;
+  var total   = document.querySelectorAll('#createInvoiceModal input[type=checkbox]').length;
+  var el = document.getElementById('ci-loc-counter');
+  if (!el) return;
+  if (checked === 0) el.textContent = 'No locations selected';
+  else if (checked === total) el.textContent = 'All ' + total + ' locations selected';
+  else el.textContent = checked + ' of ' + total + ' locations selected';
+}
+function ciToggle(card) {
+  var cb = card.querySelector('input[type=checkbox]');
+  cb.checked = !cb.checked;
+  card.style.borderColor = cb.checked ? '#33A542' : '#E5E7EB';
+  card.style.background  = cb.checked ? '#F0FDF4' : '#fff';
+  ciUpdateCounter();
+}
+function ciSelectAll(checked) {
+  document.querySelectorAll('#createInvoiceModal .ci-location-card').forEach(function(card) {
+    var cb = card.querySelector('input[type=checkbox]');
+    cb.checked = checked;
+    card.style.borderColor = checked ? '#33A542' : '#E5E7EB';
+    card.style.background  = checked ? '#F0FDF4' : '#fff';
+  });
+  ciUpdateCounter();
 }
 ['serviceHistoryModal','invoiceDetailModal','editCustomerModal','editLocationModal','createInvoiceModal','createBatchModal'].forEach(function(id){
   var el = document.getElementById(id);
