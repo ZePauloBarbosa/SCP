@@ -287,6 +287,38 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .modal-tab-panel.active { display:block; }
 .billing-section-badge { display:inline-block; margin-left:6px; font-size:9px; font-weight:700; color:#fff; background:#20315A; border-radius:3px; padding:1px 5px; text-transform:uppercase; vertical-align:middle; }
 /* Service History: Update History table */
+/* ── SETTINGS PAGE ── */
+.settings-page { padding:32px 48px;max-width:1100px;margin:0 auto }
+.settings-h1 { font-size:28px;font-weight:300;color:#242833;margin-bottom:28px }
+.settings-top-bar { display:flex;align-items:center;justify-content:space-between;margin-bottom:32px }
+.settings-cards-row { display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px }
+.settings-card { background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:28px 32px }
+.settings-card-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px }
+.settings-card-title { font-size:16px;font-weight:600;color:#242833 }
+.settings-field { margin-bottom:14px }
+.settings-field label { display:block;font-size:11px;color:#9CA3AF;margin-bottom:3px }
+.settings-field-val { font-size:14px;color:#242833 }
+.settings-section-title { font-size:18px;font-weight:600;color:#242833;margin:28px 0 18px }
+.settings-features-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:28px }
+.settings-feature-col-title { font-size:14px;font-weight:600;color:#242833;margin-bottom:14px }
+.settings-feature-row { display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F3F4F6 }
+.settings-feature-row:last-child { border-bottom:none }
+.settings-feature-left { display:flex;align-items:center;gap:8px;font-size:13px;color:#242833 }
+.settings-manage-btns { display:flex;gap:10px;margin-top:20px }
+.settings-manage-btn { padding:6px 14px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;font-family:inherit;font-size:12px;font-weight:500;color:#20315A;cursor:pointer }
+/* ── BILLING CONFIG PAGE ── */
+.bc-page { padding:32px 48px;max-width:1200px;margin:0 auto }
+.bc-subtitle { font-size:14px;color:#6B7280;margin-bottom:32px }
+.bc-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:20px }
+.bc-card { background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:22px 24px }
+.bc-card-header { display:flex;align-items:center;gap:14px;margin-bottom:18px }
+.bc-card-icon { width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0 }
+.bc-card-title { font-size:15px;font-weight:700;color:#242833 }
+.bc-card-count { font-size:12px;color:#9CA3AF }
+.bc-item { display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #F3F4F6;font-size:13px;color:#374151;cursor:pointer }
+.bc-item:last-child { border-bottom:none }
+.bc-item:hover { color:#20315A }
+.bc-item-left { display:flex;align-items:center;gap:10px }
 .sh-subtab { padding:8px 16px 10px; font-size:13px; font-weight:400; color:#6B7280; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; display:inline-flex; align-items:center; gap:5px; transition:color .15s, border-color .15s; }
 .sh-subtab:hover { color:#20315A; }
 .sh-subtab.active { color:#20315A; border-bottom-color:#20315A; font-weight:600; }
@@ -440,6 +472,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
   <div class="nav-right">
     <span class="client-tag">Test Billing</span>
     <button class="notif-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></button>
+    <button class="notif-btn" id="nav-settings" onclick="goToSettings()" title="Application Settings" style="border:2px solid rgba(255,255,255,0.35);border-radius:50%;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   </div>
 </nav>
 <!-- SUB NAV -->
@@ -1420,6 +1453,203 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
   </div>
 </div>
 
+<!-- ══ VIEW 5: APPLICATION SETTINGS ══ -->
+<div class="page-view" id="view-settings">
+  <div class="settings-page">
+    <div class="settings-top-bar">
+      <h1 class="settings-h1">Application Settings</h1>
+      <div style="display:flex;gap:12px">
+        <button style="padding:8px 20px;border:1px solid #EF4444;border-radius:6px;background:#fff;font-family:inherit;font-size:13px;font-weight:500;color:#EF4444;cursor:pointer">Logout</button>
+        <button style="padding:8px 20px;border:none;border-radius:6px;background:#20315A;font-family:inherit;font-size:13px;font-weight:500;color:#fff;cursor:pointer">Create Vendor</button>
+      </div>
+    </div>
+    <!-- Profile + Company -->
+    <div class="settings-cards-row">
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title">User Profile</div>
+          <button class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        </div>
+        <div class="settings-field"><label>Name</label><div class="settings-field-val">Paulo Barbosa</div></div>
+        <div class="settings-field"><label>Email</label><div class="settings-field-val">paulo.barbosa@routeware.com</div></div>
+        <div class="settings-field"><label>Password</label><div class="settings-field-val">········</div></div>
+      </div>
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title">Company Configuration</div>
+          <button class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px">
+          <div class="settings-field"><label>Name</label><div class="settings-field-val">test-york</div></div>
+          <div class="settings-field"><label>Time Zone</label><div class="settings-field-val">(UTC-05:00) Eastern Time (US &amp; Canada)</div></div>
+          <div class="settings-field"><label>Address</label><div class="settings-field-val">York St, Sydney NSW 2000, Australia</div></div>
+          <div class="settings-field"><label>Route Start Time</label><div class="settings-field-val">12:00 AM (0 hours)</div></div>
+        </div>
+        <div class="settings-manage-btns">
+          <button class="settings-manage-btn">Manage Users</button>
+          <button class="settings-manage-btn">Manage Devices</button>
+          <button class="settings-manage-btn">Manage API Keys</button>
+        </div>
+      </div>
+    </div>
+    <!-- Features -->
+    <div class="settings-section-title">Features</div>
+    <div class="settings-features-grid">
+      <!-- Account Management -->
+      <div>
+        <div class="settings-feature-col-title">Account Management</div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>City Alerts</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>City Flagging</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Container Management</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Customer Notification</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Dashboard Auto-Refresh</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Location Alerts</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox" checked style="accent-color:#9CA3AF"><span style="color:#9CA3AF">Pickup Exceptions</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox" checked style="accent-color:#33A542"><span>Service Deployer</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox" checked style="accent-color:#33A542"><span>Subscriptions</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      </div>
+      <!-- Fleet Management -->
+      <div>
+        <div class="settings-feature-col-title">Fleet Management</div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Fault Code Notifications</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Fleet Maintenance</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Fuel Tickets</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox" checked style="accent-color:#33A542"><span>Navi 3.0</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>On Demand Video Download</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Post Trip Inspection</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Pre Trip Inspection</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>SOS Alert</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox" checked style="accent-color:#9CA3AF"><span style="color:#9CA3AF">Stationary Settings</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox" checked style="accent-color:#33A542"><span>Travel Path</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Vehicle Notifications</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      </div>
+      <!-- Route Management -->
+      <div>
+        <div class="settings-feature-col-title">Route Management</div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>App Experience</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Exception Management Tool</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Geo-Fencing</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Optimised Stop Insertion</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Route Builder</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Route Playback</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Route Recommendations</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Route Sequencing</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Route Template Builder</span></div></div>
+      </div>
+    </div>
+    <!-- Routeware Admin Features -->
+    <div class="settings-section-title">Routeware Admin Features</div>
+    <div class="settings-features-grid">
+      <div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Automatic Account Number Generation</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Billing &amp; Invoicing</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Capture Speeding Incidents</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Container Color Configuration</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox" checked style="accent-color:#33A542"><span style="font-weight:600;color:#20315A">Billing Integration</span></div>
+          <button class="icon-btn" onclick="goToBillingConfig()" title="Configure Billing Integration"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        </div>
+      </div>
+      <div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Enable Clustering Algorithm</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Esri Sync</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Inference Audit</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox" checked style="accent-color:#33A542"><span>Insight Configuration</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      </div>
+      <div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Route Day Modifier</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Send Route Diagnostic Logs</span></div></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Send Vehicle Route Triggers</span></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="settings-feature-row"><div class="settings-feature-left"><input type="checkbox"><span>Service Contract Update Workflow</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BILLING INTEGRATION CONFIG MODAL ══ -->
+<div class="modal-overlay" id="billingConfigModal">
+  <div class="modal-lg" style="width:1100px;max-width:96vw;max-height:92vh">
+    <div class="modal-header" style="border-bottom:1px solid #E5E7EB">
+      <div>
+        <div class="modal-title">Billing Integration</div>
+        <div style="font-size:12px;color:#6B7280;margin-top:2px">Configure billing behaviour, service catalogue, tax settings, statuses, and user permissions for your tenant.</div>
+      </div>
+      <button class="modal-close-btn" onclick="closeXModal('billingConfigModal')">✕</button>
+    </div>
+    <div class="modal-body-scroll" style="padding:28px 32px">
+  <div class="bc-page" style="padding:0;max-width:none">
+    <div class="bc-grid">
+      <!-- Billing -->
+      <div class="bc-card">
+        <div class="bc-card-header">
+          <div class="bc-card-icon" style="background:#ECFDF5"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+          <div><div class="bc-card-title">Billing</div><div class="bc-card-count">7 screens</div></div>
+        </div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg> AR Adjustment Reason</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Billing Cycle</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Customer Class</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> GL Account</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg> Service Code</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Standard Rate</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg> Terms</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>
+      <!-- Company -->
+      <div class="bc-card">
+        <div class="bc-card-header">
+          <div class="bc-card-icon" style="background:#EFF6FF"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <div><div class="bc-card-title">Company</div><div class="bc-card-count">2 screens</div></div>
+        </div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Company Entity</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Company Setup</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>
+      <!-- Operations -->
+      <div class="bc-card">
+        <div class="bc-card-header">
+          <div class="bc-card-icon" style="background:#F0FDF4"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg></div>
+          <div><div class="bc-card-title">Operations</div><div class="bc-card-count">6 screens</div></div>
+        </div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Equipment Category</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg> Equipment Type</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Order Priority</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg> Region</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Service Area</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> Service Change Reason</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>
+      <!-- Status -->
+      <div class="bc-card">
+        <div class="bc-card-header">
+          <div class="bc-card-icon" style="background:#FFF7ED"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div><div class="bc-card-title">Status</div><div class="bc-card-count">5 screens</div></div>
+        </div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Customer Status</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Equipment Status</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/></svg> Order Status</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Service Location Status</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Service Status</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>
+      <!-- Tax -->
+      <div class="bc-card">
+        <div class="bc-card-header">
+          <div class="bc-card-icon" style="background:#FEFCE8"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EAB308" stroke-width="1.5"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
+          <div><div class="bc-card-title">Tax</div><div class="bc-card-count">2 screens</div></div>
+        </div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg> Tax Entity</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg> Tax Group</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>
+      <!-- Users & Permissions -->
+      <div class="bc-card">
+        <div class="bc-card-header">
+          <div class="bc-card-icon" style="background:#F5F3FF"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div><div class="bc-card-title">Users &amp; Permissions</div><div class="bc-card-count">2 screens</div></div>
+        </div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> User</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="bc-item"><div class="bc-item-left"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg> User Role</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>
+    </div><!-- /bc-grid -->
+  </div><!-- /bc-page -->
+  </div><!-- /modal-body-scroll -->
+  </div><!-- /modal-lg -->
+</div><!-- /billingConfigModal -->
+
 <!-- ══ CREATE BILLING BATCH MODAL ══ -->
 <div class="modal-overlay" id="createBatchModal">
   <div class="modal-lg" style="width:560px;max-height:90vh">
@@ -1725,6 +1955,16 @@ function goToFinance() {
   document.getElementById('nav-finance').classList.add('active');
   window.scrollTo(0,0);
   hideAllCtxMenus();
+}
+function goToSettings() {
+  document.querySelectorAll('.page-view').forEach(function(v){v.classList.remove('active');});
+  document.getElementById('view-settings').classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(function(l){l.classList.remove('active');});
+  window.scrollTo(0,0);
+  hideAllCtxMenus();
+}
+function goToBillingConfig() {
+  document.getElementById('billingConfigModal').classList.add('open');
 }
 function openCreateBatch() {
   document.getElementById('createBatchModal').classList.add('open');
