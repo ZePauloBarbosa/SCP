@@ -1564,18 +1564,20 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
   </div>
 </div>
 
-<!-- ══ BILLING INTEGRATION CONFIG MODAL ══ -->
-<div class="modal-overlay" id="billingConfigModal">
-  <div class="modal-lg" style="width:1100px;max-width:96vw;max-height:92vh">
-    <div class="modal-header" style="border-bottom:1px solid #E5E7EB">
-      <div>
-        <div class="modal-title">Billing Integration</div>
-        <div style="font-size:12px;color:#6B7280;margin-top:2px">Configure billing behaviour, service catalogue, tax settings, statuses, and user permissions for your tenant.</div>
-      </div>
-      <button class="modal-close-btn" onclick="closeXModal('billingConfigModal')">✕</button>
+<!-- ══ VIEW: BILLING INTEGRATION CONFIG (converted from modal to page, 2026-07-20) ══ -->
+<div class="page-view" id="view-billing-config">
+  <div class="bc-page">
+    <div style="font-size:13px;color:#6B7280;margin-bottom:16px">
+      <a href="#" onclick="goToSettings();return false;" style="color:#20315A;font-weight:500;text-decoration:none;cursor:pointer">&larr; Application Settings</a>
+      <span style="margin:0 6px;color:#CBD5E1">/</span>
+      <span>Billing Integration</span>
     </div>
-    <div class="modal-body-scroll" style="padding:28px 32px">
-  <div class="bc-page" style="padding:0;max-width:none">
+    <div class="settings-top-bar">
+      <div>
+        <div class="settings-h1" style="margin-bottom:6px">Billing Integration</div>
+        <div class="bc-subtitle" style="margin-bottom:0">Configure billing behaviour, service catalogue, tax settings, statuses, and user permissions for your tenant.</div>
+      </div>
+    </div>
     <div class="bc-grid">
       <!-- Billing -->
       <div class="bc-card">
@@ -1645,9 +1647,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
       </div>
     </div><!-- /bc-grid -->
   </div><!-- /bc-page -->
-  </div><!-- /modal-body-scroll -->
-  </div><!-- /modal-lg -->
-</div><!-- /billingConfigModal -->
+</div><!-- /view-billing-config -->
 
 <!-- ══ CREATE BILLING BATCH MODAL ══ -->
 <div class="modal-overlay" id="createBatchModal">
@@ -1971,7 +1971,11 @@ function goToSettings() {
   hideAllCtxMenus();
 }
 function goToBillingConfig() {
-  document.getElementById('billingConfigModal').classList.add('open');
+  document.querySelectorAll('.page-view').forEach(function(v){v.classList.remove('active');});
+  document.getElementById('view-billing-config').classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(function(l){l.classList.remove('active');});
+  window.scrollTo(0,0);
+  hideAllCtxMenus();
 }
 function openCreateBatch() {
   document.getElementById('createBatchModal').classList.add('open');
