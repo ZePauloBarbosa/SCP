@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configure Vehicle Subtypes — SCP Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#20315A;
+    --navy-dark:#242833;
+    --green:#33A542;
+    --bg:#FAFAFC;
+    --white:#FFFFFF;
+    --border:#E5E7EB;
+    --text:#242833;
+    --text-muted:#6B7280;
+    --toggle-off:#CBD5E1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Montserrat',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  /* ---------- Top nav ---------- */
+  .topnav{
+    height:70px;
+    background:var(--navy-dark);
+    display:flex;
+    align-items:center;
+    padding:0 24px;
+    justify-content:space-between;
+  }
+  .topnav-left{display:flex;align-items:center;gap:36px;height:100%;}
+  .logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:600;font-size:19px;}
+  .logo-mark{width:26px;height:26px;border-radius:50%;background:var(--green);display:inline-block;position:relative;}
+  .logo-mark::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--navy-dark);}
+  .navlinks{display:flex;height:100%;gap:8px;}
+  .navlink{
+    display:flex;align-items:center;gap:8px;
+    padding:0 18px;height:100%;
+    color:rgba(255,255,255,0.8);
+    font-size:14px;font-weight:600;letter-spacing:.03em;
+    text-transform:uppercase;
+    border-bottom:4px solid transparent;
+    cursor:pointer;
+  }
+  .navlink.active{color:#fff;border-bottom-color:var(--green);}
+  .topnav-right{display:flex;align-items:center;gap:14px;}
+  .pill{background:rgba(255,255,255,0.12);color:#fff;font-size:12px;font-weight:600;padding:6px 12px;border-radius:14px;}
+  .icon-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#fff;position:relative;}
+
+  /* ---------- Sub nav ---------- */
+  .subnav{
+    height:48px;background:#fff;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:32px;padding:0 24px;
+  }
+  .subnavlink{
+    height:100%;display:flex;align-items:center;
+    font-size:15px;color:var(--text);border-bottom:3px solid transparent;cursor:pointer;
+  }
+  .subnavlink.active{color:var(--green);border-bottom-color:var(--green);font-weight:500;}
+
+  /* ---------- Page header ---------- */
+  .page{max-width:1400px;margin:0 auto;padding:32px 40px 80px;}
+  .page-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;}
+  .back-arrow{font-size:24px;color:var(--text);cursor:pointer;line-height:1;}
+  .page-title{font-size:32px;font-weight:400;color:#3d4560;margin:0;}
+
+  /* ---------- Panel ---------- */
+  .panel{background:#fff;border:1px solid var(--border);border-radius:6px;padding:28px 32px;}
+  .add-heading{font-size:16px;font-weight:600;margin:0 0 18px;color:var(--text);}
+  .add-row{display:flex;gap:20px;align-items:flex-end;margin-bottom:22px;flex-wrap:wrap;}
+  .field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px;}
+  .field label{font-size:12px;color:var(--text-muted);font-weight:500;}
+  .field input{
+    height:38px;border:1px solid var(--border);border-radius:5px;
+    padding:0 12px;font-family:'Montserrat',sans-serif;font-size:14px;
+    outline:none;
+  }
+  .field input:focus{border-color:var(--navy);}
+
+  .vt-select{position:relative;flex:1;min-width:220px;}
+  .vt-select-box{
+    height:38px;border:1px solid var(--border);border-radius:5px;
+    padding:0 12px;display:flex;align-items:center;justify-content:space-between;
+    font-size:14px;color:var(--text-muted);cursor:pointer;background:#fff;
+  }
+  .vt-select-box.filled{color:var(--text);}
+  .vt-select-box:hover{border-color:#c7cbd4;}
+  .vt-menu{
+    position:absolute;top:44px;left:0;right:0;background:#fff;
+    border:1px solid var(--border);border-radius:5px;box-shadow:0 8px 20px rgba(36,40,51,0.12);
+    max-height:260px;overflow-y:auto;z-index:20;display:none;
+  }
+  .vt-menu.open{display:block;}
+  .vt-option{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:13.5px;cursor:pointer;}
+  .vt-option:hover{background:var(--bg);}
+  .vt-option input{width:15px;height:15px;accent-color:var(--navy);}
+
+  .btn{
+    height:38px;border-radius:5px;border:none;padding:0 22px;
+    font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;
+    cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;
+  }
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-primary:hover{background:#182647;}
+  .btn-secondary{background:transparent;color:var(--navy);border:1px solid var(--navy);}
+  .btn-secondary:hover{background:#f3f5f9;}
+  .btn-addon{background:#7C3AED;color:#fff;}
+  .btn-addon:hover{background:#6428CC;}
+
+  .add-actions-row{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:24px;}
+  .checkbox-inline{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text-muted);cursor:pointer;}
+  .checkbox-inline input{width:15px;height:15px;accent-color:#7C3AED;}
+  .add-buttons{display:flex;gap:12px;}
+
+  .divider{border-top:1px solid var(--border);margin-bottom:24px;}
+
+  .group{border:1px solid var(--border);border-radius:6px;margin-bottom:20px;overflow:hidden;}
+  .group-header{
+    display:flex;align-items:center;gap:10px;padding:16px 18px 10px;
+  }
+  .group-bar{width:4px;height:18px;background:var(--green);border-radius:2px;}
+  .group-name{font-size:16px;font-weight:600;color:var(--text);}
+
+  .row{
+    padding:12px 18px;background:var(--bg);border-top:1px solid var(--border);
+    position:relative;
+  }
+  .row-top{display:flex;align-items:center;justify-content:space-between;}
+  .row:hover .row-actions{opacity:1;}
+  .addon-flags{
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+    margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);
+    font-size:12px;color:var(--text-muted);
+  }
+  .addon-flags-label{font-weight:500;}
+  .flag-option{display:flex;align-items:center;gap:5px;cursor:pointer;}
+  .flag-option input{accent-color:var(--navy);width:13px;height:13px;cursor:pointer;}
+  .row-left{display:flex;align-items:baseline;gap:8px;font-size:14px;}
+  .row-name{font-weight:500;color:var(--text);}
+  .badge-custom{
+    background:#E7F0FF;color:#2360C2;font-size:11px;font-weight:600;
+    padding:2px 9px;border-radius:10px;
+  }
+  .badge-addon{
+    background:#F3E8FF;color:#7C3AED;font-size:11px;font-weight:600;
+    padding:2px 9px;border-radius:10px;
+  }
+  .row-desc{color:var(--text-muted);font-size:13px;}
+  .row-right{display:flex;align-items:center;gap:14px;}
+  .toggle-label{font-size:13px;color:var(--text-muted);}
+  .toggle{width:36px;height:20px;border-radius:10px;background:var(--toggle-off);position:relative;cursor:pointer;transition:background .15s;flex-shrink:0;}
+  .toggle.on{background:var(--navy);}
+  .toggle-knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;}
+  .toggle.on .toggle-knob{left:18px;}
+  .system-label{font-size:12px;color:#9AA1AC;font-style:italic;width:52px;text-align:right;}
+  .row-actions{display:flex;gap:10px;opacity:0;transition:opacity .1s;width:52px;justify-content:flex-end;}
+  .icon-action{cursor:pointer;color:#8A93A3;font-size:15px;}
+  .icon-action:hover{color:var(--navy);}
+  .icon-action.trash:hover{color:#D63447;}
+
+  .edit-box{
+    background:#EEF3FC;border-top:1px solid var(--border);padding:16px 18px;display:none;
+  }
+  .edit-box.open{display:block;}
+  .edit-box .field{margin-bottom:12px;max-width:420px;}
+  .edit-actions{display:flex;gap:10px;}
+  .btn-small{height:32px;padding:0 16px;font-size:13px;}
+  .btn-cancel{background:#fff;border:1px solid var(--border);color:var(--text);}
+
+  .save-bar{display:flex;justify-content:center;margin-top:8px;}
+
+  /* Modal */
+  .overlay{
+    position:fixed;inset:0;background:rgba(20,22,28,0.55);
+    display:none;align-items:center;justify-content:center;z-index:100;
+  }
+  .overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:8px;padding:28px 30px;width:400px;box-shadow:0 12px 40px rgba(0,0,0,0.25);}
+  .modal h3{margin:0 0 10px;font-size:17px;}
+  .modal p{margin:0 0 20px;font-size:14px;color:var(--text-muted);}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+  .btn-danger{background:#D63447;color:#fff;}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-left">
+    <div class="logo"><span class="logo-mark"></span> Routeware</div>
+    <div class="navlinks">
+      <div class="navlink">Dispatch</div>
+      <div class="navlink">Customers</div>
+      <div class="navlink active">Fleet</div>
+      <div class="navlink">Insights</div>
+    </div>
+  </div>
+  <div class="topnav-right">
+    <div class="pill">Playlyfe</div>
+    <div class="icon-btn">⚙</div>
+  </div>
+</div>
+
+<div class="subnav">
+  <div class="subnavlink active">Vehicles</div>
+  <div class="subnavlink">Resources</div>
+  <div class="subnavlink">Containers</div>
+  <div class="subnavlink">Facilities</div>
+  <div class="subnavlink">Geo-Fences</div>
+  <div class="subnavlink">Alerts</div>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <span class="back-arrow">&#8592;</span>
+    <h1 class="page-title">Configure Vehicle Subtypes</h1>
+  </div>
+
+  <div class="panel">
+    <div class="add-heading">Add new subtype or add-on</div>
+    <div class="add-row">
+      <div class="field">
+        <label>Name</label>
+        <input id="newName" type="text" placeholder="Enter name">
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <input id="newDesc" type="text" placeholder="Enter description">
+      </div>
+      <div class="vt-select">
+        <label style="font-size:12px;color:var(--text-muted);font-weight:500;">Vehicle Types (select one or more)</label>
+        <div class="vt-select-box" id="vtBox" onclick="toggleVtMenu()">
+          <span id="vtBoxLabel">Select vehicle types</span>
+          <span>&#9662;</span>
+        </div>
+        <div class="vt-menu" id="vtMenu"></div>
+      </div>
+    </div>
+
+    <div class="add-actions-row">
+      <label class="checkbox-inline">
+        <input type="checkbox" id="addonPrePost" checked>
+        Create a Pre &amp; Post Trip inspection for this add-on
+      </label>
+      <div class="add-buttons">
+        <button class="btn btn-secondary" onclick="addEntry(false)">+ Add Subtype</button>
+        <button class="btn btn-addon" onclick="addEntry(true)">+ Add Add-on</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <div id="groups"></div>
+
+    <div class="save-bar">
+      <button class="btn btn-primary" style="padding:0 40px;">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="deleteOverlay">
+  <div class="modal">
+    <h3>Delete Custom Subtype</h3>
+    <p>Are you sure you want to delete <strong id="deleteName"></strong>?</p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel btn-small" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger btn-small" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- Seed data (mirrors the live "Configure Vehicle Subtypes" page) ----------
+let data = {
+  "Front Load": [
+    {id:1, name:"Rear Load", desc:"", system:true, isAddOn:false, allowsAddOns:false, showPrePost:true},
+    {id:2, name:"Front Load", desc:"", system:true, isAddOn:false, allowsAddOns:false, showPrePost:true},
+    {id:3, name:"Custom front load", desc:"Custom subtype", system:false, isAddOn:false, allowsAddOns:false, showPrePost:false},
+  ],
+  "Roll Off": [
+    {id:4, name:"Open Top", desc:"", system:true, isAddOn:false, allowsAddOns:false, showPrePost:true},
+    {id:5, name:"Compactor", desc:"", system:true, isAddOn:false, allowsAddOns:false, showPrePost:false},
+  ],
+  "Residential": [
+    {id:6, name:"Single-Family Truck", desc:"", system:true, isAddOn:false, allowsAddOns:false, showPrePost:true},
+    {id:7, name:"Multi-Family Truck", desc:"", system:true, isAddOn:false, allowsAddOns:false, showPrePost:true},
+  ],
+  "Snow Plow": [
+    {id:8, name:"Standard Plow", desc:"", system:true, isAddOn:false, allowsAddOns:false, showPrePost:true},
+    {id:9, name:"V-Plow", desc:"", system:true, isAddOn:false, allowsAddOns:false, showPrePost:true},
+    {id:10, name:"Front Skid Attachment", desc:"Snowplow add-on", system:false, isAddOn:true, allowsAddOns:false, showPrePost:true},
+    {id:11, name:"Heavy-Duty Plow Mount", desc:"Accepts front skid attachments", system:false, isAddOn:false, allowsAddOns:true, showPrePost:true},
+  ],
+};
+let nextId = 100;
+let selectedVehicleTypes = [];
+let pendingDelete = null; // {group, id}
+
+const vehicleTypeOptions = Object.keys(data);
+
+function render(){
+  const container = document.getElementById('groups');
+  container.innerHTML = '';
+  Object.keys(data).forEach(groupName => {
+    const groupEl = document.createElement('div');
+    groupEl.className = 'group';
+
+    const header = document.createElement('div');
+    header.className = 'group-header';
+    header.innerHTML = `<span class="group-bar"></span><span class="group-name">${groupName}</span>`;
+    groupEl.appendChild(header);
+
+    data[groupName].forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      const isAddOn = !!item.isAddOn;
+      row.innerHTML = `
+        <div class="row-top">
+          <div class="row-left">
+            <span class="row-name">${item.name}</span>
+            ${!item.system ? (isAddOn ? `<span class="badge-addon">Add-on</span>` : `<span class="badge-custom">Custom</span>`) : ''}
+            ${!item.system && item.desc ? `<span class="row-desc">- ${item.desc}</span>` : ''}
+          </div>
+          <div class="row-right">
+            <span class="toggle-label">Show In Pre &amp; Post Trip</span>
+            <div class="toggle ${item.showPrePost ? 'on' : ''}" onclick="toggleShow('${groupName}', ${item.id})">
+              <div class="toggle-knob"></div>
+            </div>
+            ${item.system
+              ? `<span class="system-label">System</span>`
+              : `<div class="row-actions">
+                   <span class="icon-action edit" onclick="openEdit('${groupName}', ${item.id})">&#9998;</span>
+                   <span class="icon-action trash" onclick="openDeleteModal('${groupName}', ${item.id})">&#128465;</span>
+                 </div>`
+            }
+          </div>
+        </div>
+        ${(!item.system && !isAddOn) ? `
+        <div class="addon-flags">
+          <span class="addon-flags-label">Add-on status:</span>
+          <label class="flag-option">
+            <input type="checkbox" ${item.allowsAddOns ? 'checked' : ''} onchange="toggleAllowsAddOns('${groupName}', ${item.id})">
+            Allows Add-ons
+          </label>
+        </div>` : ''}
+      `;
+      groupEl.appendChild(row);
+
+      if(!item.system){
+        const editBox = document.createElement('div');
+        editBox.className = 'edit-box';
+        editBox.id = `edit-${groupName}-${item.id}`;
+        editBox.innerHTML = `
+          <div class="field">
+            <label>Name</label>
+            <input type="text" id="editName-${groupName}-${item.id}" value="${item.name}">
+          </div>
+          <div class="field">
+            <label>Description</label>
+            <input type="text" id="editDesc-${groupName}-${item.id}" value="${item.desc}">
+          </div>
+          <div class="edit-actions">
+            <button class="btn btn-primary btn-small" onclick="saveEdit('${groupName}', ${item.id})">Save</button>
+            <button class="btn btn-cancel btn-small" onclick="closeEdit('${groupName}', ${item.id})">Cancel</button>
+          </div>
+        `;
+        groupEl.appendChild(editBox);
+      }
+    });
+
+    container.appendChild(groupEl);
+  });
+}
+
+function toggleShow(group, id){
+  const item = data[group].find(i => i.id === id);
+  item.showPrePost = !item.showPrePost;
+  render();
+}
+
+function toggleAllowsAddOns(group, id){
+  const item = data[group].find(i => i.id === id);
+  item.allowsAddOns = !item.allowsAddOns;
+  render();
+}
+
+function openEdit(group, id){
+  closeAllEdits();
+  document.getElementById(`edit-${group}-${id}`).classList.add('open');
+}
+function closeEdit(group, id){
+  document.getElementById(`edit-${group}-${id}`).classList.remove('open');
+}
+function closeAllEdits(){
+  document.querySelectorAll('.edit-box').forEach(b => b.classList.remove('open'));
+}
+function saveEdit(group, id){
+  const item = data[group].find(i => i.id === id);
+  item.name = document.getElementById(`editName-${group}-${id}`).value;
+  item.desc = document.getElementById(`editDesc-${group}-${id}`).value;
+  render();
+}
+
+function openDeleteModal(group, id){
+  const item = data[group].find(i => i.id === id);
+  pendingDelete = {group, id};
+  document.getElementById('deleteName').textContent = item.name;
+  document.getElementById('deleteOverlay').classList.add('open');
+}
+function closeDeleteModal(){
+  pendingDelete = null;
+  document.getElementById('deleteOverlay').classList.remove('open');
+}
+function confirmDelete(){
+  if(pendingDelete){
+    data[pendingDelete.group] = data[pendingDelete.group].filter(i => i.id !== pendingDelete.id);
+  }
+  closeDeleteModal();
+  render();
+}
+
+// ---------- Vehicle type multi-select ----------
+function buildVtMenu(){
+  const menu = document.getElementById('vtMenu');
+  menu.innerHTML = vehicleTypeOptions.map(vt => `
+    <label class="vt-option">
+      <input type="checkbox" value="${vt}" onchange="onVtCheck(this)">
+      ${vt}
+    </label>
+  `).join('');
+}
+function toggleVtMenu(){
+  document.getElementById('vtMenu').classList.toggle('open');
+}
+function onVtCheck(cb){
+  if(cb.checked){ selectedVehicleTypes.push(cb.value); }
+  else { selectedVehicleTypes = selectedVehicleTypes.filter(v => v !== cb.value); }
+  const label = document.getElementById('vtBoxLabel');
+  const box = document.getElementById('vtBox');
+  if(selectedVehicleTypes.length === 0){
+    label.textContent = 'Select vehicle types';
+    box.classList.remove('filled');
+  } else {
+    label.textContent = `${selectedVehicleTypes.length} type${selectedVehicleTypes.length > 1 ? 's' : ''} selected`;
+    box.classList.add('filled');
+  }
+}
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.vt-select')){
+    document.getElementById('vtMenu').classList.remove('open');
+  }
+});
+
+function addEntry(isAddOn){
+  const name = document.getElementById('newName').value.trim();
+  const desc = document.getElementById('newDesc').value.trim();
+  if(!name || selectedVehicleTypes.length === 0){
+    alert('Please enter a name and select at least one vehicle type.');
+    return;
+  }
+  const id = nextId++;
+  // Regular subtypes always show in Pre & Post Trip by default (unchanged behavior).
+  // Add-ons use the "Create a Pre & Post Trip inspection for this add-on" checkbox.
+  const showPrePost = isAddOn ? document.getElementById('addonPrePost').checked : true;
+  // isAddOn is fixed at creation time (Add Subtype vs Add Add-on) and never changes.
+  // allowsAddOns only applies to non-add-on subtypes and can be toggled any time.
+  selectedVehicleTypes.forEach(vt => {
+    data[vt].push({id, name, desc, system:false, isAddOn, allowsAddOns:false, showPrePost});
+  });
+  document.getElementById('newName').value = '';
+  document.getElementById('newDesc').value = '';
+  selectedVehicleTypes = [];
+  document.getElementById('vtBoxLabel').textContent = 'Select vehicle types';
+  document.getElementById('vtBox').classList.remove('filled');
+  document.getElementById('addonPrePost').checked = true;
+  document.querySelectorAll('.vt-option input').forEach(cb => cb.checked = false);
+  render();
+}
+
+buildVtMenu();
+render();
+</script>
+</body>
+</html>
