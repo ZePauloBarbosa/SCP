@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Edit Vehicle — SCP Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#20315A;
+    --navy-dark:#242833;
+    --green:#33A542;
+    --purple:#7C3AED;
+    --bg:#FAFAFC;
+    --border:#E5E7EB;
+    --text:#242833;
+    --text-muted:#9AA1AC;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);}
+
+  .form-page-header{
+    background:var(--bg);padding:36px 48px 28px;display:flex;align-items:center;gap:18px;
+  }
+  .form-back{font-size:26px;color:var(--navy);cursor:pointer;line-height:1;}
+  .form-title{font-size:34px;font-weight:400;color:#3d4560;margin:0;}
+
+  .form-panel{background:#fff;padding:44px 48px 56px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 90px;max-width:1500px;margin:0 auto;}
+  .form-col{display:flex;flex-direction:column;}
+
+  .field-block{margin-bottom:30px;position:relative;}
+  .field-label{font-size:12.5px;color:var(--text-muted);margin-bottom:7px;display:block;}
+
+  .field-text{
+    border:none;border-bottom:1px solid var(--border);width:100%;
+    font-family:'Montserrat',sans-serif;font-size:17px;color:var(--text);
+    padding:3px 0 7px;outline:none;background:transparent;
+  }
+  .field-text::placeholder{color:#C6CAD2;font-size:15px;}
+  .field-text:focus{border-bottom-color:var(--navy);}
+
+  .field-with-icon{
+    display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);padding:3px 0 7px;
+  }
+  .field-with-icon input{
+    border:none;outline:none;flex:1;font-family:'Montserrat',sans-serif;font-size:17px;background:transparent;color:var(--text);
+  }
+  .field-with-icon input::placeholder{color:#C6CAD2;font-size:15px;}
+  .field-with-icon .icon{color:var(--text-muted);cursor:pointer;font-size:15px;flex-shrink:0;}
+
+  .field-select-wrap{position:relative;}
+  .field-select{
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--border);padding:3px 0 7px;cursor:pointer;
+    font-size:17px;color:var(--text);
+  }
+  .field-select:hover{border-bottom-color:#c7cbd4;}
+  .field-select .value.placeholder{color:#C6CAD2;font-size:15px;}
+  .field-select-icons{display:flex;align-items:center;gap:9px;color:var(--text-muted);flex-shrink:0;}
+  .field-select-icons .clear-x{cursor:pointer;font-size:14px;}
+  .field-select-icons .clear-x:hover{color:#D63447;}
+  .field-select-icons .chevron{font-size:13px;}
+  .field-select-wrap.disabled .field-select{cursor:not-allowed;}
+  .field-select-wrap.disabled .value{color:#D8DBE1;}
+
+  .dropdown-panel{
+    position:absolute;top:100%;left:0;right:0;background:#fff;
+    border:1px solid var(--border);border-radius:6px;
+    box-shadow:0 10px 26px rgba(36,40,51,0.14);
+    max-height:280px;overflow-y:auto;z-index:30;margin-top:6px;display:none;
+  }
+  .dropdown-panel.open{display:block;}
+  .dropdown-group-label{
+    font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--text-muted);
+    text-transform:uppercase;padding:11px 16px 6px;
+  }
+  .dropdown-group-label.addons{color:var(--purple);}
+  .dropdown-option{
+    padding:9px 16px;font-size:14px;color:var(--text);cursor:pointer;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dropdown-option:hover{background:var(--bg);}
+  .dropdown-empty{padding:8px 16px 14px;font-size:12.5px;color:#C6CAD2;font-style:italic;}
+  .opt-badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:8px;background:#F3E8FF;color:var(--purple);}
+
+  .checkbox-row{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+  .checkbox-row input{width:16px;height:16px;accent-color:var(--navy);cursor:pointer;}
+  .checkbox-row label{font-size:15px;cursor:pointer;}
+
+  .device-type-row{display:flex;align-items:center;gap:30px;flex-wrap:wrap;}
+  .device-type-option{display:flex;align-items:center;gap:8px;font-size:15px;cursor:pointer;}
+  .device-type-option input{width:16px;height:16px;accent-color:var(--navy);cursor:pointer;}
+
+  .save-bar{display:flex;justify-content:flex-start;max-width:1500px;margin:10px auto 0;}
+  .btn-save{
+    height:42px;padding:0 46px;border-radius:5px;border:none;
+    background:var(--navy);color:#fff;font-family:'Montserrat',sans-serif;
+    font-size:15px;font-weight:600;cursor:pointer;
+  }
+  .btn-save:hover{background:#182647;}
+
+  .mode-switch{display:flex;gap:10px;margin-left:auto;}
+  .mode-btn{
+    height:32px;padding:0 16px;border-radius:5px;border:1px solid var(--border);
+    background:#fff;color:var(--text-muted);font-family:'Montserrat',sans-serif;
+    font-size:12.5px;font-weight:600;cursor:pointer;
+  }
+  .mode-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+</style>
+</head>
+<body>
+
+<div class="form-page-header">
+  <span class="form-back" onclick="void(0)">&#8592;</span>
+  <h1 class="form-title" id="pageTitle">Edit Vehicle</h1>
+  <div class="mode-switch">
+    <button class="mode-btn active" id="modeEditBtn" onclick="setMode('edit')">Edit Vehicle</button>
+    <button class="mode-btn" id="modeCreateBtn" onclick="setMode('create')">Create Vehicle</button>
+  </div>
+</div>
+
+<div class="form-panel">
+  <div class="form-grid">
+    <!-- LEFT COLUMN -->
+    <div class="form-col">
+
+      <div class="field-block">
+        <label class="field-label">Vehicle Name</label>
+        <input class="field-text" id="vehicleName" type="text" placeholder="Enter vehicle name">
+      </div>
+
+      <div class="field-block field-select-wrap" id="vtWrap">
+        <label class="field-label">Vehicle Type</label>
+        <div class="field-select" id="vtField" onclick="toggleVehicleTypeDropdown()">
+          <span class="value placeholder" id="vtValue">Select vehicle type</span>
+          <span class="field-select-icons">
+            <span class="clear-x" id="vtClear" onclick="clearVehicleType(event)" style="display:none;">&#10005;</span>
+            <span class="chevron">&#9662;</span>
+          </span>
+        </div>
+        <div class="dropdown-panel" id="vtPanel"></div>
+      </div>
+
+      <div class="field-block field-select-wrap disabled" id="vstWrap">
+        <label class="field-label">Vehicle Subtype</label>
+        <div class="field-select" id="vstField" onclick="toggleSubtypeDropdown()">
+          <span class="value placeholder" id="vstValue">Select a vehicle type first</span>
+          <span class="field-select-icons">
+            <span class="clear-x" id="vstClear" onclick="clearSubtype(event)" style="display:none;">&#10005;</span>
+            <span class="chevron">&#9662;</span>
+          </span>
+        </div>
+        <div class="dropdown-panel" id="vstPanel"></div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="activeCheck" onchange="void(0)">
+        <label for="activeCheck">Active</label>
+      </div>
+
+      <div class="field-block field-select-wrap" id="ssWrap">
+        <label class="field-label">Service Status</label>
+        <div class="field-select" id="ssField" onclick="toggleDropdown('ssPanel', buildSimplePanel('ssPanel', ['Available','Out of Service','In Maintenance'], 'serviceStatus'))">
+          <span class="value placeholder" id="ssValue">Select service status</span>
+          <span class="field-select-icons"><span class="chevron">&#9662;</span></span>
+        </div>
+        <div class="dropdown-panel" id="ssPanel"></div>
+      </div>
+
+      <div class="field-block field-select-wrap" id="ofWrap">
+        <label class="field-label">Operational Facility</label>
+        <div class="field-select" id="ofField" onclick="toggleDropdown('ofPanel', buildSimplePanel('ofPanel', ['St. Catharines Waste Hauler Yard','Niagara Falls Yard','Welland Depot'], 'operationalFacility'))">
+          <span class="value placeholder" id="ofValue">Select operational facility</span>
+          <span class="field-select-icons">
+            <span class="clear-x" id="ofClear" onclick="clearField(event,'operationalFacility','ofValue','ofClear','Select operational facility')" style="display:none;">&#10005;</span>
+            <span class="chevron">&#9662;</span>
+          </span>
+        </div>
+        <div class="dropdown-panel" id="ofPanel"></div>
+      </div>
+
+      <div class="field-block field-select-wrap" id="uomWrap">
+        <label class="field-label">Empty Vehicle Unit Of Measure</label>
+        <div class="field-select" id="uomField" onclick="toggleDropdown('uomPanel', buildSimplePanel('uomPanel', ['lbs','kg'], 'emptyVehicleUOM'))">
+          <span class="value placeholder" id="uomValue">Select unit of measure</span>
+          <span class="field-select-icons"><span class="chevron">&#9662;</span></span>
+        </div>
+        <div class="dropdown-panel" id="uomPanel"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Empty Vehicle Weight</label>
+        <input class="field-text" id="emptyWeight" type="number" placeholder="Enter weight">
+      </div>
+
+      <div class="field-block field-select-wrap" id="sideWrap">
+        <label class="field-label">Servicing Side</label>
+        <div class="field-select" id="sideField" onclick="toggleDropdown('sidePanel', buildSimplePanel('sidePanel', ['Left','Right','Dual'], 'servicingSide'))">
+          <span class="value placeholder" id="sideValue">Select servicing side</span>
+          <span class="field-select-icons"><span class="chevron">&#9662;</span></span>
+        </div>
+        <div class="dropdown-panel" id="sidePanel"></div>
+      </div>
+
+      <div class="field-block field-select-wrap" id="cmodeWrap">
+        <label class="field-label">Confirmation Mode</label>
+        <div class="field-select" id="cmodeField" onclick="toggleDropdown('cmodePanel', buildSimplePanel('cmodePanel', ['Trapezoid','Rectangle','None'], 'confirmationMode'))">
+          <span class="value placeholder" id="cmodeValue">Select confirmation mode</span>
+          <span class="field-select-icons"><span class="chevron">&#9662;</span></span>
+        </div>
+        <div class="dropdown-panel" id="cmodePanel"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="form-col">
+
+      <div class="field-block">
+        <label class="field-label">Device Type</label>
+        <div class="device-type-row">
+          <label class="device-type-option"><input type="checkbox" id="devSmartcity"> SmartCity App</label>
+          <label class="device-type-option"><input type="checkbox" id="devTelematics"> Telematics Device</label>
+          <label class="device-type-option"><input type="checkbox" id="devVisionai"> Vision AI</label>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Telematics Device ID</label>
+        <input class="field-text" id="telematicsId" type="text" placeholder="Enter device ID">
+      </div>
+
+      <div class="field-block field-select-wrap" id="tmanWrap">
+        <label class="field-label">Telematics Device Manufacturer</label>
+        <div class="field-select" id="tmanField" onclick="toggleDropdown('tmanPanel', buildSimplePanel('tmanPanel', ['Samsara','Geotab','Verizon Connect'], 'telematicsManufacturer'))">
+          <span class="value placeholder" id="tmanValue">Select manufacturer</span>
+          <span class="field-select-icons"><span class="chevron">&#9662;</span></span>
+        </div>
+        <div class="dropdown-panel" id="tmanPanel"></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Surfsight Camera ID</label>
+        <div class="field-with-icon">
+          <input type="text" id="surfsightId" placeholder="Enter camera ID">
+          <span class="icon">&#9881;</span>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Vision AI Device Id</label>
+        <div class="field-with-icon">
+          <input type="text" id="visionaiId" placeholder="Enter device ID">
+          <span class="icon">&#128065;</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="save-bar">
+    <button class="btn-save" onclick="alert('Mock only — nothing is actually saved.')">Save</button>
+  </div>
+</div>
+
+<script>
+// ---------- Vehicle type -> subtype/add-on data (mirrors the Configure Vehicle Subtypes mock) ----------
+const subtypeData = {
+  "Front Load":   { subtypes: ["Rear Load", "Front Load", "Custom front load"], addons: [] },
+  "Roll Off":     { subtypes: ["Open Top", "Compactor"], addons: [] },
+  "Residential":  { subtypes: ["Single-Family Truck", "Multi-Family Truck", "Side Load"], addons: [] },
+  "Snow Plow":    { subtypes: ["Standard Plow", "V-Plow", "Heavy-Duty Plow Mount"], addons: ["Front Skid Attachment"] },
+};
+const vehicleTypeOptions = [
+  "Front Load", "Roll Off", "Residential", "Snow Plow",
+  "Delivery / Utility", "Dump Truck", "Cart", "Street Sweeper"
+];
+
+let state = {
+  vehicleType: null,
+  vehicleSubtype: null,
+  operationalFacility: null,
+  serviceStatus: null,
+  emptyVehicleUOM: null,
+  servicingSide: null,
+  confirmationMode: null,
+  telematicsManufacturer: null,
+};
+
+// ---------- Generic dropdown helpers ----------
+function closeAllDropdowns(){
+  document.querySelectorAll('.dropdown-panel').forEach(p => p.classList.remove('open'));
+}
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.field-select-wrap')){ closeAllDropdowns(); }
+});
+function toggleDropdown(panelId){
+  const panel = document.getElementById(panelId);
+  const willOpen = !panel.classList.contains('open');
+  closeAllDropdowns();
+  if(willOpen) panel.classList.add('open');
+}
+// Builds a flat (non-grouped) option list into a panel; returns undefined (called for side effect
+// before toggleDropdown runs, since onclick evaluates left-to-right).
+function buildSimplePanel(panelId, options, stateKey){
+  const panel = document.getElementById(panelId);
+  panel.innerHTML = options.map(o => `<div class="dropdown-option" onclick="selectSimple('${stateKey}', '${o}')">${o}</div>`).join('');
+}
+function fieldMeta(stateKey){
+  const map = {
+    serviceStatus:   {valueId:'ssValue'},
+    operationalFacility: {valueId:'ofValue', clearId:'ofClear', placeholder:'Select operational facility'},
+    emptyVehicleUOM: {valueId:'uomValue'},
+    servicingSide:   {valueId:'sideValue'},
+    confirmationMode:{valueId:'cmodeValue'},
+    telematicsManufacturer:{valueId:'tmanValue'},
+  };
+  return map[stateKey];
+}
+function selectSimple(stateKey, value){
+  state[stateKey] = value;
+  const meta = fieldMeta(stateKey);
+  const el = document.getElementById(meta.valueId);
+  el.textContent = value;
+  el.classList.remove('placeholder');
+  if(meta.clearId) document.getElementById(meta.clearId).style.display = 'inline';
+  closeAllDropdowns();
+}
+function clearField(e, stateKey, valueId, clearId, placeholderText){
+  e.stopPropagation();
+  state[stateKey] = null;
+  const el = document.getElementById(valueId);
+  el.textContent = placeholderText;
+  el.classList.add('placeholder');
+  document.getElementById(clearId).style.display = 'none';
+}
+
+// ---------- Vehicle Type dropdown ----------
+function toggleVehicleTypeDropdown(){
+  const panel = document.getElementById('vtPanel');
+  panel.innerHTML = vehicleTypeOptions.map(vt =>
+    `<div class="dropdown-option" onclick="selectVehicleType('${vt}')">${vt}</div>`
+  ).join('');
+  toggleDropdown('vtPanel');
+}
+function selectVehicleType(vt){
+  state.vehicleType = vt;
+  state.vehicleSubtype = null; // changing vehicle type invalidates the previously selected subtype
+  const vtValue = document.getElementById('vtValue');
+  vtValue.textContent = vt;
+  vtValue.classList.remove('placeholder');
+  document.getElementById('vtClear').style.display = 'inline';
+  document.getElementById('vstWrap').classList.remove('disabled');
+  renderSubtypeField();
+  closeAllDropdowns();
+}
+function clearVehicleType(e){
+  e.stopPropagation();
+  state.vehicleType = null;
+  state.vehicleSubtype = null;
+  const vtValue = document.getElementById('vtValue');
+  vtValue.textContent = 'Select vehicle type';
+  vtValue.classList.add('placeholder');
+  document.getElementById('vtClear').style.display = 'none';
+  document.getElementById('vstWrap').classList.add('disabled');
+  renderSubtypeField();
+}
+
+// ---------- Vehicle Subtype dropdown (grouped: Subtypes / Add-ons) ----------
+function toggleSubtypeDropdown(){
+  if(!state.vehicleType) return; // disabled until a vehicle type is chosen
+  const panel = document.getElementById('vstPanel');
+  const d = subtypeData[state.vehicleType] || { subtypes: [], addons: [] };
+  let html = '<div class="dropdown-group-label">Subtypes</div>';
+  html += d.subtypes.length
+    ? d.subtypes.map(s => `<div class="dropdown-option" onclick="selectSubtype('${s}')">${s}</div>`).join('')
+    : '<div class="dropdown-empty">No subtypes configured for this vehicle type</div>';
+  html += '<div class="dropdown-group-label addons">Add-ons</div>';
+  html += d.addons.length
+    ? d.addons.map(s => `<div class="dropdown-option" onclick="selectSubtype('${s}')"><span class="opt-badge">Add-on</span>${s}</div>`).join('')
+    : '<div class="dropdown-empty">No add-ons for this vehicle type</div>';
+  panel.innerHTML = html;
+  toggleDropdown('vstPanel');
+}
+function selectSubtype(name){
+  state.vehicleSubtype = name;
+  const vstValue = document.getElementById('vstValue');
+  vstValue.textContent = name;
+  vstValue.classList.remove('placeholder');
+  document.getElementById('vstClear').style.display = 'inline';
+  closeAllDropdowns();
+}
+function clearSubtype(e){
+  e.stopPropagation();
+  state.vehicleSubtype = null;
+  const vstValue = document.getElementById('vstValue');
+  vstValue.textContent = 'Select vehicle subtype';
+  vstValue.classList.add('placeholder');
+  document.getElementById('vstClear').style.display = 'none';
+}
+function renderSubtypeField(){
+  const vstValue = document.getElementById('vstValue');
+  if(!state.vehicleType){
+    vstValue.textContent = 'Select a vehicle type first';
+    vstValue.classList.add('placeholder');
+    document.getElementById('vstClear').style.display = 'none';
+    return;
+  }
+  if(state.vehicleSubtype){
+    vstValue.textContent = state.vehicleSubtype;
+    vstValue.classList.remove('placeholder');
+    document.getElementById('vstClear').style.display = 'inline';
+  } else {
+    vstValue.textContent = 'Select vehicle subtype';
+    vstValue.classList.add('placeholder');
+    document.getElementById('vstClear').style.display = 'none';
+  }
+}
+
+// ---------- Mode switch: pre-fills the form to mirror the two reference screenshots ----------
+function setMode(mode){
+  document.getElementById('modeEditBtn').classList.toggle('active', mode === 'edit');
+  document.getElementById('modeCreateBtn').classList.toggle('active', mode === 'create');
+  document.getElementById('pageTitle').textContent = mode === 'edit' ? 'Edit Vehicle' : 'Create Vehicle';
+
+  if(mode === 'edit'){
+    document.getElementById('vehicleName').value = 'ASL100';
+    document.getElementById('activeCheck').checked = true;
+    document.getElementById('emptyWeight').value = '';
+    document.getElementById('devSmartcity').checked = true;
+    document.getElementById('devTelematics').checked = false;
+    document.getElementById('devVisionai').checked = false;
+    selectVehicleType('Residential');
+    selectSubtype('Side Load');
+    selectSimple('serviceStatus', 'Available');
+    selectSimple('operationalFacility', 'St. Catharines Waste Hauler Yard');
+    selectSimple('servicingSide', 'Right');
+    selectSimple('confirmationMode', 'Trapezoid');
+  } else {
+    document.getElementById('vehicleName').value = '';
+    document.getElementById('activeCheck').checked = false;
+    document.getElementById('emptyWeight').value = '';
+    document.getElementById('devSmartcity').checked = false;
+    document.getElementById('devTelematics').checked = false;
+    document.getElementById('devVisionai').checked = false;
+    clearVehicleType({stopPropagation(){}});
+    clearField({stopPropagation(){}}, 'operationalFacility', 'ofValue', 'ofClear', 'Select operational facility');
+    ['serviceStatus','emptyVehicleUOM','servicingSide','confirmationMode','telematicsManufacturer'].forEach(k => {
+      const meta = fieldMeta(k);
+      state[k] = null;
+      const el = document.getElementById(meta.valueId);
+      const placeholders = {
+        serviceStatus:'Select service status', emptyVehicleUOM:'Select unit of measure',
+        servicingSide:'Select servicing side', confirmationMode:'Select confirmation mode',
+        telematicsManufacturer:'Select manufacturer'
+      };
+      el.textContent = placeholders[k];
+      el.classList.add('placeholder');
+    });
+  }
+  closeAllDropdowns();
+}
+
+// Initialize in "Edit Vehicle" state, matching the first reference screenshot.
+setMode('edit');
+</script>
+</body>
+</html>
