@@ -435,16 +435,10 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 .fv.changed, .freq-val.changed { box-shadow:inset 0 -2px 0 #C0392B; border-radius:2px; }
 .icon-btn.billing-btn svg { stroke:#20315A; }
 /* Finance page */
-.fin-subnav { display:flex; gap:0; border-bottom:2px solid #E5E7EB; margin-bottom:24px; }
-.fin-subnav-link { padding:10px 20px; font-size:13px; font-weight:500; color:#6B7280; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; }
-.fin-subnav-link.active { color:#33A542; border-bottom-color:#33A542; font-weight:600; }
 .fin-card { background:#fff; border:1px solid #E5E7EB; border-radius:8px; overflow:hidden; }
 .fin-card-header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid #E5E7EB; }
 .btn-create-batch { height:38px; padding:0 20px; background:#20315A; color:#fff; border:none; border-radius:6px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; }
 .btn-create-batch:hover { background:#162545; }
-.fin-batch-tabs { display:flex; border-bottom:2px solid #E5E7EB; padding:0 24px; }
-.fin-batch-tab { padding:12px 4px; font-size:13px; font-weight:500; color:#6B7280; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; margin-right:24px; }
-.fin-batch-tab.active { color:#33A542; border-bottom-color:#33A542; font-weight:600; }
 .fin-table { width:100%; border-collapse:collapse; font-size:12px; }
 .fin-table th { padding:10px 16px; text-align:left; font-size:9px; font-weight:700; color:#9CA3AF; letter-spacing:.6px; text-transform:uppercase; background:#F9FAFB; border-bottom:1px solid #E5E7EB; white-space:nowrap; }
 .fin-table td { padding:14px 16px; border-bottom:1px solid #F3F4F6; color:#242833; vertical-align:middle; }
@@ -561,7 +555,7 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
   </div>
 </nav>
 <!-- SUB NAV -->
-<div class="sub-nav">
+<div class="sub-nav" id="customersSubNav">
   <div class="sub-nav-link active">Customers</div>
   <div class="sub-nav-link">Suspended Locations</div>
   <div class="sub-nav-link">Service Network</div>
@@ -1488,18 +1482,10 @@ body { font-family: 'Montserrat', sans-serif; background: #FAFAFC; color: #24283
 <!-- ══ VIEW 4: FINANCE ══ -->
 <div class="page-view" id="view-finance">
   <div style="padding:24px 32px;max-width:1280px;margin:0 auto">
-    <div class="fin-subnav">
-      <div class="fin-subnav-link active">Billing Batches</div>
-      <div class="fin-subnav-link">Exports</div>
-    </div>
     <div class="fin-card">
       <div class="fin-card-header">
         <div style="font-size:18px;font-weight:600;color:#242833">Billing Batches</div>
         <button class="btn-create-batch" onclick="openCreateBatch()">+ Create Batch</button>
-      </div>
-      <div class="fin-batch-tabs">
-        <div class="fin-batch-tab active">Open Batches</div>
-        <div class="fin-batch-tab">Closed Batches</div>
       </div>
       <table class="fin-table">
         <thead><tr>
@@ -2038,6 +2024,9 @@ function goTo(view) {
   var views = document.querySelectorAll('.page-view');
   for (var i=0;i<views.length;i++) views[i].classList.remove('active');
   document.getElementById('view-'+view).classList.add('active');
+  // the Customers sub-nav belongs to the customer views only
+  var sub = document.getElementById('customersSubNav');
+  if (sub) sub.style.display = (['customers','details','edit'].indexOf(view) !== -1) ? 'flex' : 'none';
   window.scrollTo(0,0);
   hideAllCtxMenus();
 }
