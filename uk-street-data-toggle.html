@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCP-5015 — UK Street Data toggle · Application Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#20315A;
+    --green:#33A542;
+    --dark:#242833;
+    --page:#FAFAFC;
+    --border:#D9D9E1;
+    --label:#B4B4C4;
+    --text:#242833;
+    --muted:#9A9AAE;
+    --danger:#E4572E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--page);
+    font-family:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- Header ---------- */
+  .topbar{
+    background:var(--dark);
+    height:70px;
+    display:flex;
+    align-items:center;
+    padding:0 28px;
+    gap:40px;
+  }
+  .logo{display:flex;align-items:center;gap:9px;color:#fff;font-size:22px;font-weight:500;letter-spacing:-.2px;}
+  .logo .mark{
+    width:30px;height:30px;border-radius:50%;
+    background:conic-gradient(from 200deg,var(--green) 0 60%,#1f8f36 60% 100%);
+    display:inline-block;position:relative;
+  }
+  .logo .mark::after{
+    content:"";position:absolute;inset:8px;border-radius:50%;background:var(--dark);
+  }
+  nav{display:flex;gap:34px;margin-left:18px;}
+  nav a{
+    color:#fff;text-decoration:none;font-size:14px;font-weight:400;letter-spacing:.6px;
+    display:flex;align-items:center;gap:9px;opacity:.92;
+  }
+  nav a .ico{
+    width:22px;height:22px;border:1.5px solid #fff;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;font-size:11px;
+  }
+  .topbar .right{margin-left:auto;display:flex;align-items:center;gap:16px;}
+  .vendor-select{
+    background:#C9C9D2;border:none;border-radius:2px;padding:6px 10px;
+    font-family:inherit;font-size:12px;color:#2c2c3a;width:150px;
+  }
+  .gear{
+    width:30px;height:30px;border-radius:50%;border:2px solid #fff;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;position:relative;
+  }
+  .gear .badge{
+    position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;
+    background:#E02020;color:#fff;font-size:9px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* ---------- Page ---------- */
+  .page{max-width:1600px;margin:0 auto;padding:34px 46px 70px;}
+  .page-head{display:flex;align-items:center;margin-bottom:26px;}
+  h1{font-weight:300;font-size:36px;margin:0;letter-spacing:-.5px;}
+  .page-head .actions{margin-left:auto;display:flex;gap:14px;}
+  .btn{
+    font-family:inherit;font-size:13px;font-weight:500;padding:10px 22px;border-radius:3px;
+    cursor:pointer;border:1px solid transparent;
+  }
+  .btn-outline-danger{background:#fff;border-color:var(--danger);color:var(--danger);}
+  .btn-primary{background:var(--navy);color:#fff;}
+
+  .card{background:#fff;border-radius:3px;padding:36px 40px 44px;box-shadow:0 1px 2px rgba(36,40,51,.05);}
+
+  h2{font-weight:300;font-size:27px;margin:0 0 26px;letter-spacing:-.3px;}
+  h2 .pencil{font-size:14px;color:var(--label);margin-left:10px;}
+
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.9fr);gap:46px;}
+  .split > div:first-child{border-right:1px solid #EDEDF2;padding-right:46px;}
+
+  .field{margin-bottom:24px;}
+  .field label{display:block;font-size:12px;color:var(--label);margin-bottom:4px;}
+  .field .val{
+    font-size:14px;color:var(--text);padding-bottom:7px;border-bottom:1px solid #E8E8EF;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px 34px;}
+  .sub-actions{display:flex;gap:14px;margin-top:6px;}
+  .btn-sm{
+    font-family:inherit;font-size:12px;padding:9px 18px;border-radius:3px;cursor:pointer;
+    background:#fff;border:1px solid var(--navy);color:var(--navy);
+  }
+
+  hr.sep{border:none;border-top:1px solid #EDEDF2;margin:42px 0 34px;}
+
+  .cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;}
+  .col{padding:0 34px;}
+  .col:first-child{padding-left:0;}
+  .col:not(:last-child){border-right:1px solid #EDEDF2;}
+  .col h3{font-size:17px;font-weight:400;margin:0 0 22px;letter-spacing:-.1px;}
+
+  /* ---------- Checkbox row (Figma: Checkmark 48:4409) ---------- */
+  .row{
+    display:flex;align-items:flex-start;gap:12px;
+    padding:9px 6px;margin:0 -6px;border-radius:3px;
+  }
+  .row .cb{
+    width:15px;height:15px;border-radius:3px;border:1px solid var(--border);
+    background:#fff;flex:0 0 auto;margin-top:3px;cursor:pointer;position:relative;
+  }
+  .row .cb svg{display:none;position:absolute;inset:0;width:100%;height:100%;}
+  .row.checked .cb{background:var(--navy);border-color:var(--navy);}
+  .row.checked .cb svg{display:block;}
+  .row.disabled .cb{background:rgba(32,49,90,.4);border-color:transparent;cursor:default;}
+  .row.disabled .cb svg{display:block;}
+  .row.disabled .txt{color:#B0B0C0;}
+  .row .txt{font-size:14px;line-height:19px;flex:1;}
+  .row .pencil{
+    color:var(--label);font-size:12px;flex:0 0 auto;margin-top:3px;opacity:.75;
+  }
+
+  /* new row emphasis — mock annotation only, not part of the build */
+  .row.is-new{background:rgba(51,165,66,.09);outline:1px dashed var(--green);}
+  .tag-new{
+    display:inline-block;margin-left:9px;background:var(--green);color:#fff;
+    font-size:9px;font-weight:600;letter-spacing:.8px;padding:2px 6px;border-radius:2px;
+    vertical-align:2px;
+  }
+
+  .note{
+    max-width:1600px;margin:26px auto 0;padding:0 46px;
+  }
+  .note-inner{
+    background:#fff;border-left:3px solid var(--green);border-radius:3px;
+    padding:20px 26px;font-size:13px;line-height:21px;color:#4a4a5c;
+    box-shadow:0 1px 2px rgba(36,40,51,.05);
+  }
+  .note-inner strong{color:var(--navy);font-weight:600;}
+  .note-inner code{
+    background:#F2F2F7;padding:1px 5px;border-radius:2px;font-size:12px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  .note-inner ul{margin:10px 0 0;padding-left:18px;}
+  .note-inner li{margin-bottom:5px;}
+  .disclaimer{
+    margin-top:16px;padding-top:14px;border-top:1px solid #EDEDF2;
+    font-size:12px;color:var(--muted);
+  }
+  .state-readout{
+    margin-top:12px;font-size:12px;color:var(--navy);font-weight:500;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><span class="mark"></span>Routeware</div>
+  <nav>
+    <a href="#"><span class="ico">◧</span>DISPATCH</a>
+    <a href="#"><span class="ico">☻</span>CUSTOMERS</a>
+    <a href="#"><span class="ico">🚛</span>FLEET</a>
+    <a href="#"><span class="ico">▥</span>INSIGHTS</a>
+  </nav>
+  <div class="right">
+    <select class="vendor-select"><option>Example Council</option></select>
+    <div class="gear">⚙<span class="badge">!</span></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-head">
+    <h1>Application Settings</h1>
+    <div class="actions">
+      <button class="btn btn-outline-danger">Logout</button>
+      <button class="btn btn-primary">Create Vendor</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="split">
+      <div>
+        <h2>User Profile <span class="pencil">✎</span></h2>
+        <div class="field"><label>Name</label><div class="val">A. Admin</div></div>
+        <div class="field"><label>Email</label><div class="val">admin@example.gov.uk</div></div>
+        <div class="field"><label>Password</label><div class="val">•••••••</div></div>
+      </div>
+      <div>
+        <h2>Company Configuration <span class="pencil">✎</span></h2>
+        <div class="grid2">
+          <div class="field"><label>Name</label><div class="val">Example Council</div></div>
+          <div class="field"><label>Time Zone</label><div class="val">(UTC+00:00) Dublin, Edinburgh, Lisbon, London</div></div>
+          <div class="field"><label>Address</label><div class="val">1 Example Way, Example Town, EX1 1AA</div></div>
+          <div class="field"><label>Route Start Time</label><div class="val">12:00 AM (0 hours)</div></div>
+        </div>
+        <div class="sub-actions">
+          <button class="btn-sm">Manage Users</button>
+          <button class="btn-sm">Manage Devices</button>
+          <button class="btn-sm">Manage API Keys</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sep">
+
+    <h2>Features</h2>
+    <div class="cols">
+      <div class="col">
+        <h3>Account Management</h3>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">City Alerts</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">City Flagging</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Container Management</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Customer Notification</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Dashboard Auto-Refresh</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Location Alerts</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Material Types</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Open311 Configuration</span><span class="pencil">✎</span></div>
+        <div class="row checked disabled"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Pickup Exceptions</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Service Deployer</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Subscriptions</span><span class="pencil">✎</span></div>
+      </div>
+
+      <div class="col">
+        <h3>Fleet Management</h3>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Fault Code Notifications</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Fleet Maintenance</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Fuel Tickets</span><span class="pencil">✎</span></div>
+        <div class="row checked disabled"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Navi 3.0</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">On Demand Video Download</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Post Trip Inspection</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Pre Trip Inspection</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">SOS Alert</span><span class="pencil">✎</span></div>
+        <div class="row checked disabled"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Stationary Settings</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Travel Path</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Vehicle Notifications</span><span class="pencil">✎</span></div>
+      </div>
+
+      <div class="col">
+        <h3>Route Management</h3>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">App Experience</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Exception Management Tool</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Geo-Fencing</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Optimised Stop Insertion</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Route Builder</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Route Playback</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Route Recommendations</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Route Sequencing</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Route Template Builder</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:26px"></div>
+
+  <div class="card">
+    <h2>Routeware Admin Features</h2>
+    <div class="cols">
+      <div class="col">
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Automatic Account Number Generation</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Capture Speeding Incidents</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Container Color Configuration</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Custom Reports</span></div>
+        <div class="row checked disabled"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Data Retention</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Dispatch Board - On Hold Bucket</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Display Unscheduled Stops</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Driver Safety</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">ESRI Integration</span><span class="pencil">✎</span></div>
+      </div>
+
+      <div class="col">
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Enable Clustering Algorithm</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Esri Sync</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Inference Audit</span></div>
+        <div class="row checked disabled"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Insight Configuration</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Large Vehicle Routing</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">ReCollect Configuration</span><span class="pencil">✎</span></div>
+        <div class="row checked disabled"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Reporting Configuration</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Road Conditions</span></div>
+      </div>
+
+      <div class="col">
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Route Day Modifier</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Send Route Diagnostic Logs</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Send Vehicle Route Triggers</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Service Contract Update Workflow</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Single Sign-On</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Strobe Images</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Surfsight Configuration</span><span class="pencil">✎</span></div>
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Telematics Device Data</span><span class="pencil">✎</span></div>
+        <div class="row checked"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">UK Address Data</span><span class="pencil">✎</span></div>
+
+        <!-- ▼ NEW — SCP-5015 / SCP-5016 ▼ -->
+        <div class="row is-new" id="ukStreetDataRow">
+          <span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="txt">UK Street Data<span class="tag-new">NEW</span></span>
+        </div>
+        <!-- ▲ NEW ▲  no pencil — nothing to configure -->
+
+        <div class="row"><span class="cb"><svg viewBox="0 0 15 15"><path d="M3.4 7.8l2.6 2.6 5.2-5.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt">Winter/Street Services</span></div>
+      </div>
+    </div>
+    <div class="state-readout" id="readout">ukStreetData = false → FleetRoute builds the street network from <strong>OSM</strong></div>
+  </div>
+</div>
+
+<div class="note">
+  <div class="note-inner">
+    <strong>SCP-5015 / SCP-5016 — what this mock shows</strong>
+    <ul>
+      <li>A new <strong>UK Street Data</strong> checkbox in <em>Routeware Admin Features</em>, third column, directly below <em>UK Address Data</em> and above <em>Winter/Street Services</em> — which is also the alphabetically correct position, so no ordering exception is needed.</li>
+      <li><strong>No pencil / edit icon.</strong> The flag is on/off only; there is nothing to configure behind it.</li>
+      <li>Unchecked by default for every vendor. Visibility follows the section — the whole Routeware Admin Features block is already Routeware-employee only, so no extra gating.</li>
+      <li>ON → SmartCity tells FleetRoute to build the vendor's street network from <strong>Ordnance Survey (OS NGD)</strong> data. OFF → unchanged, <strong>OSM</strong> is used. Read at generation time; existing networks are not rebuilt.</li>
+      <li>Checkbox uses the standard library component confirmed in Figma (<code>Checkmark 48:4409</code>): 15px box, 3px radius, <code>#D9D9E1</code> border unchecked, <code>#20315A</code> fill checked, <code>rgba(32,49,90,.4)</code> checked-and-disabled.</li>
+      <li>Click the new checkbox to see both states. The dashed green outline and NEW tag are mock annotations only — they are not part of the build.</li>
+    </ul>
+    <div class="disclaimer">
+      Functional reference only. All visuals must match the existing SmartCity Portal look and feel — use the standard components already in the portal, not this markup.
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var row = document.getElementById('ukStreetDataRow');
+    var readout = document.getElementById('readout');
+    row.addEventListener('click', function () {
+      row.classList.toggle('checked');
+      var on = row.classList.contains('checked');
+      readout.innerHTML = on
+        ? 'ukStreetData = true → FleetRoute builds the street network from <strong>Ordnance Survey (OS NGD)</strong>'
+        : 'ukStreetData = false → FleetRoute builds the street network from <strong>OSM</strong>';
+    });
+  })();
+</script>
+
+</body>
+</html>
