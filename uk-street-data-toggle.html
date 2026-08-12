@@ -160,6 +160,42 @@
   .state-readout{
     margin-top:12px;font-size:12px;color:var(--navy);font-weight:500;
   }
+
+  /* ---------- Confirmation modal (Figma buttons: Frame6 1:21) ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(120,124,134,.55);
+    display:none;align-items:center;justify-content:center;z-index:100;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:#fff;border-radius:5px;width:560px;max-width:calc(100vw - 48px);
+    box-shadow:0 8px 32px rgba(36,40,51,.22);overflow:hidden;
+  }
+  .modal-head{
+    padding:26px 32px 0;display:flex;align-items:flex-start;
+  }
+  .modal-head h4{
+    margin:0;font-size:21px;font-weight:400;letter-spacing:-.2px;flex:1;
+  }
+  .modal-head .close{
+    background:none;border:none;font-size:18px;line-height:1;color:var(--label);
+    cursor:pointer;padding:2px 0 0 16px;font-family:inherit;
+  }
+  .modal-body{
+    padding:16px 32px 26px;font-size:14px;line-height:22px;color:#4a4a5c;
+  }
+  .modal-body p{margin:0 0 14px;}
+  .modal-body p:last-child{margin-bottom:0;}
+  .modal-body strong{color:var(--text);font-weight:600;}
+  .modal-foot{
+    padding:0 32px 28px;display:flex;justify-content:flex-end;gap:14px;
+  }
+  .mbtn{
+    font-family:inherit;font-size:14px;font-weight:400;padding:8px 30px;
+    border-radius:5px;cursor:pointer;
+  }
+  .mbtn-secondary{background:#fff;border:1px solid var(--navy);color:var(--navy);}
+  .mbtn-primary{background:var(--navy);border:1px solid var(--navy);color:#fff;}
 </style>
 </head>
 <body>
@@ -313,6 +349,25 @@
   </div>
 </div>
 
+<!-- ▼ Confirmation modal — SCP-5016 ▼ -->
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <h4 id="modalTitle">Change street network provider?</h4>
+      <button class="close" id="btnClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>You are switching this vendor's street network from <strong id="fromProvider">OpenStreetMap (OSM)</strong> to <strong id="toProvider">Ordnance Survey (OS)</strong>.</p>
+      <p>There is no migration path between the two. The street files are different, and streets present in one may be missing in the other. <strong>All travel paths will need to be regenerated, and any edits made to them will be lost.</strong></p>
+    </div>
+    <div class="modal-foot">
+      <button class="mbtn mbtn-secondary" id="btnCancel">Cancel</button>
+      <button class="mbtn mbtn-primary" id="btnOk">OK</button>
+    </div>
+  </div>
+</div>
+<!-- ▲ Confirmation modal ▲ -->
+
 <div class="note">
   <div class="note-inner">
     <strong>SCP-5015 / SCP-5016 — what this mock shows</strong>
@@ -321,6 +376,8 @@
       <li><strong>No pencil / edit icon.</strong> The flag is on/off only; there is nothing to configure behind it.</li>
       <li>Unchecked by default for every vendor. Visibility follows the section — the whole Routeware Admin Features block is already Routeware-employee only, so no extra gating.</li>
       <li>ON → SmartCity tells FleetRoute to build the vendor's street network from <strong>Ordnance Survey (OS NGD)</strong> data. OFF → unchanged, <strong>OSM</strong> is used. Read at generation time; existing networks are not rebuilt.</li>
+      <li><strong>Every change raises a confirmation modal</strong> — turning it ON and turning it OFF alike. There is no migration path between OSM and OS, so switching means all travel paths must be regenerated and any edits are lost. The modal is informational consent only: <strong>OK flips the flag and nothing else</strong> — it does not start, queue or schedule a regeneration.</li>
+      <li>The checkbox does not move until OK is pressed. Cancel, Escape, backdrop click and the ✕ all abandon the change and send nothing to the backend.</li>
       <li>Checkbox uses the standard library component confirmed in Figma (<code>Checkmark 48:4409</code>): 15px box, 3px radius, <code>#D9D9E1</code> border unchecked, <code>#20315A</code> fill checked, <code>rgba(32,49,90,.4)</code> checked-and-disabled.</li>
       <li>Click the new checkbox to see both states. The dashed green outline and NEW tag are mock annotations only — they are not part of the build.</li>
     </ul>
@@ -332,14 +389,63 @@
 
 <script>
   (function () {
-    var row = document.getElementById('ukStreetDataRow');
-    var readout = document.getElementById('readout');
-    row.addEventListener('click', function () {
-      row.classList.toggle('checked');
+    var row      = document.getElementById('ukStreetDataRow');
+    var readout  = document.getElementById('readout');
+    var overlay  = document.getElementById('overlay');
+    var fromEl   = document.getElementById('fromProvider');
+    var toEl     = document.getElementById('toProvider');
+
+    var OSM = 'OpenStreetMap (OSM)';
+    var OS  = 'Ordnance Survey (OS)';
+
+    // The pending change is held here until the admin confirms.
+    // The checkbox itself does not move until OK is pressed.
+    var pending = null;
+
+    function paintReadout() {
       var on = row.classList.contains('checked');
       readout.innerHTML = on
         ? 'ukStreetData = true → FleetRoute builds the street network from <strong>Ordnance Survey (OS NGD)</strong>'
         : 'ukStreetData = false → FleetRoute builds the street network from <strong>OSM</strong>';
+    }
+
+    function openModal(turningOn) {
+      pending = turningOn;
+      fromEl.textContent = turningOn ? OSM : OS;
+      toEl.textContent   = turningOn ? OS  : OSM;
+      overlay.classList.add('show');
+    }
+
+    // Cancel: close, change nothing, send nothing.
+    function cancel() {
+      pending = null;
+      overlay.classList.remove('show');
+    }
+
+    // OK: commit the state change. Deliberately does NOT start a regeneration.
+    function confirm() {
+      if (pending !== null) {
+        row.classList.toggle('checked', pending);
+        paintReadout();
+      }
+      pending = null;
+      overlay.classList.remove('show');
+    }
+
+    row.addEventListener('click', function () {
+      openModal(!row.classList.contains('checked'));
+    });
+
+    document.getElementById('btnCancel').addEventListener('click', cancel);
+    document.getElementById('btnClose').addEventListener('click', cancel);
+    document.getElementById('btnOk').addEventListener('click', confirm);
+
+    // Backdrop click and Escape both behave as Cancel.
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) cancel();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && overlay.classList.contains('show')) cancel();
     });
   })();
 </script>
