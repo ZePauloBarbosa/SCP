@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SCP-4829 — Break Types Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#20315A;
+    --navy-dark:#242833;
+    --green:#33A542;
+    --page-bg:#FAFAFC;
+    --white:#FFFFFF;
+    --border:#E5E7EB;
+    --checkbox-border:#D9D9E1;
+    --toggle-off:#CBD5E1;
+    --text-muted:#888888;
+    --text-body:#242833;
+    --warn-border:#E0A000;
+    --warn-bg:rgba(224,160,0,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:'Montserrat',Arial,sans-serif; background:var(--page-bg); color:var(--text-body); }
+
+  /* ===== Mock control strip (dev harness, not part of app UI) ===== */
+  .mock-strip{
+    background:var(--navy-dark); color:rgba(255,255,255,0.9); padding:12px 24px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap; position:sticky; top:0; z-index:50;
+  }
+  .mock-strip .label{ font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-right:4px; }
+  .mock-tab{
+    background:transparent; border:1px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.85);
+    font-family:inherit; font-size:13px; font-weight:500; padding:7px 14px; border-radius:5px; cursor:pointer; transition:all .15s ease;
+  }
+  .mock-tab:hover{ border-color:rgba(255,255,255,0.5); }
+  .mock-tab.active{ background:var(--green); border-color:var(--green); color:#fff; }
+  .mock-ticket{ margin-left:auto; font-size:12px; color:rgba(255,255,255,0.55); }
+  .mock-ticket a{ color:#9FC5F9; text-decoration:none; }
+
+  /* ===== Backdrop: Application Settings page ===== */
+  .app-nav{ height:60px; background:var(--navy-dark); display:flex; align-items:center; padding:0 24px; gap:36px; }
+  .app-nav .logo{ color:#fff; font-weight:600; font-size:17px; display:flex; align-items:center; gap:8px; }
+  .app-nav .logo .mark{ color:var(--green); font-size:20px; }
+  .app-nav .navlink{ color:rgba(255,255,255,0.8); font-size:14px; font-weight:500; letter-spacing:.03em; }
+  .app-nav .spacer{ flex:1; }
+  .app-nav .pill{ background:rgba(255,255,255,0.12); color:#fff; font-size:12px; border-radius:12px; padding:4px 10px; }
+
+  .backdrop{ max-width:1100px; margin:0 auto; padding:32px 24px 60px; }
+  .backdrop.dimmed{ filter:blur(1px) brightness(0.94); }
+  .page-title{ font-size:28px; font-weight:400; margin:0 0 24px; }
+  .settings-card{ background:var(--white); border:1px solid var(--border); border-radius:6px; padding:28px 32px; }
+  .settings-card h2{ font-size:19px; font-weight:500; margin:0 0 18px; }
+  .feature-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:0 32px; }
+  .feature-col h3{ font-size:16px; font-weight:400; margin:0 0 8px; }
+  .feature-row{ display:flex; align-items:center; gap:10px; height:37px; font-size:13px; border-bottom:1px solid #F1F2F5; }
+  .feature-row.clickable{ cursor:pointer; }
+  .feature-row.clickable:hover{ background:#F7F9FC; }
+  .feature-row.highlight{ background:#EEF1F8; outline:1px solid var(--navy); outline-offset:-1px; }
+  .chk{ width:15px; height:15px; border-radius:3px; border:1px solid var(--checkbox-border); display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; background:transparent; }
+  .chk.on{ background:var(--navy); border-color:var(--navy); color:#fff; font-size:10px; }
+  .feature-row .flabel{ flex:1; }
+  .pencil{ margin-left:auto; opacity:.55; font-size:12px; cursor:pointer; border:none; background:none; }
+  .infoicon{ width:14px; height:14px; border-radius:50%; background:#C7CBD4; color:#fff; font-size:10px; display:inline-flex; align-items:center; justify-content:center; font-style:italic; font-weight:600; margin-left:6px; }
+  .new-tag{ font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:rgba(51,165,66,0.12); color:var(--green); border-radius:10px; padding:2px 7px; margin-left:8px; }
+
+  /* ===== Modal ===== */
+  .modal-overlay{ position:fixed; inset:0; background:rgba(20,24,33,0.45); display:none; align-items:flex-start; justify-content:center; padding:48px 16px; overflow-y:auto; z-index:100; }
+  .modal-overlay.show{ display:flex; }
+  .modal{ background:var(--white); border-radius:8px; width:560px; max-width:100%; box-shadow:0 8px 32px rgba(0,0,0,0.2); }
+  .modal-header{ height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; border-bottom:1px solid var(--border); }
+  .modal-header h3{ font-size:19px; font-weight:500; margin:0; display:flex; align-items:center; }
+  .modal-close{ font-size:20px; color:#9299a6; cursor:pointer; border:none; background:none; line-height:1; }
+  .modal-body{ padding:20px 24px; max-height:70vh; overflow-y:auto; }
+  .modal-footer{ height:64px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 24px; }
+  .modal-footer .hint{ font-size:11px; color:#9299a6; }
+  .btn{ font-family:inherit; font-size:14px; border-radius:5px; padding:8px 22px; cursor:pointer; border:1px solid transparent; }
+  .btn-primary{ background:var(--navy); color:#fff; }
+  .btn-secondary{ background:transparent; border:1px solid var(--navy); color:var(--navy); }
+  .btn-text{ background:none; border:none; color:var(--navy); font-size:13px; font-weight:500; cursor:pointer; padding:4px 0; }
+  .btn-text:disabled{ color:#B4B9C4; cursor:not-allowed; }
+
+  .section-label{ font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#8b8f99; padding:8px 0; border-bottom:1px solid var(--border); margin:18px 0 2px; display:flex; align-items:center; }
+  .section-label:first-child{ margin-top:0; }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid #F1F2F5; font-size:14px; }
+  .toggle{ width:36px; height:20px; border-radius:10px; background:var(--toggle-off); position:relative; cursor:pointer; flex-shrink:0; border:none; transition:background .15s; }
+  .toggle.on{ background:var(--navy); }
+  .toggle .knob{ width:16px; height:16px; border-radius:50%; background:#fff; position:absolute; top:2px; left:2px; transition:left .15s; box-shadow:0 1px 2px rgba(0,0,0,0.25); }
+  .toggle.on .knob{ left:18px; }
+
+  .callout{ border-left:3px solid var(--warn-border); background:var(--warn-bg); padding:14px 16px; border-radius:2px; font-size:13px; margin:16px 0; line-height:1.5; }
+  .callout strong{ display:block; margin-bottom:4px; font-size:13px; }
+  .callout .goto{ margin-top:8px; }
+  .removed-block{ border:1px dashed #C7CBD4; border-radius:6px; padding:14px 16px; opacity:.5; margin:10px 0; position:relative; }
+  .removed-block::after{ content:"REMOVED"; position:absolute; top:-9px; right:12px; background:#fff; font-size:10px; font-weight:700; letter-spacing:.05em; color:#B4494A; padding:0 6px; }
+  .subtype-row{ display:flex; align-items:center; gap:10px; font-size:13px; padding:6px 0; text-decoration:line-through; color:#9299a6; }
+
+  /* Underline tabs (SubNav pattern) */
+  .undertabs{ display:flex; gap:28px; border-bottom:1px solid var(--border); margin:14px 0 0; }
+  .undertab{
+    border:none; background:transparent; font-family:inherit; font-size:15px; font-weight:400; color:#6b7080;
+    padding:12px 0; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-1px;
+  }
+  .undertab.active{ color:var(--green); border-bottom-color:var(--green); font-weight:500; }
+
+  /* Break type rows */
+  .bt-list{ margin-top:14px; }
+  .bt-row{ display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #F1F2F5; }
+  .bt-row.inactive{ opacity:.55; }
+  .bt-badge{ font-size:10px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; padding:3px 8px; border-radius:10px; white-space:nowrap; }
+  .bt-badge.active{ background:rgba(51,165,66,0.12); color:var(--green); }
+  .bt-badge.inactive{ background:#EEF0F3; color:#8b8f99; }
+  .bt-badge.inuse{ background:#EEF1F8; color:var(--navy); }
+  .bt-label-wrap{ flex:1; min-width:0; }
+  .bt-input{ width:100%; border:none; border-bottom:1px solid var(--border); background:transparent; font-family:inherit; font-size:14px; padding:4px 0; color:var(--text-body); }
+  .bt-input:focus{ outline:none; border-bottom-color:var(--navy); }
+  .bt-counter{ font-size:11px; color:#B0B4BE; margin-top:2px; }
+  .bt-counter.limit{ color:#B4494A; }
+  .bt-default-tag{ font-size:11px; color:#B0B4BE; font-style:italic; }
+  .bt-empty{ font-size:13px; color:#9299a6; padding:20px 0; text-align:center; }
+  .add-row{ margin-top:14px; }
+  .add-hint{ font-size:12px; color:#9299a6; margin-top:6px; }
+
+  /* Confirm sub-modal */
+  .confirm-overlay{ position:fixed; inset:0; background:rgba(20,24,33,0.55); display:none; align-items:center; justify-content:center; z-index:200; }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{ background:#fff; width:380px; border-radius:8px; box-shadow:0 8px 32px rgba(0,0,0,0.25); padding:22px; }
+  .confirm-box h4{ margin:0 0 10px; font-size:16px; font-weight:600; }
+  .confirm-box p{ margin:0 0 18px; font-size:13px; color:#4A5164; line-height:1.5; }
+  .confirm-actions{ display:flex; justify-content:flex-end; gap:10px; }
+  .btn-danger{ background:#B4494A; color:#fff; border:1px solid #B4494A; }
+</style>
+</head>
+<body>
+
+  <div class="mock-strip">
+    <span class="label">SCP-4829 mock</span>
+    <button class="mock-tab active" data-view="appexp">App Experience → General Features</button>
+    <button class="mock-tab" data-view="snow">Snow Plow — updated</button>
+    <button class="mock-tab" data-view="sweep">Street Sweeping — updated</button>
+    <span class="mock-ticket">Ticket: <a href="https://routeware.atlassian.net/browse/SCP-4829" target="_blank">SCP-4829</a> · scope: per-route-type lists (Waste / Snow / Sweeper)</span>
+  </div>
+
+  <div class="app-nav">
+    <div class="logo"><span class="mark">⬡</span> Routeware</div>
+    <div class="navlink">DISPATCH</div>
+    <div class="navlink">CUSTOMERS</div>
+    <div class="navlink">FLEET</div>
+    <div class="navlink">INSIGHTS</div>
+    <div class="spacer"></div>
+    <div class="pill">ABC</div>
+  </div>
+
+  <div class="backdrop dimmed" id="backdrop">
+    <h1 class="page-title">Application Settings</h1>
+    <div class="settings-card">
+      <h2>Features</h2>
+      <div class="feature-grid">
+        <div class="feature-col">
+          <h3>Account Management</h3>
+          <div class="feature-row"><span class="chk on">✓</span><span class="flabel">Cart Fill Level</span></div>
+          <div class="feature-row"><span class="chk on">✓</span><span class="flabel">City Alerts</span></div>
+          <div class="feature-row"><span class="chk on">✓</span><span class="flabel">Container Management</span></div>
+        </div>
+        <div class="feature-col">
+          <h3>Fleet Management</h3>
+          <div class="feature-row clickable" id="row-altfleet"><span class="chk on">✓</span><span class="flabel">Alternative Fleet</span><span class="pencil">✎</span></div>
+          <div class="feature-row"><span class="chk on">✓</span><span class="flabel">Fleet Maintenance</span></div>
+          <div class="feature-row"><span class="chk on">✓</span><span class="flabel">Fuel Tickets</span></div>
+        </div>
+        <div class="feature-col">
+          <h3>Route Management</h3>
+          <div class="feature-row clickable" id="row-appexp"><span class="chk on">✓</span><span class="flabel">App Experience</span><span class="pencil">✎</span></div>
+          <div class="feature-row"><span class="chk on">✓</span><span class="flabel">Geo-Fencing</span></div>
+          <div class="feature-row"><span class="chk on">✓</span><span class="flabel">Route Builder</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== GENERAL FEATURES MODAL (opened from "App Experience") ===================== -->
+  <div class="modal-overlay show" id="modal-appexp">
+    <div class="modal" style="width:600px;">
+      <div class="modal-header">
+        <h3>General Features</h3>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="section-label" style="border-bottom:none;margin-bottom:0;">GENERAL FEATURES</div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Driver Pick List Defaults</span><button class="pencil">✎</button></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk">&nbsp;</span>Driver Pin</span><button class="pencil">✎</button></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Navigation</span><button class="pencil">✎</button></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>No Route</span></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Not-Out Quick Button</span></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Route Assistance</span><button class="pencil">✎</button></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Route Preview</span></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Route Service Status<span class="infoicon">i</span></span></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Start In-Route Navigation Alert</span><button class="pencil">✎</button></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Supervisor Experience</span><button class="pencil">✎</button></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Two Way Messaging</span></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Vehicle Tracking</span><button class="pencil">✎</button></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>Weight Tickets</span></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel" style="display:flex;align-items:center;gap:8px;"><span class="chk on">✓</span>IOS Orientation Mode</span></div>
+        <div class="toggle-row" id="row-breaktypes" style="padding:8px 0;">
+          <span class="flabel" style="display:flex;align-items:center;gap:8px;">
+            <span class="chk on" id="chk-breaktypes-master">✓</span>Break Types<span class="new-tag">New — SCP-4829</span>
+          </span>
+          <button class="pencil" id="pencil-breaktypes">✎</button>
+        </div>
+
+        <div class="section-label"><span class="flabel" style="text-transform:none;font-weight:500;font-size:14px;color:var(--text-body);">Edit Route &amp; Pin Location</span><span class="infoicon">i</span></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel"><span class="chk on">✓</span> Add, Remove Or Reorder Stops</span></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel"><span class="chk on">✓</span> Confirmation Settings</span></div>
+        <div class="toggle-row" style="padding:8px 0;"><span class="flabel"><span class="chk on">✓</span> Pin A Container</span></div>
+        <div class="toggle-row" style="padding:8px 0;border-bottom:none;"><span class="flabel"><span class="chk on">✓</span> Update A Service</span></div>
+      </div>
+      <div class="modal-footer">
+        <span class="hint">Break Types changes save with this button too</span>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-secondary">Restore To Defaults</button>
+          <button class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== BREAK TYPES DRILL-DOWN (opened via pencil on Break Types row) ===================== -->
+  <div class="modal-overlay" id="modal-breaktypes">
+    <div class="modal" style="width:520px;">
+      <div class="modal-header">
+        <h3>Break Types</h3>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:#5b6170;line-height:1.5;margin:0 0 4px;">
+          Options drivers see when they switch into <strong>Not Servicing</strong> mode. Each route type keeps its own list — up to 5 break types, 20 characters per label.
+        </p>
+        <div class="undertabs" id="route-tabs">
+          <button class="undertab active" data-route="waste">Waste</button>
+          <button class="undertab" data-route="snow">Snow</button>
+          <button class="undertab" data-route="sweep">Sweeper</button>
+        </div>
+
+        <div class="bt-list" id="bt-list"></div>
+
+        <div class="add-row">
+          <button class="btn-text" id="btn-add-bt">+ Add Break Type</button>
+          <div class="add-hint" id="add-hint"></div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between;">
+        <span class="hint">Saved with the General Features Save button</span>
+        <button class="btn btn-secondary" id="btn-done-bt">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SNOW PLOW MODAL ===================== -->
+  <div class="modal-overlay" id="modal-snow">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Snow Plow</h3>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="section-label" style="margin-top:0;">FEATURES</div>
+        <div class="toggle-row"><span>Display Snow Plow Data on Dashboard</span><button class="toggle on"><span class="knob"></span></button></div>
+        <div class="toggle-row"><span>Switch Routes Capability</span><button class="toggle on"><span class="knob"></span></button></div>
+        <div class="toggle-row" style="border-bottom:none;"><span>Simple Driver Experience</span><button class="toggle"><span class="knob"></span></button></div>
+
+        <div class="section-label">NON-SERVICE SUB-TYPES</div>
+        <div class="removed-block">
+          <div class="subtype-row"><span class="chk on">✓</span> Breaktime</div>
+          <div class="subtype-row"><span class="chk">&nbsp;</span> Driving To/From Facility</div>
+          <div class="subtype-row"><span class="chk on">✓</span> Off Route</div>
+        </div>
+        <div class="callout">
+          <strong>Moved for SCP-4829</strong>
+          These options are removed from Snow Plow settings and now live as default Break Types under the Snow tab in App Experience → Break Types. "Breaktime" and "Off Route" migrate over as Active; "Driving To/From Facility" migrates as Inactive to match its current unchecked state here.
+          <div class="goto"><button class="btn-text" id="goto-snow-bt">Go to App Experience → Break Types (Snow) →</button></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-secondary">Restore To Defaults</button>
+          <button class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== STREET SWEEPING MODAL ===================== -->
+  <div class="modal-overlay" id="modal-sweep">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Street Sweeping</h3>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="section-label" style="margin-top:0;">FEATURES</div>
+        <div class="toggle-row"><span>Display Street Sweeper Data on Dashboard</span><button class="toggle on"><span class="knob"></span></button></div>
+        <div class="toggle-row" style="border-bottom:none;"><span>Switch Routes Capability</span><button class="toggle on"><span class="knob"></span></button></div>
+
+        <div class="section-label">NON-SERVICE SUB-TYPES</div>
+        <div class="removed-block">
+          <div class="subtype-row"><span class="chk on">✓</span> Breaktime</div>
+          <div class="subtype-row"><span class="chk on">✓</span> Driving To Dump Debris</div>
+          <div class="subtype-row"><span class="chk on">✓</span> Driving To/From Facility</div>
+          <div class="subtype-row"><span class="chk on">✓</span> Off Route</div>
+        </div>
+        <div class="callout">
+          <strong>Moved for SCP-4829</strong>
+          These options are removed from Street Sweeping settings and now live as default Break Types under the Sweeper tab in App Experience → Break Types — all four migrate over as Active, matching their current checked state here.
+          <div class="goto"><button class="btn-text" id="goto-sweep-bt">Go to App Experience → Break Types (Sweeper) →</button></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-secondary">Restore To Defaults</button>
+          <button class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CONFIRM INACTIVATE MODAL ===================== -->
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+      <h4>Inactivate this break type?</h4>
+      <p id="confirm-text">This break type is currently in use. Inactivating it removes it from the Not Servicing menu for drivers immediately.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" id="confirm-cancel">Cancel</button>
+        <button class="btn btn-danger" id="confirm-ok">Inactivate</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ---- data model: per-route-type break type lists (max 5 each, 20 char labels) ----
+  const MAX_TYPES = 5;
+  const MAX_CHARS = 20;
+  const data = {
+    waste: [],
+    snow: [
+      { label:'Breaktime', active:true, inUse:true, isDefault:true },
+      { label:'Driving To/From Facility', active:false, inUse:false, isDefault:true },
+      { label:'Off Route', active:true, inUse:true, isDefault:true }
+    ],
+    sweep: [
+      { label:'Breaktime', active:true, inUse:true, isDefault:true },
+      { label:'Driving To Dump Debris', active:true, inUse:false, isDefault:true },
+      { label:'Driving To/From Facility', active:true, inUse:false, isDefault:true },
+      { label:'Off Route', active:true, inUse:true, isDefault:true }
+    ]
+  };
+  let currentRoute = 'waste';
+  let pendingInactivate = null;
+
+  Object.values(data).forEach(list => list.forEach(bt => { if (bt.label.length > MAX_CHARS) bt.label = bt.label.slice(0, MAX_CHARS); }));
+
+  function renderBreakTypes(){
+    const list = data[currentRoute];
+    const wrap = document.getElementById('bt-list');
+    wrap.innerHTML = '';
+    if (list.length === 0){
+      wrap.innerHTML = '<div class="bt-empty">No break types yet for this route type. Click "+ Add Break Type" to create one.</div>';
+    } else {
+      list.forEach((bt, i) => {
+        const row = document.createElement('div');
+        row.className = 'bt-row' + (bt.active ? '' : ' inactive');
+        row.innerHTML = `
+          <div class="bt-label-wrap">
+            <input class="bt-input" maxlength="${MAX_CHARS}" value="${escapeHtml(bt.label)}" data-idx="${i}">
+            <div class="bt-counter">${bt.label.length}/${MAX_CHARS}${bt.isDefault ? ' · <span class="bt-default-tag">default</span>' : ''}</div>
+          </div>
+          ${bt.inUse ? '<span class="bt-badge inuse">In use</span>' : ''}
+          <span class="bt-badge ${bt.active ? 'active' : 'inactive'}">${bt.active ? 'Active' : 'Inactive'}</span>
+          <button class="toggle ${bt.active ? 'on' : ''}" data-idx="${i}"><span class="knob"></span></button>
+        `;
+        wrap.appendChild(row);
+      });
+    }
+    document.getElementById('btn-add-bt').disabled = list.length >= MAX_TYPES;
+    document.getElementById('add-hint').textContent = list.length >= MAX_TYPES
+      ? `Maximum of ${MAX_TYPES} break types reached for this route type.`
+      : '';
+    wrap.querySelectorAll('.bt-input').forEach(inp => {
+      inp.addEventListener('input', e => {
+        const idx = +e.target.dataset.idx;
+        data[currentRoute][idx].label = e.target.value.slice(0, MAX_CHARS);
+        const counter = e.target.closest('.bt-label-wrap').querySelector('.bt-counter');
+        const len = e.target.value.length;
+        counter.innerHTML = `${len}/${MAX_CHARS}${data[currentRoute][idx].isDefault ? ' · <span class="bt-default-tag">default</span>' : ''}`;
+        counter.classList.toggle('limit', len >= MAX_CHARS);
+      });
+    });
+    wrap.querySelectorAll('.bt-row .toggle').forEach(t => {
+      t.addEventListener('click', e => {
+        const idx = +e.currentTarget.dataset.idx;
+        const bt = data[currentRoute][idx];
+        if (bt.active && bt.inUse){
+          pendingInactivate = { route: currentRoute, idx };
+          document.getElementById('confirm-text').textContent =
+            `"${bt.label}" is currently in use. Inactivating it removes it from the Not Servicing menu for drivers immediately.`;
+          document.getElementById('confirm-overlay').classList.add('show');
+        } else {
+          bt.active = !bt.active;
+          renderBreakTypes();
+        }
+      });
+    });
+  }
+
+  function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  document.getElementById('confirm-cancel').addEventListener('click', () => {
+    pendingInactivate = null;
+    document.getElementById('confirm-overlay').classList.remove('show');
+  });
+  document.getElementById('confirm-ok').addEventListener('click', () => {
+    if (pendingInactivate){
+      data[pendingInactivate.route][pendingInactivate.idx].active = false;
+      pendingInactivate = null;
+    }
+    document.getElementById('confirm-overlay').classList.remove('show');
+    renderBreakTypes();
+  });
+
+  document.getElementById('btn-add-bt').addEventListener('click', () => {
+    const list = data[currentRoute];
+    if (list.length >= MAX_TYPES) return;
+    list.push({ label:'New Break Type', active:true, inUse:false, isDefault:false });
+    renderBreakTypes();
+  });
+
+  document.querySelectorAll('#route-tabs .undertab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('#route-tabs .undertab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentRoute = tab.dataset.route;
+      renderBreakTypes();
+    });
+  });
+
+  renderBreakTypes();
+
+  // ---- master checkbox on the Break Types row (General Features modal) ----
+  document.getElementById('chk-breaktypes-master').addEventListener('click', e => {
+    e.target.classList.toggle('on');
+    e.target.textContent = e.target.classList.contains('on') ? '✓' : ' ';
+  });
+
+  // ---- open Break Types drill-down from pencil ----
+  function openBreakTypesPanel(){ document.getElementById('modal-breaktypes').classList.add('show'); }
+  document.getElementById('pencil-breaktypes').addEventListener('click', openBreakTypesPanel);
+  document.getElementById('btn-done-bt').addEventListener('click', () => document.getElementById('modal-breaktypes').classList.remove('show'));
+
+  // ---- mock view switching (App Experience / Snow Plow / Street Sweeping) ----
+  const views = {
+    appexp: document.getElementById('modal-appexp'),
+    snow: document.getElementById('modal-snow'),
+    sweep: document.getElementById('modal-sweep')
+  };
+  function showView(name){
+    Object.values(views).forEach(v => v.classList.remove('show'));
+    views[name].classList.add('show');
+    document.getElementById('modal-breaktypes').classList.remove('show');
+    document.querySelectorAll('.mock-tab').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    document.getElementById('row-altfleet').classList.toggle('highlight', name === 'snow' || name === 'sweep');
+    document.getElementById('row-appexp').classList.toggle('highlight', name === 'appexp');
+  }
+  document.querySelectorAll('.mock-tab').forEach(btn => {
+    btn.addEventListener('click', () => showView(btn.dataset.view));
+  });
+  document.getElementById('row-appexp').addEventListener('click', () => showView('appexp'));
+  document.getElementById('goto-snow-bt').addEventListener('click', () => {
+    showView('appexp');
+    openBreakTypesPanel();
+    document.querySelector('#route-tabs [data-route="snow"]').click();
+  });
+  document.getElementById('goto-sweep-bt').addEventListener('click', () => {
+    showView('appexp');
+    openBreakTypesPanel();
+    document.querySelector('#route-tabs [data-route="sweep"]').click();
+  });
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', e => e.target.closest('.modal-overlay').classList.remove('show'));
+  });
+
+  showView('appexp');
+</script>
+</body>
+</html>
