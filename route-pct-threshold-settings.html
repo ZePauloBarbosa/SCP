@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Application Settings — Snow/Sweeper Route Reset — SmartCity Portal Mock</title>
+<title>Application Settings — Snow/Sweeper Automatic Route Reset — SmartCity Portal Mock</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,6 +19,7 @@
     --text-secondary: #6B7280;
     --text-muted: #9AA0AC;
     --text-faint: #C6CAD3;
+    --toggle-off: #CBD5E1;
   }
   * { box-sizing: border-box; }
   body {
@@ -35,26 +36,7 @@
     font-size: 12px;
     text-align: center;
     padding: 6px 12px;
-  }
-
-  /* Mock-only demo control — not part of the SCP design system, clearly separated */
-  .mock-control-bar {
-    background: #F0F0F5;
-    border-bottom: 1px solid var(--border);
-    padding: 10px 32px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 12px;
-    color: var(--text-secondary);
-  }
-  .mock-control-bar strong { color: var(--navy); font-weight: 700; }
-  .mock-control-bar label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    font-weight: 500;
+    line-height: 1.5;
   }
 
   .page-header {
@@ -120,14 +102,13 @@
     align-items: center;
     justify-content: space-between;
   }
-  .info-block h2 .edit-icon { color: var(--text-faint); font-size: 14px; cursor: default; }
+  .info-block .edit-icon { color: var(--text-faint); font-size: 14px; cursor: default; }
   .info-field { border-bottom: 1px solid var(--border); padding: 10px 0; }
   .info-field:last-of-type { border-bottom: none; }
   .info-field .field-label {
     display: block;
     font-size: 11px;
     color: var(--text-muted);
-    text-transform: none;
     margin-bottom: 4px;
     font-weight: 400;
   }
@@ -174,7 +155,6 @@
     align-items: center;
     gap: 10px;
     padding: 8px 0;
-    border-bottom: none;
   }
   .feature-row input[type="checkbox"] {
     width: 15px;
@@ -202,14 +182,6 @@
   .feature-row .pencil-btn:hover { color: var(--navy); }
   .feature-row .pencil-btn:disabled { color: var(--text-faint); cursor: not-allowed; }
 
-  /* New row gets a highlight ring + badge so it reads clearly as the addition in this mock */
-  .feature-row.new-row {
-    background: #F5F8FF;
-    margin: 4px -10px;
-    padding: 8px 10px;
-    border-radius: 5px;
-    border: 1px dashed #B9C6E8;
-  }
   .gating-note {
     font-size: 10.5px;
     color: var(--text-muted);
@@ -218,7 +190,8 @@
   }
   .gating-note.blocked { color: #A66A1E; }
 
-  /* Modal chrome — matches the existing General Features / Route Assistance modal pattern */
+  /* Modal chrome — matches Modal/Dialog (Figma node 1213:6778): white bg, 8px radius,
+     shadow rgba(0,0,0,0.2) 0 8 32, header/footer 1px border #E5E7EB */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -233,13 +206,14 @@
   .modal-overlay.open { display: flex; }
   .modal-card {
     background: #FFFFFF;
-    border-radius: 6px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     width: 100%;
-    max-width: 620px;
+    max-width: 560px;
     position: relative;
     padding: 40px 44px 36px 44px;
   }
+  .modal-card.modal-card--wide { max-width: 720px; padding: 0 0 28px 0; }
   .modal-close {
     position: absolute;
     top: 18px;
@@ -252,6 +226,7 @@
     font-size: 16px;
     color: var(--text-muted);
     cursor: pointer;
+    z-index: 2;
   }
   .modal-close:hover { color: var(--navy); }
   .modal-title {
@@ -261,98 +236,14 @@
     margin: 0 0 6px 0;
     color: var(--text-primary);
   }
+  .modal-card--wide .modal-title { padding-top: 34px; }
   .modal-subtitle {
     text-align: center;
     font-size: 12.5px;
     color: var(--text-muted);
     margin: 0 0 26px 0;
   }
-  .modal-description {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin: 0 0 20px 0;
-  }
-
-  .alert {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    border-left: 3px solid;
-    border-radius: 3px;
-    padding: 12px 16px;
-    font-size: 12.5px;
-    line-height: 1.5;
-    margin-bottom: 18px;
-  }
-  .alert-warning { border-left-color: #C99A1E; background: rgba(201,154,30,0.08); color: #7A5D10; }
-  .alert-blocked { border-left-color: #C1554A; background: rgba(193,85,74,0.08); color: #8C3B32; }
-  .alert strong { font-weight: 700; }
-
-  .threshold-form-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin: 22px 0 8px 0;
-    flex-wrap: wrap;
-  }
-  .threshold-form-row .field-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-right: 4px;
-  }
-  .pct-input-wrap { position: relative; display: inline-flex; align-items: center; }
-  .pct-input-wrap input[type="number"] {
-    width: 96px;
-    height: 38px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    font-family: inherit;
-    font-size: 14px;
-    color: var(--text-primary);
-    padding: 0 28px 0 12px;
-    -moz-appearance: textfield;
-  }
-  .pct-input-wrap input[type="number"]:focus { outline: none; border-color: var(--navy); }
-  .pct-input-wrap input::-webkit-outer-spin-button,
-  .pct-input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .pct-input-wrap .pct-suffix { position: absolute; right: 12px; font-size: 14px; color: var(--text-secondary); pointer-events: none; }
-
-  .current-value-line {
-    text-align: center;
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-bottom: 18px;
-  }
-  .current-value-line strong { color: var(--text-primary); font-weight: 600; }
-
-  .example-block {
-    background: #F7F8FA;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 14px 16px;
-    margin-bottom: 22px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    line-height: 1.7;
-  }
-  .example-block .example-title {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-  }
-  .example-block code {
-    background: #EEF1F8;
-    color: var(--navy);
-    padding: 1px 5px;
-    border-radius: 3px;
-    font-weight: 600;
-  }
+  .modal-card--wide .modal-subtitle { padding: 0 44px 20px 44px; margin: 0; }
 
   .modal-footer { display: flex; justify-content: center; align-items: center; gap: 12px; }
   .app-experience-list { margin: 4px 0 0 0; }
@@ -372,16 +263,7 @@
     margin-bottom: 14px;
   }
   .modal-back-link:hover { color: var(--navy); }
-  .save-confirmation {
-    display: none;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--green);
-  }
-  .save-confirmation.visible { display: inline-flex; }
-
+  .modal-card--wide .modal-back-link { margin: 20px 0 0 24px; }
   .modal-footnote {
     font-size: 11px;
     color: var(--text-muted);
@@ -389,17 +271,131 @@
     margin-top: 16px;
     line-height: 1.5;
   }
+
+  /* Alternative Fleet modal list (checkbox + label + pencil, FeatureRow pattern) */
+  .alt-fleet-list { margin: 4px 0 0 0; }
+  .alt-fleet-list .feature-row { padding: 10px 0; }
+
+  /* FEATURES / ACTIVE table — Snow Plow + Street Sweeping sub-modals */
+  .features-table-header {
+    display: flex;
+    justify-content: space-between;
+    background: #F7F8FA;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .features-table-header.section-subheader { margin-top: 4px; }
+  .features-table-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .features-table-row .row-label-group { flex: 1; min-width: 0; }
+  .features-table-row .row-label { font-size: 14px; color: var(--text-primary); }
+  .features-table-row .row-sublabel { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .features-table-row.new-row {
+    background: #F5F8FF;
+    border-left: 3px solid var(--navy);
+    padding-left: 21px;
+  }
+  .features-table-row .row-select {
+    font-size: 13px;
+    color: var(--text-primary);
+    border: none;
+    background: transparent;
+    text-align: right;
+  }
+
+  /* Toggle switch — spec from Figma 1213:6778: off #CBD5E1 track, on #20315A track,
+     white 16x16 knob, 36x20 track, 10px radius */
+  .toggle-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: var(--toggle-off);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s ease;
+    border: none;
+    padding: 0;
+  }
+  .toggle-switch.on { background: var(--navy); }
+  .toggle-switch .toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    transition: left 0.15s ease;
+  }
+  .toggle-switch.on .toggle-knob { left: 18px; }
+  .toggle-switch:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* Inline threshold field — sits between the row's label and its toggle, only when the
+     row's toggle is ON. Reuses the pct-input pattern at a smaller, inline scale. */
+  .inline-pct-field {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
+  .inline-pct-field.visible { display: inline-flex; }
+  .inline-pct-field .pct-input-wrap { position: relative; display: inline-flex; align-items: center; }
+  .inline-pct-field input[type="number"] {
+    width: 64px;
+    height: 30px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text-primary);
+    padding: 0 22px 0 10px;
+    -moz-appearance: textfield;
+  }
+  .inline-pct-field input[type="number"]:focus { outline: none; border-color: var(--navy); }
+  .inline-pct-field input::-webkit-outer-spin-button,
+  .inline-pct-field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .inline-pct-field .pct-suffix { position: absolute; right: 9px; font-size: 12.5px; color: var(--text-secondary); pointer-events: none; }
+  .inline-pct-field .pct-caption { font-size: 10.5px; color: var(--text-muted); }
+
+  .new-row-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--navy);
+    background: #E4EAFB;
+    border-radius: 3px;
+    padding: 2px 6px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .modal-footer-wide {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 24px 4px 24px;
+  }
 </style>
 </head>
 <body>
 
-  <div class="mock-banner">Functional reference mock — SmartCity Portal Application Settings. Rebuilt to match Paulo's screenshots of the live page (User Profile / Company Configuration header, 3-column Features grid, checkbox + pencil edit pattern, modal chrome). Round 3: Snow/Sweeper Route Reset moved inside the existing App Experience row's modal, per Paulo. Not connected to live data.</div>
-
-  <div class="mock-control-bar">
-    <strong>Mock control (not part of the real UI):</strong>
-    <label><input type="checkbox" id="mock-toggle-snow-sweeper-enabled" checked> Vendor has Snow Plow + Street Sweeper vehicle types enabled</label>
-    <span>— toggles the gating behavior described below.</span>
-  </div>
+  <div class="mock-banner">Functional reference mock — SmartCity Portal Application Settings. Round 4 (2026-08-28), per Paulo: Snow/Sweeper Route Reset removed entirely from the App Experience modal and rebuilt inside the existing Alternative Fleet modal, matching Paulo's live-app screenshots (Alternative Fleet → Snow Plow / Street Sweeping, each with its own FEATURES/ACTIVE toggle table). New "Automatic Route Reset" toggle added independently to each vehicle type. Not connected to live data.</div>
 
   <div class="page-header">
     <h1>Application Settings</h1>
@@ -421,11 +417,11 @@
       <div class="info-block">
         <h2>Company Configuration <span class="edit-icon">✏️</span></h2>
         <div class="field-row">
-          <div class="info-field"><span class="field-label">Name</span><span class="field-value">ABC</span></div>
+          <div class="info-field"><span class="field-label">Name</span><span class="field-value">City of Louisville, KY PRO-SW/SS/Snow</span></div>
           <div class="info-field"><span class="field-label">Time Zone</span><span class="field-value">(UTC-05:00) Eastern Time (US &amp; Canada)</span></div>
         </div>
         <div class="field-row">
-          <div class="info-field"><span class="field-label">Address</span><span class="field-value">29 Main St, Westford, MA 01886, USA</span></div>
+          <div class="info-field"><span class="field-label">Address</span><span class="field-value">600 Meriwether Ave, Louisville, KY 40217, USA</span></div>
           <div class="info-field"><span class="field-label">Route Start Time</span><span class="field-value">12:00 AM (0 hours)</span></div>
         </div>
         <div class="util-buttons">
@@ -444,26 +440,30 @@
           <h3>Account Management</h3>
           <div class="feature-row"><input type="checkbox"><label>Billing Settings</label><button class="pencil-btn">✏️</button></div>
           <div class="feature-row"><input type="checkbox" checked disabled><label>Bulky Item Scheduler</label><button class="pencil-btn" disabled>✏️</button></div>
-          <div class="feature-row"><input type="checkbox" checked><label>Cart Fill Level</label></div>
+          <div class="feature-row"><input type="checkbox"><label>Cart Fill Level</label></div>
           <div class="feature-row"><input type="checkbox" checked><label>City Alerts</label><button class="pencil-btn">✏️</button></div>
           <div class="feature-row"><input type="checkbox" checked><label>City Flagging</label><button class="pencil-btn">✏️</button></div>
           <div class="feature-row"><input type="checkbox"><label>Container Management</label><button class="pencil-btn">✏️</button></div>
           <div class="feature-row"><input type="checkbox" checked><label>Customer Notification</label><button class="pencil-btn">✏️</button></div>
           <div class="feature-row"><input type="checkbox" checked><label>Dashboard Auto-Refresh</label></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Location Alerts</label><button class="pencil-btn">✏️</button></div>
         </div>
 
         <div class="feature-column">
           <h3>Fleet Management</h3>
-          <div class="feature-row"><input type="checkbox" checked><label>Alternative Fleet</label><button class="pencil-btn">✏️</button></div>
-          <div class="feature-row"><input type="checkbox" checked><label>Fault Code Notifications</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row" id="settings-feature-row-alternative-fleet">
+            <input type="checkbox" checked id="settings-alternative-fleet-checkbox">
+            <label for="settings-alternative-fleet-checkbox">Alternative Fleet</label>
+            <button class="pencil-btn" id="settings-alternative-fleet-edit-button" title="Configure Alternative Fleet">✏️</button>
+          </div>
+          <div class="feature-row"><input type="checkbox"><label>Fault Code Notifications</label><button class="pencil-btn">✏️</button></div>
           <div class="feature-row"><input type="checkbox" checked><label>Fleet Maintenance</label><button class="pencil-btn">✏️</button></div>
-          <div class="feature-row"><input type="checkbox" checked><label>Fuel Tickets</label><button class="pencil-btn">✏️</button></div>
-          <div class="feature-row"><input type="checkbox" checked disabled><label>Navi 3.0</label></div>
+          <div class="feature-row"><input type="checkbox"><label>Fuel Tickets</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Navi 3.0</label></div>
           <div class="feature-row"><input type="checkbox" checked><label>On Demand Video Download</label></div>
-          <div class="feature-row"><input type="checkbox"><label>Post Trip Inspection</label><button class="pencil-btn">✏️</button></div>
-          <div class="feature-row"><input type="checkbox"><label>Pre Trip Inspection</label><button class="pencil-btn">✏️</button></div>
-          <div class="feature-row"><input type="checkbox" checked id="mock-snow-plow-checkbox"><label>Snow Plow (vehicle type)</label></div>
-          <div class="feature-row"><input type="checkbox" checked id="mock-street-sweeper-checkbox"><label>Street Sweeper (vehicle type)</label></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Post Trip Inspection</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Pre Trip Inspection</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox"><label>SOS Alert</label><button class="pencil-btn">✏️</button></div>
         </div>
 
         <div class="feature-column">
@@ -474,12 +474,13 @@
             <button class="pencil-btn" id="settings-app-experience-edit-button" title="Configure App Experience">✏️</button>
           </div>
           <div class="feature-row"><input type="checkbox" checked><label>Exception Management Tool</label><button class="pencil-btn">✏️</button></div>
-          <div class="feature-row"><input type="checkbox" checked><label>Geo-Fencing</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox"><label>Geo-Fencing</label><button class="pencil-btn">✏️</button></div>
           <div class="feature-row"><input type="checkbox" checked><label>Optimized Stop Insertion</label></div>
           <div class="feature-row"><input type="checkbox" checked><label>Route Builder</label><button class="pencil-btn">✏️</button></div>
           <div class="feature-row"><input type="checkbox" checked><label>Route Playback</label></div>
           <div class="feature-row"><input type="checkbox" checked><label>Route Recommendations</label></div>
           <div class="feature-row"><input type="checkbox" checked><label>Route Sequencing</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Route Template Builder</label></div>
         </div>
 
       </div>
@@ -487,9 +488,10 @@
 
   </div>
 
-  <!-- App Experience — edit modal, opened via the pencil icon on the "App Experience" row above.
-       Per Paulo (2026-08-27, round 3): Snow/Sweeper Route Reset lives INSIDE this modal, not as its
-       own Route Management row. Its own pencil drills into the threshold modal below. -->
+  <!-- App Experience — edit modal. Per Paulo (2026-08-28, round 4): Snow/Sweeper Route Reset is
+       REMOVED from this modal entirely — it now lives inside Alternative Fleet (see below). This
+       modal is restored to its own unrelated App Experience settings, shown here for layout
+       context only; it carries no functional scope in this mock. -->
   <div class="modal-overlay" id="settings-app-experience-modal-overlay">
     <div class="modal-card">
       <button class="modal-close" id="settings-app-experience-modal-close" aria-label="Close">×</button>
@@ -499,15 +501,6 @@
       <div class="app-experience-list">
         <div class="feature-row"><input type="checkbox" checked disabled><label>Show Route ETA to Driver</label></div>
         <div class="feature-row"><input type="checkbox" checked disabled><label>Allow Driver Route Reordering</label></div>
-
-        <div class="feature-row new-row" id="settings-feature-row-snow-sweeper-route-reset">
-          <input type="checkbox" checked id="settings-snow-sweeper-route-reset-checkbox">
-          <label for="settings-snow-sweeper-route-reset-checkbox">Snow/Sweeper Route Reset</label>
-          <button class="pencil-btn" id="settings-snow-sweeper-route-reset-edit-button" title="Configure threshold">✏️</button>
-        </div>
-        <div class="gating-note" id="settings-snow-sweeper-route-reset-gating-note">
-          NEW — only selectable when Snow Plow and Street Sweeper vehicle types (Fleet Management, left) are both enabled for this vendor.
-        </div>
       </div>
 
       <div class="modal-footer app-experience-footer">
@@ -516,151 +509,323 @@
       </div>
 
       <p class="modal-footnote">
-        Show Route ETA to Driver and Allow Driver Route Reordering are existing App Experience settings shown
-        here for layout context only — this mock's functional scope is the Snow/Sweeper Route Reset row.
+        Shown for layout context only — as of round 4, Snow/Sweeper Route Reset no longer lives here.
+        See the Alternative Fleet modal (Fleet Management column) for that flow.
       </p>
     </div>
   </div>
 
-  <!-- Snow/Sweeper Route Reset — edit modal, opened via the pencil icon on the row above -->
-  <div class="modal-overlay" id="settings-snow-sweeper-route-reset-modal-overlay">
+  <!-- Alternative Fleet — edit modal, opened via the pencil on the "Alternative Fleet" row
+       (Fleet Management column). Lists each alternative vehicle type the vendor has; each has
+       its own pencil drilling into that vehicle type's own settings modal. -->
+  <div class="modal-overlay" id="settings-alternative-fleet-modal-overlay">
     <div class="modal-card">
-      <button class="modal-close" id="settings-snow-sweeper-route-reset-modal-close" aria-label="Close">×</button>
-      <button class="modal-back-link" id="settings-route-pct-threshold-back-button" type="button">‹ App Experience</button>
-      <h2 class="modal-title">Snow/Sweeper Route Reset</h2>
-      <p class="modal-subtitle">Applies only to Snow Plow and Street Sweeper routes for this vendor</p>
+      <button class="modal-close" id="settings-alternative-fleet-modal-close" aria-label="Close">×</button>
+      <h2 class="modal-title">Alternative Fleet</h2>
 
-      <p class="modal-description">
-        Sets the Route % Complete threshold that decides what happens when a driver logs into a snow or
-        sweeper route that already has one or more drivers on it. At or above this percent complete, the
-        new driver starts a new route instance as the primary/additional driver. Below it, the new driver
-        is automatically logged in as an assisting driver on the existing route — no prompt is shown to
-        the driver either way. This value is global for this vendor; there is no per-route override.
-      </p>
-
-      <div class="alert alert-warning" id="settings-snow-sweeper-route-reset-unset-alert">
-        <span>⚠️</span>
-        <span><strong>Not yet configured.</strong> Until a value is saved, the automatic login-routing
-        behavior is undefined — see the open engineering question on <strong>SCP-5078</strong>.</span>
-      </div>
-
-      <div class="threshold-form-row">
-        <span class="field-title">Route % Complete Threshold</span>
-        <div class="pct-input-wrap">
-          <input type="number" id="settings-route-pct-threshold-input" min="0" max="100" step="1" placeholder="—" aria-label="Route percent complete threshold">
-          <span class="pct-suffix">%</span>
+      <div class="alt-fleet-list">
+        <div class="feature-row" id="settings-feature-row-alt-fleet-snow-plow">
+          <input type="checkbox" checked id="settings-alt-fleet-snow-plow-checkbox">
+          <label for="settings-alt-fleet-snow-plow-checkbox">Snow Plow</label>
+          <button class="pencil-btn" id="settings-alt-fleet-snow-plow-edit-button" title="Configure Snow Plow">✏️</button>
+        </div>
+        <div class="feature-row" id="settings-feature-row-alt-fleet-street-sweeping">
+          <input type="checkbox" checked id="settings-alt-fleet-street-sweeping-checkbox">
+          <label for="settings-alt-fleet-street-sweeping-checkbox">Street Sweeping</label>
+          <button class="pencil-btn" id="settings-alt-fleet-street-sweeping-edit-button" title="Configure Street Sweeping">✏️</button>
         </div>
       </div>
 
-      <div class="current-value-line" id="settings-route-pct-threshold-current-value">
-        Current value: <strong>Not set</strong>
-      </div>
-
-      <div class="example-block">
-        <div class="example-title">Example</div>
-        If this is set to <code>80%</code>: a snow route that's 82% complete sends the next driver into a
-        <strong>new route instance</strong> as primary/additional. A route that's only 50% complete logs the
-        next driver in as an <strong>assisting</strong> driver on the route already in progress.
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-primary" id="settings-route-pct-threshold-save-button" disabled type="button">Save</button>
-        <span class="save-confirmation" id="settings-route-pct-threshold-save-confirmation">✓ Saved</span>
-      </div>
-
       <p class="modal-footnote">
-        Changes take effect immediately for all subsequent route logins and are audited the same way as
-        other Application Settings changes. They do not affect a route instance already in progress.
+        Unchecking a vehicle type here disables it for this vendor and greys out its pencil —
+        its own settings (including Automatic Route Reset, below) become unreachable until it's
+        re-checked. Snow Plow and Street Sweeping are configured independently: a vendor can turn
+        on Automatic Route Reset for one without the other.
       </p>
+    </div>
+  </div>
+
+  <!-- Snow Plow — edit modal, opened via the Snow Plow pencil inside Alternative Fleet.
+       Reproduces the live FEATURES/ACTIVE table. New in round 4: "Automatic Route Reset" row,
+       directly below the existing "Route Reset - App Experience" row, mutually exclusive with it. -->
+  <div class="modal-overlay" id="settings-snow-plow-modal-overlay">
+    <div class="modal-card modal-card--wide">
+      <button class="modal-close" id="settings-snow-plow-modal-close" aria-label="Close">×</button>
+      <button class="modal-back-link" id="settings-snow-plow-back-button" type="button">‹ Alternative Fleet</button>
+      <h2 class="modal-title">Snow Plow</h2>
+
+      <div class="features-table-header">
+        <span>Features</span>
+        <span>Active</span>
+      </div>
+
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Display Snow Plow Data on Dashboard</div></div>
+        <button class="toggle-switch on" id="settings-snow-plow-toggle-dashboard-data" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Switch Routes Capability</div></div>
+        <button class="toggle-switch on" id="settings-snow-plow-toggle-switch-routes" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Material Pick Up Ticket</div></div>
+        <button class="toggle-switch" id="settings-snow-plow-toggle-material-pickup" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Route Reset - Portal Experience</div></div>
+        <button class="toggle-switch on" id="settings-snow-plow-toggle-route-reset-portal" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Route Reset - App Experience</div></div>
+        <button class="toggle-switch on" id="settings-snow-plow-toggle-route-reset-app" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <div class="features-table-row new-row" id="settings-snow-plow-row-automatic-route-reset">
+        <div class="row-label-group">
+          <div class="row-label">Automatic Route Reset<span class="new-row-badge">NEW</span></div>
+          <div class="row-sublabel">Turning this on turns off Route Reset - App Experience, and vice versa</div>
+        </div>
+        <div class="inline-pct-field" id="settings-snow-plow-automatic-route-reset-field">
+          <div class="pct-input-wrap">
+            <input type="number" id="settings-snow-plow-automatic-route-reset-threshold-input" min="0" max="100" step="1" placeholder="—" aria-label="Snow Plow route percent complete threshold">
+            <span class="pct-suffix">%</span>
+          </div>
+        </div>
+        <button class="toggle-switch" id="settings-snow-plow-toggle-automatic-route-reset" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Simple Driver Experience</div></div>
+        <button class="toggle-switch" id="settings-snow-plow-toggle-simple-driver-experience" type="button"><span class="toggle-knob"></span></button>
+      </div>
+
+      <div class="features-table-header section-subheader">
+        <span>Display Options</span>
+        <span>Last Serviced Time: Hours</span>
+        <span>Color</span>
+      </div>
+      <p class="modal-footnote" style="text-align:left; padding: 10px 24px 0 24px; margin-top:0;">
+        Time Frame rows (0–4 / 4–8 / 8–16 / 16+ hours, with colors) are existing Display Options
+        settings shown for layout context only — out of scope for this mock's functional focus.
+      </p>
+
+      <div class="modal-footer-wide">
+        <button class="btn-secondary-outline" id="settings-snow-plow-modal-cancel-button" type="button">Cancel</button>
+        <button class="btn-primary" id="settings-snow-plow-modal-save-button" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Street Sweeping — edit modal, opened via the Street Sweeping pencil inside Alternative Fleet.
+       New in round 4: standalone "Automatic Route Reset" row, above "Simple Driver Experience" —
+       there is no existing Route Reset toggle here to link against, so no mutual exclusion. -->
+  <div class="modal-overlay" id="settings-street-sweeping-modal-overlay">
+    <div class="modal-card modal-card--wide">
+      <button class="modal-close" id="settings-street-sweeping-modal-close" aria-label="Close">×</button>
+      <button class="modal-back-link" id="settings-street-sweeping-back-button" type="button">‹ Alternative Fleet</button>
+      <h2 class="modal-title">Street Sweeping</h2>
+
+      <div class="features-table-header">
+        <span>Features</span>
+        <span>Active</span>
+      </div>
+
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Display Street Sweeper Data on Dashboard</div></div>
+        <button class="toggle-switch" id="settings-street-sweeping-toggle-dashboard-data" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Switch Routes Capability</div></div>
+        <button class="toggle-switch on" id="settings-street-sweeping-toggle-switch-routes" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <div class="features-table-row new-row" id="settings-street-sweeping-row-automatic-route-reset">
+        <div class="row-label-group">
+          <div class="row-label">Automatic Route Reset<span class="new-row-badge">NEW</span></div>
+          <div class="row-sublabel">No existing Route Reset toggle for Street Sweeping — this is a standalone addition</div>
+        </div>
+        <div class="inline-pct-field" id="settings-street-sweeping-automatic-route-reset-field">
+          <div class="pct-input-wrap">
+            <input type="number" id="settings-street-sweeping-automatic-route-reset-threshold-input" min="0" max="100" step="1" placeholder="—" aria-label="Street Sweeping route percent complete threshold">
+            <span class="pct-suffix">%</span>
+          </div>
+        </div>
+        <button class="toggle-switch" id="settings-street-sweeping-toggle-automatic-route-reset" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Simple Driver Experience</div></div>
+        <button class="toggle-switch" id="settings-street-sweeping-toggle-simple-driver-experience" type="button"><span class="toggle-knob"></span></button>
+      </div>
+
+      <div class="features-table-header section-subheader">
+        <span>Material Experience</span>
+        <span></span>
+      </div>
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Water Fill-up Data</div></div>
+        <button class="toggle-switch on" id="settings-street-sweeping-toggle-water-fillup" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <div class="features-table-row">
+        <div class="row-label-group"><div class="row-label">Disposal Data</div></div>
+        <button class="toggle-switch on" id="settings-street-sweeping-toggle-disposal-data" type="button"><span class="toggle-knob"></span></button>
+      </div>
+      <p class="modal-footnote" style="text-align:left; padding: 10px 24px 0 24px; margin-top:0;">
+        Water/Debris unit-of-measurement and Require Picture sub-fields, and the Display Options
+        Time Frame rows, are existing settings shown for layout context only — out of scope for
+        this mock's functional focus.
+      </p>
+
+      <div class="modal-footer-wide">
+        <button class="btn-secondary-outline" id="settings-street-sweeping-modal-cancel-button" type="button">Cancel</button>
+        <button class="btn-primary" id="settings-street-sweeping-modal-save-button" type="button">Save</button>
+      </div>
     </div>
   </div>
 
   <script>
     (function () {
-      // App Experience modal (parent) — Snow/Sweeper Route Reset lives inside it
+      // ---- generic toggle helpers ----
+      function isOn(el) { return el.classList.contains('on'); }
+      function setToggle(el, on) { el.classList.toggle('on', !!on); }
+      function wireToggle(el, onChange) {
+        if (!el) return;
+        el.addEventListener('click', function () {
+          if (el.disabled) return;
+          var next = !isOn(el);
+          setToggle(el, next);
+          if (onChange) onChange(next);
+        });
+      }
+
+      // ---- App Experience modal (unrelated to Route Reset as of round 4) ----
       var appExpEditBtn = document.getElementById('settings-app-experience-edit-button');
       var appExpOverlay = document.getElementById('settings-app-experience-modal-overlay');
       var appExpCloseBtn = document.getElementById('settings-app-experience-modal-close');
       var appExpCancelBtn = document.getElementById('settings-app-experience-cancel-button');
       var appExpSaveBtn = document.getElementById('settings-app-experience-save-button');
-
-      // Snow/Sweeper Route Reset row (inside the App Experience modal) + its own threshold modal (child)
-      var editBtn = document.getElementById('settings-snow-sweeper-route-reset-edit-button');
-      var overlay = document.getElementById('settings-snow-sweeper-route-reset-modal-overlay');
-      var closeBtn = document.getElementById('settings-snow-sweeper-route-reset-modal-close');
-      var backBtn = document.getElementById('settings-route-pct-threshold-back-button');
-      var rowCheckbox = document.getElementById('settings-snow-sweeper-route-reset-checkbox');
-      var rowLabel = document.querySelector('label[for="settings-snow-sweeper-route-reset-checkbox"]');
-      var row = document.getElementById('settings-feature-row-snow-sweeper-route-reset');
-      var gatingNote = document.getElementById('settings-snow-sweeper-route-reset-gating-note');
-      var gateToggle = document.getElementById('mock-toggle-snow-sweeper-enabled');
-      var snowCb = document.getElementById('mock-snow-plow-checkbox');
-      var sweeperCb = document.getElementById('mock-street-sweeper-checkbox');
-
-      var input = document.getElementById('settings-route-pct-threshold-input');
-      var saveBtn = document.getElementById('settings-route-pct-threshold-save-button');
-      var confirmEl = document.getElementById('settings-route-pct-threshold-save-confirmation');
-      var currentValueEl = document.getElementById('settings-route-pct-threshold-current-value');
-      var unsetAlert = document.getElementById('settings-snow-sweeper-route-reset-unset-alert');
-
-      function applyGating(enabled) {
-        rowCheckbox.disabled = !enabled;
-        editBtn.disabled = !enabled;
-        row.classList.toggle('disabled', !enabled);
-        rowLabel.style.color = enabled ? '' : 'var(--text-faint)';
-        gatingNote.classList.toggle('blocked', !enabled);
-        gatingNote.textContent = enabled
-          ? 'NEW — only selectable when Snow Plow and Street Sweeper vehicle types (Fleet Management, left) are both enabled for this vendor.'
-          : 'Unavailable: this vendor does not have both Snow Plow and Street Sweeper vehicle types enabled.';
-        snowCb.checked = enabled;
-        sweeperCb.checked = enabled;
-      }
-
-      gateToggle.addEventListener('change', function () {
-        applyGating(gateToggle.checked);
-      });
-
-      // Open App Experience modal from its Route Management row
-      appExpEditBtn.addEventListener('click', function () {
-        appExpOverlay.classList.add('open');
-      });
+      appExpEditBtn.addEventListener('click', function () { appExpOverlay.classList.add('open'); });
       appExpCloseBtn.addEventListener('click', function () { appExpOverlay.classList.remove('open'); });
       appExpCancelBtn.addEventListener('click', function () { appExpOverlay.classList.remove('open'); });
       appExpSaveBtn.addEventListener('click', function () { appExpOverlay.classList.remove('open'); });
       appExpOverlay.addEventListener('click', function (e) { if (e.target === appExpOverlay) appExpOverlay.classList.remove('open'); });
 
-      // Drill down: Snow/Sweeper Route Reset's own pencil (inside App Experience modal) opens the
-      // threshold modal on top of it; closing/saving/back returns to the App Experience modal.
-      editBtn.addEventListener('click', function () {
-        if (editBtn.disabled) return;
-        appExpOverlay.classList.remove('open');
-        overlay.classList.add('open');
-      });
-      function returnToAppExperience() {
-        overlay.classList.remove('open');
-        appExpOverlay.classList.add('open');
+      // ---- Alternative Fleet modal (entry point + drill-down parent) ----
+      var altFleetEditBtn = document.getElementById('settings-alternative-fleet-edit-button');
+      var altFleetOverlay = document.getElementById('settings-alternative-fleet-modal-overlay');
+      var altFleetCloseBtn = document.getElementById('settings-alternative-fleet-modal-close');
+
+      var snowPlowRow = document.getElementById('settings-feature-row-alt-fleet-snow-plow');
+      var snowPlowCheckbox = document.getElementById('settings-alt-fleet-snow-plow-checkbox');
+      var snowPlowEditBtn = document.getElementById('settings-alt-fleet-snow-plow-edit-button');
+      var snowPlowLabel = snowPlowRow.querySelector('label');
+
+      var sweeperRow = document.getElementById('settings-feature-row-alt-fleet-street-sweeping');
+      var sweeperCheckbox = document.getElementById('settings-alt-fleet-street-sweeping-checkbox');
+      var sweeperEditBtn = document.getElementById('settings-alt-fleet-street-sweeping-edit-button');
+      var sweeperLabel = sweeperRow.querySelector('label');
+
+      function applyVehicleTypeGating(checkbox, editBtn, row, label) {
+        var enabled = checkbox.checked;
+        editBtn.disabled = !enabled;
+        row.classList.toggle('disabled', !enabled);
+        label.style.color = enabled ? '' : 'var(--text-faint)';
       }
-      closeBtn.addEventListener('click', returnToAppExperience);
-      backBtn.addEventListener('click', returnToAppExperience);
-      overlay.addEventListener('click', function (e) { if (e.target === overlay) returnToAppExperience(); });
-
-      input.addEventListener('input', function () {
-        confirmEl.classList.remove('visible');
-        var v = input.value;
-        var valid = v !== '' && Number(v) >= 0 && Number(v) <= 100;
-        saveBtn.disabled = !valid;
+      snowPlowCheckbox.addEventListener('change', function () {
+        applyVehicleTypeGating(snowPlowCheckbox, snowPlowEditBtn, snowPlowRow, snowPlowLabel);
+      });
+      sweeperCheckbox.addEventListener('change', function () {
+        applyVehicleTypeGating(sweeperCheckbox, sweeperEditBtn, sweeperRow, sweeperLabel);
       });
 
-      saveBtn.addEventListener('click', function () {
-        if (saveBtn.disabled) return;
-        var v = Math.round(Number(input.value));
-        currentValueEl.innerHTML = 'Current value: <strong>' + v + '%</strong> · saved just now';
-        unsetAlert.style.display = 'none';
-        confirmEl.classList.add('visible');
-        saveBtn.disabled = true;
+      altFleetEditBtn.addEventListener('click', function () { altFleetOverlay.classList.add('open'); });
+      altFleetCloseBtn.addEventListener('click', function () { altFleetOverlay.classList.remove('open'); });
+      altFleetOverlay.addEventListener('click', function (e) { if (e.target === altFleetOverlay) altFleetOverlay.classList.remove('open'); });
+
+      // ---- Snow Plow modal ----
+      var snowPlowOverlay = document.getElementById('settings-snow-plow-modal-overlay');
+      var snowPlowCloseBtn = document.getElementById('settings-snow-plow-modal-close');
+      var snowPlowBackBtn = document.getElementById('settings-snow-plow-back-button');
+      var snowPlowCancelBtn = document.getElementById('settings-snow-plow-modal-cancel-button');
+      var snowPlowSaveBtn = document.getElementById('settings-snow-plow-modal-save-button');
+
+      var snowRouteResetAppToggle = document.getElementById('settings-snow-plow-toggle-route-reset-app');
+      var snowAutomaticToggle = document.getElementById('settings-snow-plow-toggle-automatic-route-reset');
+      var snowAutomaticField = document.getElementById('settings-snow-plow-automatic-route-reset-field');
+
+      snowPlowEditBtn.addEventListener('click', function () {
+        if (snowPlowEditBtn.disabled) return;
+        altFleetOverlay.classList.remove('open');
+        snowPlowOverlay.classList.add('open');
+      });
+      function returnToAltFleetFromSnowPlow() {
+        snowPlowOverlay.classList.remove('open');
+        altFleetOverlay.classList.add('open');
+      }
+      snowPlowCloseBtn.addEventListener('click', returnToAltFleetFromSnowPlow);
+      snowPlowBackBtn.addEventListener('click', returnToAltFleetFromSnowPlow);
+      snowPlowCancelBtn.addEventListener('click', returnToAltFleetFromSnowPlow);
+      snowPlowSaveBtn.addEventListener('click', returnToAltFleetFromSnowPlow);
+      snowPlowOverlay.addEventListener('click', function (e) { if (e.target === snowPlowOverlay) returnToAltFleetFromSnowPlow(); });
+
+      // Mutual exclusion: Route Reset - App Experience <-> Automatic Route Reset (Snow Plow only)
+      wireToggle(snowRouteResetAppToggle, function (nowOn) {
+        if (nowOn) {
+          setToggle(snowAutomaticToggle, false);
+          snowAutomaticField.classList.remove('visible');
+        }
+      });
+      wireToggle(snowAutomaticToggle, function (nowOn) {
+        if (nowOn) {
+          setToggle(snowRouteResetAppToggle, false);
+          snowAutomaticField.classList.add('visible');
+        } else {
+          snowAutomaticField.classList.remove('visible');
+        }
       });
 
-      applyGating(true);
+      // Remaining Snow Plow toggles — visual only, no cross-field behavior
+      ['settings-snow-plow-toggle-dashboard-data', 'settings-snow-plow-toggle-switch-routes',
+       'settings-snow-plow-toggle-material-pickup', 'settings-snow-plow-toggle-route-reset-portal',
+       'settings-snow-plow-toggle-simple-driver-experience'].forEach(function (id) {
+        wireToggle(document.getElementById(id));
+      });
+
+      // ---- Street Sweeping modal ----
+      var sweeperOverlay = document.getElementById('settings-street-sweeping-modal-overlay');
+      var sweeperCloseBtn = document.getElementById('settings-street-sweeping-modal-close');
+      var sweeperBackBtn = document.getElementById('settings-street-sweeping-back-button');
+      var sweeperCancelBtn = document.getElementById('settings-street-sweeping-modal-cancel-button');
+      var sweeperSaveBtn = document.getElementById('settings-street-sweeping-modal-save-button');
+
+      var sweeperAutomaticToggle = document.getElementById('settings-street-sweeping-toggle-automatic-route-reset');
+      var sweeperAutomaticField = document.getElementById('settings-street-sweeping-automatic-route-reset-field');
+
+      sweeperEditBtn.addEventListener('click', function () {
+        if (sweeperEditBtn.disabled) return;
+        altFleetOverlay.classList.remove('open');
+        sweeperOverlay.classList.add('open');
+      });
+      function returnToAltFleetFromSweeper() {
+        sweeperOverlay.classList.remove('open');
+        altFleetOverlay.classList.add('open');
+      }
+      sweeperCloseBtn.addEventListener('click', returnToAltFleetFromSweeper);
+      sweeperBackBtn.addEventListener('click', returnToAltFleetFromSweeper);
+      sweeperCancelBtn.addEventListener('click', returnToAltFleetFromSweeper);
+      sweeperSaveBtn.addEventListener('click', returnToAltFleetFromSweeper);
+      sweeperOverlay.addEventListener('click', function (e) { if (e.target === sweeperOverlay) returnToAltFleetFromSweeper(); });
+
+      // Automatic Route Reset (Street Sweeping) — standalone, no mutual-exclusion partner
+      wireToggle(sweeperAutomaticToggle, function (nowOn) {
+        sweeperAutomaticField.classList.toggle('visible', nowOn);
+      });
+
+      ['settings-street-sweeping-toggle-dashboard-data', 'settings-street-sweeping-toggle-switch-routes',
+       'settings-street-sweeping-toggle-simple-driver-experience', 'settings-street-sweeping-toggle-water-fillup',
+       'settings-street-sweeping-toggle-disposal-data'].forEach(function (id) {
+        wireToggle(document.getElementById(id));
+      });
+
+      // initialize gating to match default-checked state
+      applyVehicleTypeGating(snowPlowCheckbox, snowPlowEditBtn, snowPlowRow, snowPlowLabel);
+      applyVehicleTypeGating(sweeperCheckbox, sweeperEditBtn, sweeperRow, sweeperLabel);
     })();
   </script>
 
