@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Application Settings — Snow/Sweeper Route Reset — SmartCity Portal Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #20315A;
+    --navy-dark: #242833;
+    --green: #33A542;
+    --page-bg: #FAFAFC;
+    --panel: #FFFFFF;
+    --border: #E5E7EB;
+    --text-primary: #242833;
+    --text-secondary: #6B7280;
+    --text-muted: #9AA0AC;
+    --text-faint: #C6CAD3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: var(--page-bg);
+    color: var(--text-primary);
+  }
+
+  .mock-banner {
+    background: #FFF7E0;
+    border-bottom: 1px solid #E8D48A;
+    color: #6B5510;
+    font-size: 12px;
+    text-align: center;
+    padding: 6px 12px;
+  }
+
+  /* Mock-only demo control — not part of the SCP design system, clearly separated */
+  .mock-control-bar {
+    background: #F0F0F5;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .mock-control-bar strong { color: var(--navy); font-weight: 700; }
+  .mock-control-bar label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .page-header {
+    padding: 28px 32px 0 32px;
+    max-width: 1240px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .page-header h1 {
+    font-size: 26px;
+    font-weight: 400;
+    margin: 0;
+    color: var(--text-primary);
+  }
+  .page-header .header-actions { display: flex; gap: 12px; }
+  .btn-outline-danger {
+    background: transparent;
+    border: 1px solid #E0847A;
+    color: #C1554A;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 22px;
+    cursor: default;
+  }
+  .btn-primary {
+    background: var(--navy);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 26px;
+    cursor: pointer;
+  }
+  .btn-primary:hover { background: #1a2749; }
+  .btn-primary:disabled { background: #A9B2C6; cursor: not-allowed; }
+
+  .settings-shell {
+    max-width: 1240px;
+    margin: 24px auto 60px auto;
+    padding: 0 32px;
+  }
+
+  .info-panel {
+    background: var(--panel);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(36,40,51,0.06);
+    padding: 28px 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  .info-block h2 {
+    font-size: 19px;
+    font-weight: 400;
+    margin: 0 0 18px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .info-block h2 .edit-icon { color: var(--text-faint); font-size: 14px; cursor: default; }
+  .info-field { border-bottom: 1px solid var(--border); padding: 10px 0; }
+  .info-field:last-of-type { border-bottom: none; }
+  .info-field .field-label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: none;
+    margin-bottom: 4px;
+    font-weight: 400;
+  }
+  .info-field .field-value { font-size: 14px; color: var(--text-primary); }
+  .info-block .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .util-buttons { display: flex; gap: 10px; margin-top: 18px; }
+  .btn-secondary-outline {
+    background: transparent;
+    border: 1px solid var(--navy);
+    color: var(--navy);
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 8px 16px;
+    cursor: default;
+  }
+
+  .features-panel {
+    background: var(--panel);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(36,40,51,0.06);
+    padding: 28px 32px 8px 32px;
+    margin-top: 24px;
+  }
+  .features-panel > h2 {
+    font-size: 19px;
+    font-weight: 400;
+    margin: 0 0 20px 0;
+  }
+  .features-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  .feature-column h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+  }
+  .feature-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: none;
+  }
+  .feature-row input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--navy);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .feature-row label {
+    font-size: 13px;
+    color: var(--text-primary);
+    flex: 1;
+    cursor: pointer;
+  }
+  .feature-row.disabled label { color: var(--text-faint); }
+  .feature-row .pencil-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 4px;
+    line-height: 1;
+  }
+  .feature-row .pencil-btn:hover { color: var(--navy); }
+  .feature-row .pencil-btn:disabled { color: var(--text-faint); cursor: not-allowed; }
+
+  /* New row gets a highlight ring + badge so it reads clearly as the addition in this mock */
+  .feature-row.new-row {
+    background: #F5F8FF;
+    margin: 4px -10px;
+    padding: 8px 10px;
+    border-radius: 5px;
+    border: 1px dashed #B9C6E8;
+  }
+  .gating-note {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    margin: -4px 0 10px 25px;
+    line-height: 1.4;
+  }
+  .gating-note.blocked { color: #A66A1E; }
+
+  /* Modal chrome — matches the existing General Features / Route Assistance modal pattern */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(36,40,51,0.45);
+    align-items: flex-start;
+    justify-content: center;
+    padding: 60px 20px;
+    z-index: 100;
+    overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-card {
+    background: #FFFFFF;
+    border-radius: 6px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: 620px;
+    position: relative;
+    padding: 40px 44px 36px 44px;
+  }
+  .modal-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: #F3F4F6;
+    border: none;
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .modal-close:hover { color: var(--navy); }
+  .modal-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 300;
+    margin: 0 0 6px 0;
+    color: var(--text-primary);
+  }
+  .modal-subtitle {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin: 0 0 26px 0;
+  }
+  .modal-description {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+  }
+
+  .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-left: 3px solid;
+    border-radius: 3px;
+    padding: 12px 16px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .alert-warning { border-left-color: #C99A1E; background: rgba(201,154,30,0.08); color: #7A5D10; }
+  .alert-blocked { border-left-color: #C1554A; background: rgba(193,85,74,0.08); color: #8C3B32; }
+  .alert strong { font-weight: 700; }
+
+  .threshold-form-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 22px 0 8px 0;
+    flex-wrap: wrap;
+  }
+  .threshold-form-row .field-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-right: 4px;
+  }
+  .pct-input-wrap { position: relative; display: inline-flex; align-items: center; }
+  .pct-input-wrap input[type="number"] {
+    width: 96px;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text-primary);
+    padding: 0 28px 0 12px;
+    -moz-appearance: textfield;
+  }
+  .pct-input-wrap input[type="number"]:focus { outline: none; border-color: var(--navy); }
+  .pct-input-wrap input::-webkit-outer-spin-button,
+  .pct-input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .pct-input-wrap .pct-suffix { position: absolute; right: 12px; font-size: 14px; color: var(--text-secondary); pointer-events: none; }
+
+  .current-value-line {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 18px;
+  }
+  .current-value-line strong { color: var(--text-primary); font-weight: 600; }
+
+  .example-block {
+    background: #F7F8FA;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px 16px;
+    margin-bottom: 22px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .example-block .example-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .example-block code {
+    background: #EEF1F8;
+    color: var(--navy);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  .modal-footer { display: flex; justify-content: center; align-items: center; gap: 12px; }
+  .app-experience-list { margin: 4px 0 0 0; }
+  .app-experience-footer { justify-content: flex-end; gap: 12px; margin-top: 24px; }
+  .modal-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 14px;
+  }
+  .modal-back-link:hover { color: var(--navy); }
+  .save-confirmation {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--green);
+  }
+  .save-confirmation.visible { display: inline-flex; }
+
+  .modal-footnote {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+  <div class="mock-banner">Functional reference mock — SmartCity Portal Application Settings. Rebuilt to match Paulo's screenshots of the live page (User Profile / Company Configuration header, 3-column Features grid, checkbox + pencil edit pattern, modal chrome). Round 3: Snow/Sweeper Route Reset moved inside the existing App Experience row's modal, per Paulo. Not connected to live data.</div>
+
+  <div class="mock-control-bar">
+    <strong>Mock control (not part of the real UI):</strong>
+    <label><input type="checkbox" id="mock-toggle-snow-sweeper-enabled" checked> Vendor has Snow Plow + Street Sweeper vehicle types enabled</label>
+    <span>— toggles the gating behavior described below.</span>
+  </div>
+
+  <div class="page-header">
+    <h1>Application Settings</h1>
+    <div class="header-actions">
+      <button class="btn-outline-danger" type="button">Logout</button>
+      <button class="btn-primary" type="button">Create Vendor</button>
+    </div>
+  </div>
+
+  <div class="settings-shell">
+
+    <div class="info-panel">
+      <div class="info-block">
+        <h2>User Profile <span class="edit-icon">✏️</span></h2>
+        <div class="info-field"><span class="field-label">Name</span><span class="field-value">Paulo Barbosa</span></div>
+        <div class="info-field"><span class="field-label">Email</span><span class="field-value">paulo.barbosa@routeware.com</span></div>
+        <div class="info-field"><span class="field-label">Password</span><span class="field-value">•••••••</span></div>
+      </div>
+      <div class="info-block">
+        <h2>Company Configuration <span class="edit-icon">✏️</span></h2>
+        <div class="field-row">
+          <div class="info-field"><span class="field-label">Name</span><span class="field-value">ABC</span></div>
+          <div class="info-field"><span class="field-label">Time Zone</span><span class="field-value">(UTC-05:00) Eastern Time (US &amp; Canada)</span></div>
+        </div>
+        <div class="field-row">
+          <div class="info-field"><span class="field-label">Address</span><span class="field-value">29 Main St, Westford, MA 01886, USA</span></div>
+          <div class="info-field"><span class="field-label">Route Start Time</span><span class="field-value">12:00 AM (0 hours)</span></div>
+        </div>
+        <div class="util-buttons">
+          <button class="btn-secondary-outline" type="button">Manage Users</button>
+          <button class="btn-secondary-outline" type="button">Manage Devices</button>
+          <button class="btn-secondary-outline" type="button">Manage API Keys</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="features-panel">
+      <h2>Features</h2>
+      <div class="features-columns">
+
+        <div class="feature-column">
+          <h3>Account Management</h3>
+          <div class="feature-row"><input type="checkbox"><label>Billing Settings</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked disabled><label>Bulky Item Scheduler</label><button class="pencil-btn" disabled>✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Cart Fill Level</label></div>
+          <div class="feature-row"><input type="checkbox" checked><label>City Alerts</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>City Flagging</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox"><label>Container Management</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Customer Notification</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Dashboard Auto-Refresh</label></div>
+        </div>
+
+        <div class="feature-column">
+          <h3>Fleet Management</h3>
+          <div class="feature-row"><input type="checkbox" checked><label>Alternative Fleet</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Fault Code Notifications</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Fleet Maintenance</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Fuel Tickets</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked disabled><label>Navi 3.0</label></div>
+          <div class="feature-row"><input type="checkbox" checked><label>On Demand Video Download</label></div>
+          <div class="feature-row"><input type="checkbox"><label>Post Trip Inspection</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox"><label>Pre Trip Inspection</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked id="mock-snow-plow-checkbox"><label>Snow Plow (vehicle type)</label></div>
+          <div class="feature-row"><input type="checkbox" checked id="mock-street-sweeper-checkbox"><label>Street Sweeper (vehicle type)</label></div>
+        </div>
+
+        <div class="feature-column">
+          <h3>Route Management</h3>
+          <div class="feature-row" id="settings-feature-row-app-experience">
+            <input type="checkbox" checked id="settings-app-experience-checkbox">
+            <label for="settings-app-experience-checkbox">App Experience</label>
+            <button class="pencil-btn" id="settings-app-experience-edit-button" title="Configure App Experience">✏️</button>
+          </div>
+          <div class="feature-row"><input type="checkbox" checked><label>Exception Management Tool</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Geo-Fencing</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Optimized Stop Insertion</label></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Route Builder</label><button class="pencil-btn">✏️</button></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Route Playback</label></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Route Recommendations</label></div>
+          <div class="feature-row"><input type="checkbox" checked><label>Route Sequencing</label><button class="pencil-btn">✏️</button></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- App Experience — edit modal, opened via the pencil icon on the "App Experience" row above.
+       Per Paulo (2026-08-27, round 3): Snow/Sweeper Route Reset lives INSIDE this modal, not as its
+       own Route Management row. Its own pencil drills into the threshold modal below. -->
+  <div class="modal-overlay" id="settings-app-experience-modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close" id="settings-app-experience-modal-close" aria-label="Close">×</button>
+      <h2 class="modal-title">App Experience</h2>
+      <p class="modal-subtitle">Options for the driver-facing in-cab app experience</p>
+
+      <div class="app-experience-list">
+        <div class="feature-row"><input type="checkbox" checked disabled><label>Show Route ETA to Driver</label></div>
+        <div class="feature-row"><input type="checkbox" checked disabled><label>Allow Driver Route Reordering</label></div>
+
+        <div class="feature-row new-row" id="settings-feature-row-snow-sweeper-route-reset">
+          <input type="checkbox" checked id="settings-snow-sweeper-route-reset-checkbox">
+          <label for="settings-snow-sweeper-route-reset-checkbox">Snow/Sweeper Route Reset</label>
+          <button class="pencil-btn" id="settings-snow-sweeper-route-reset-edit-button" title="Configure threshold">✏️</button>
+        </div>
+        <div class="gating-note" id="settings-snow-sweeper-route-reset-gating-note">
+          NEW — only selectable when Snow Plow and Street Sweeper vehicle types (Fleet Management, left) are both enabled for this vendor.
+        </div>
+      </div>
+
+      <div class="modal-footer app-experience-footer">
+        <button class="btn-secondary-outline" id="settings-app-experience-cancel-button" type="button">Cancel</button>
+        <button class="btn-primary" id="settings-app-experience-save-button" type="button">Save</button>
+      </div>
+
+      <p class="modal-footnote">
+        Show Route ETA to Driver and Allow Driver Route Reordering are existing App Experience settings shown
+        here for layout context only — this mock's functional scope is the Snow/Sweeper Route Reset row.
+      </p>
+    </div>
+  </div>
+
+  <!-- Snow/Sweeper Route Reset — edit modal, opened via the pencil icon on the row above -->
+  <div class="modal-overlay" id="settings-snow-sweeper-route-reset-modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close" id="settings-snow-sweeper-route-reset-modal-close" aria-label="Close">×</button>
+      <button class="modal-back-link" id="settings-route-pct-threshold-back-button" type="button">‹ App Experience</button>
+      <h2 class="modal-title">Snow/Sweeper Route Reset</h2>
+      <p class="modal-subtitle">Applies only to Snow Plow and Street Sweeper routes for this vendor</p>
+
+      <p class="modal-description">
+        Sets the Route % Complete threshold that decides what happens when a driver logs into a snow or
+        sweeper route that already has one or more drivers on it. At or above this percent complete, the
+        new driver starts a new route instance as the primary/additional driver. Below it, the new driver
+        is automatically logged in as an assisting driver on the existing route — no prompt is shown to
+        the driver either way. This value is global for this vendor; there is no per-route override.
+      </p>
+
+      <div class="alert alert-warning" id="settings-snow-sweeper-route-reset-unset-alert">
+        <span>⚠️</span>
+        <span><strong>Not yet configured.</strong> Until a value is saved, the automatic login-routing
+        behavior is undefined — see the open engineering question on <strong>SCP-5078</strong>.</span>
+      </div>
+
+      <div class="threshold-form-row">
+        <span class="field-title">Route % Complete Threshold</span>
+        <div class="pct-input-wrap">
+          <input type="number" id="settings-route-pct-threshold-input" min="0" max="100" step="1" placeholder="—" aria-label="Route percent complete threshold">
+          <span class="pct-suffix">%</span>
+        </div>
+      </div>
+
+      <div class="current-value-line" id="settings-route-pct-threshold-current-value">
+        Current value: <strong>Not set</strong>
+      </div>
+
+      <div class="example-block">
+        <div class="example-title">Example</div>
+        If this is set to <code>80%</code>: a snow route that's 82% complete sends the next driver into a
+        <strong>new route instance</strong> as primary/additional. A route that's only 50% complete logs the
+        next driver in as an <strong>assisting</strong> driver on the route already in progress.
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary" id="settings-route-pct-threshold-save-button" disabled type="button">Save</button>
+        <span class="save-confirmation" id="settings-route-pct-threshold-save-confirmation">✓ Saved</span>
+      </div>
+
+      <p class="modal-footnote">
+        Changes take effect immediately for all subsequent route logins and are audited the same way as
+        other Application Settings changes. They do not affect a route instance already in progress.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // App Experience modal (parent) — Snow/Sweeper Route Reset lives inside it
+      var appExpEditBtn = document.getElementById('settings-app-experience-edit-button');
+      var appExpOverlay = document.getElementById('settings-app-experience-modal-overlay');
+      var appExpCloseBtn = document.getElementById('settings-app-experience-modal-close');
+      var appExpCancelBtn = document.getElementById('settings-app-experience-cancel-button');
+      var appExpSaveBtn = document.getElementById('settings-app-experience-save-button');
+
+      // Snow/Sweeper Route Reset row (inside the App Experience modal) + its own threshold modal (child)
+      var editBtn = document.getElementById('settings-snow-sweeper-route-reset-edit-button');
+      var overlay = document.getElementById('settings-snow-sweeper-route-reset-modal-overlay');
+      var closeBtn = document.getElementById('settings-snow-sweeper-route-reset-modal-close');
+      var backBtn = document.getElementById('settings-route-pct-threshold-back-button');
+      var rowCheckbox = document.getElementById('settings-snow-sweeper-route-reset-checkbox');
+      var rowLabel = document.querySelector('label[for="settings-snow-sweeper-route-reset-checkbox"]');
+      var row = document.getElementById('settings-feature-row-snow-sweeper-route-reset');
+      var gatingNote = document.getElementById('settings-snow-sweeper-route-reset-gating-note');
+      var gateToggle = document.getElementById('mock-toggle-snow-sweeper-enabled');
+      var snowCb = document.getElementById('mock-snow-plow-checkbox');
+      var sweeperCb = document.getElementById('mock-street-sweeper-checkbox');
+
+      var input = document.getElementById('settings-route-pct-threshold-input');
+      var saveBtn = document.getElementById('settings-route-pct-threshold-save-button');
+      var confirmEl = document.getElementById('settings-route-pct-threshold-save-confirmation');
+      var currentValueEl = document.getElementById('settings-route-pct-threshold-current-value');
+      var unsetAlert = document.getElementById('settings-snow-sweeper-route-reset-unset-alert');
+
+      function applyGating(enabled) {
+        rowCheckbox.disabled = !enabled;
+        editBtn.disabled = !enabled;
+        row.classList.toggle('disabled', !enabled);
+        rowLabel.style.color = enabled ? '' : 'var(--text-faint)';
+        gatingNote.classList.toggle('blocked', !enabled);
+        gatingNote.textContent = enabled
+          ? 'NEW — only selectable when Snow Plow and Street Sweeper vehicle types (Fleet Management, left) are both enabled for this vendor.'
+          : 'Unavailable: this vendor does not have both Snow Plow and Street Sweeper vehicle types enabled.';
+        snowCb.checked = enabled;
+        sweeperCb.checked = enabled;
+      }
+
+      gateToggle.addEventListener('change', function () {
+        applyGating(gateToggle.checked);
+      });
+
+      // Open App Experience modal from its Route Management row
+      appExpEditBtn.addEventListener('click', function () {
+        appExpOverlay.classList.add('open');
+      });
+      appExpCloseBtn.addEventListener('click', function () { appExpOverlay.classList.remove('open'); });
+      appExpCancelBtn.addEventListener('click', function () { appExpOverlay.classList.remove('open'); });
+      appExpSaveBtn.addEventListener('click', function () { appExpOverlay.classList.remove('open'); });
+      appExpOverlay.addEventListener('click', function (e) { if (e.target === appExpOverlay) appExpOverlay.classList.remove('open'); });
+
+      // Drill down: Snow/Sweeper Route Reset's own pencil (inside App Experience modal) opens the
+      // threshold modal on top of it; closing/saving/back returns to the App Experience modal.
+      editBtn.addEventListener('click', function () {
+        if (editBtn.disabled) return;
+        appExpOverlay.classList.remove('open');
+        overlay.classList.add('open');
+      });
+      function returnToAppExperience() {
+        overlay.classList.remove('open');
+        appExpOverlay.classList.add('open');
+      }
+      closeBtn.addEventListener('click', returnToAppExperience);
+      backBtn.addEventListener('click', returnToAppExperience);
+      overlay.addEventListener('click', function (e) { if (e.target === overlay) returnToAppExperience(); });
+
+      input.addEventListener('input', function () {
+        confirmEl.classList.remove('visible');
+        var v = input.value;
+        var valid = v !== '' && Number(v) >= 0 && Number(v) <= 100;
+        saveBtn.disabled = !valid;
+      });
+
+      saveBtn.addEventListener('click', function () {
+        if (saveBtn.disabled) return;
+        var v = Math.round(Number(input.value));
+        currentValueEl.innerHTML = 'Current value: <strong>' + v + '%</strong> · saved just now';
+        unsetAlert.style.display = 'none';
+        confirmEl.classList.add('visible');
+        saveBtn.disabled = true;
+      });
+
+      applyGating(true);
+    })();
+  </script>
+
+</body>
+</html>
