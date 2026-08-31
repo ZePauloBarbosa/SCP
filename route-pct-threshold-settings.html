@@ -395,7 +395,7 @@
 </head>
 <body>
 
-  <div class="mock-banner">Functional reference mock — SmartCity Portal Application Settings. Round 4 (2026-08-28), per Paulo: Snow/Sweeper Route Reset removed entirely from the App Experience modal and rebuilt inside the existing Alternative Fleet modal, matching Paulo's live-app screenshots (Alternative Fleet → Snow Plow / Street Sweeping, each with its own FEATURES/ACTIVE toggle table). New "Automatic Route Reset" toggle added independently to each vehicle type. Not connected to live data.</div>
+  <div class="mock-banner">Functional reference mock — SmartCity Portal Application Settings. Round 4 (2026-08-28): Snow/Sweeper Route Reset removed entirely from the App Experience modal and rebuilt inside the existing Alternative Fleet modal (Alternative Fleet → Snow Plow / Street Sweeping, each with its own FEATURES/ACTIVE toggle table), with a new "Automatic Route Reset" toggle added independently to each vehicle type. Round 5 (2026-08-28): full mutual-exclusion logic added — Snow Plow: Route Reset - Portal Experience and Route Reset - App Experience can be on together (App requires Portal), but Automatic Route Reset and Simple Driver Experience are each exclusive against that pair and against each other; Street Sweeping: Automatic Route Reset and Simple Driver Experience are mutually exclusive. Not connected to live data.</div>
 
   <div class="page-header">
     <h1>Application Settings</h1>
@@ -572,17 +572,23 @@
         <button class="toggle-switch" id="settings-snow-plow-toggle-material-pickup" type="button"><span class="toggle-knob"></span></button>
       </div>
       <div class="features-table-row">
-        <div class="row-label-group"><div class="row-label">Route Reset - Portal Experience</div></div>
+        <div class="row-label-group">
+          <div class="row-label">Route Reset - Portal Experience</div>
+          <div class="row-sublabel">Can be on at the same time as App Experience below. Turning on Automatic Route Reset or Simple Driver Experience turns this off.</div>
+        </div>
         <button class="toggle-switch on" id="settings-snow-plow-toggle-route-reset-portal" type="button"><span class="toggle-knob"></span></button>
       </div>
       <div class="features-table-row">
-        <div class="row-label-group"><div class="row-label">Route Reset - App Experience</div></div>
+        <div class="row-label-group">
+          <div class="row-label">Route Reset - App Experience</div>
+          <div class="row-sublabel">Requires Portal Experience — turning this on also turns Portal Experience on. Turning on Automatic Route Reset or Simple Driver Experience turns this off.</div>
+        </div>
         <button class="toggle-switch on" id="settings-snow-plow-toggle-route-reset-app" type="button"><span class="toggle-knob"></span></button>
       </div>
       <div class="features-table-row new-row" id="settings-snow-plow-row-automatic-route-reset">
         <div class="row-label-group">
           <div class="row-label">Automatic Route Reset<span class="new-row-badge">NEW</span></div>
-          <div class="row-sublabel">Turning this on turns off Route Reset - App Experience, and vice versa</div>
+          <div class="row-sublabel">Turning this on turns off Route Reset - Portal/App Experience and Simple Driver Experience, and vice versa</div>
         </div>
         <div class="inline-pct-field" id="settings-snow-plow-automatic-route-reset-field">
           <div class="pct-input-wrap">
@@ -593,7 +599,10 @@
         <button class="toggle-switch" id="settings-snow-plow-toggle-automatic-route-reset" type="button"><span class="toggle-knob"></span></button>
       </div>
       <div class="features-table-row">
-        <div class="row-label-group"><div class="row-label">Simple Driver Experience</div></div>
+        <div class="row-label-group">
+          <div class="row-label">Simple Driver Experience</div>
+          <div class="row-sublabel">Turning this on turns off Route Reset - Portal/App Experience and Automatic Route Reset</div>
+        </div>
         <button class="toggle-switch" id="settings-snow-plow-toggle-simple-driver-experience" type="button"><span class="toggle-knob"></span></button>
       </div>
 
@@ -639,7 +648,7 @@
       <div class="features-table-row new-row" id="settings-street-sweeping-row-automatic-route-reset">
         <div class="row-label-group">
           <div class="row-label">Automatic Route Reset<span class="new-row-badge">NEW</span></div>
-          <div class="row-sublabel">No existing Route Reset toggle for Street Sweeping — this is a standalone addition</div>
+          <div class="row-sublabel">No existing Route Reset toggle for Street Sweeping. Mutually exclusive with Simple Driver Experience — only one can be active.</div>
         </div>
         <div class="inline-pct-field" id="settings-street-sweeping-automatic-route-reset-field">
           <div class="pct-input-wrap">
@@ -650,7 +659,10 @@
         <button class="toggle-switch" id="settings-street-sweeping-toggle-automatic-route-reset" type="button"><span class="toggle-knob"></span></button>
       </div>
       <div class="features-table-row">
-        <div class="row-label-group"><div class="row-label">Simple Driver Experience</div></div>
+        <div class="row-label-group">
+          <div class="row-label">Simple Driver Experience</div>
+          <div class="row-sublabel">Mutually exclusive with Automatic Route Reset — only one can be active.</div>
+        </div>
         <button class="toggle-switch" id="settings-street-sweeping-toggle-simple-driver-experience" type="button"><span class="toggle-knob"></span></button>
       </div>
 
@@ -745,9 +757,11 @@
       var snowPlowCancelBtn = document.getElementById('settings-snow-plow-modal-cancel-button');
       var snowPlowSaveBtn = document.getElementById('settings-snow-plow-modal-save-button');
 
+      var snowPortalToggle = document.getElementById('settings-snow-plow-toggle-route-reset-portal');
       var snowRouteResetAppToggle = document.getElementById('settings-snow-plow-toggle-route-reset-app');
       var snowAutomaticToggle = document.getElementById('settings-snow-plow-toggle-automatic-route-reset');
       var snowAutomaticField = document.getElementById('settings-snow-plow-automatic-route-reset-field');
+      var snowSimpleToggle = document.getElementById('settings-snow-plow-toggle-simple-driver-experience');
 
       snowPlowEditBtn.addEventListener('click', function () {
         if (snowPlowEditBtn.disabled) return;
@@ -764,26 +778,58 @@
       snowPlowSaveBtn.addEventListener('click', returnToAltFleetFromSnowPlow);
       snowPlowOverlay.addEventListener('click', function (e) { if (e.target === snowPlowOverlay) returnToAltFleetFromSnowPlow(); });
 
-      // Mutual exclusion: Route Reset - App Experience <-> Automatic Route Reset (Snow Plow only)
-      wireToggle(snowRouteResetAppToggle, function (nowOn) {
+      // Round 5 (2026-08-28) gating, per Paulo: four rows, three exclusive "modes" —
+      //   Mode A = Route Reset - Portal Experience (+ optionally App Experience, which requires Portal)
+      //   Mode B = Automatic Route Reset
+      //   Mode C = Simple Driver Experience
+      // Only one mode is active at a time. Within Mode A, Portal and App can both be on together;
+      // App turning on pulls Portal on with it; Portal turning off cascades App off (App can't
+      // outlive its prerequisite).
+      function snowSetAutomaticFieldVisible(v) { snowAutomaticField.classList.toggle('visible', !!v); }
+
+      wireToggle(snowPortalToggle, function (nowOn) {
         if (nowOn) {
           setToggle(snowAutomaticToggle, false);
-          snowAutomaticField.classList.remove('visible');
+          snowSetAutomaticFieldVisible(false);
+          setToggle(snowSimpleToggle, false);
+        } else if (isOn(snowRouteResetAppToggle)) {
+          // Portal is a prerequisite for App — turning Portal off cascades App off too
+          setToggle(snowRouteResetAppToggle, false);
         }
       });
+
+      wireToggle(snowRouteResetAppToggle, function (nowOn) {
+        if (nowOn) {
+          if (!isOn(snowPortalToggle)) setToggle(snowPortalToggle, true);
+          setToggle(snowAutomaticToggle, false);
+          snowSetAutomaticFieldVisible(false);
+          setToggle(snowSimpleToggle, false);
+        }
+      });
+
       wireToggle(snowAutomaticToggle, function (nowOn) {
         if (nowOn) {
+          setToggle(snowPortalToggle, false);
           setToggle(snowRouteResetAppToggle, false);
-          snowAutomaticField.classList.add('visible');
+          setToggle(snowSimpleToggle, false);
+          snowSetAutomaticFieldVisible(true);
         } else {
-          snowAutomaticField.classList.remove('visible');
+          snowSetAutomaticFieldVisible(false);
+        }
+      });
+
+      wireToggle(snowSimpleToggle, function (nowOn) {
+        if (nowOn) {
+          setToggle(snowPortalToggle, false);
+          setToggle(snowRouteResetAppToggle, false);
+          setToggle(snowAutomaticToggle, false);
+          snowSetAutomaticFieldVisible(false);
         }
       });
 
       // Remaining Snow Plow toggles — visual only, no cross-field behavior
       ['settings-snow-plow-toggle-dashboard-data', 'settings-snow-plow-toggle-switch-routes',
-       'settings-snow-plow-toggle-material-pickup', 'settings-snow-plow-toggle-route-reset-portal',
-       'settings-snow-plow-toggle-simple-driver-experience'].forEach(function (id) {
+       'settings-snow-plow-toggle-material-pickup'].forEach(function (id) {
         wireToggle(document.getElementById(id));
       });
 
@@ -796,6 +842,7 @@
 
       var sweeperAutomaticToggle = document.getElementById('settings-street-sweeping-toggle-automatic-route-reset');
       var sweeperAutomaticField = document.getElementById('settings-street-sweeping-automatic-route-reset-field');
+      var sweeperSimpleToggle = document.getElementById('settings-street-sweeping-toggle-simple-driver-experience');
 
       sweeperEditBtn.addEventListener('click', function () {
         if (sweeperEditBtn.disabled) return;
@@ -812,14 +859,21 @@
       sweeperSaveBtn.addEventListener('click', returnToAltFleetFromSweeper);
       sweeperOverlay.addEventListener('click', function (e) { if (e.target === sweeperOverlay) returnToAltFleetFromSweeper(); });
 
-      // Automatic Route Reset (Street Sweeping) — standalone, no mutual-exclusion partner
+      // Round 5 (2026-08-28): Automatic Route Reset <-> Simple Driver Experience mutual exclusion
+      // (Street Sweeping only has these two rows in the exclusivity group — no Portal/App pair here)
       wireToggle(sweeperAutomaticToggle, function (nowOn) {
         sweeperAutomaticField.classList.toggle('visible', nowOn);
+        if (nowOn) setToggle(sweeperSimpleToggle, false);
+      });
+      wireToggle(sweeperSimpleToggle, function (nowOn) {
+        if (nowOn) {
+          setToggle(sweeperAutomaticToggle, false);
+          sweeperAutomaticField.classList.remove('visible');
+        }
       });
 
       ['settings-street-sweeping-toggle-dashboard-data', 'settings-street-sweeping-toggle-switch-routes',
-       'settings-street-sweeping-toggle-simple-driver-experience', 'settings-street-sweeping-toggle-water-fillup',
-       'settings-street-sweeping-toggle-disposal-data'].forEach(function (id) {
+       'settings-street-sweeping-toggle-water-fillup', 'settings-street-sweeping-toggle-disposal-data'].forEach(function (id) {
         wireToggle(document.getElementById(id));
       });
 
