@@ -137,10 +137,12 @@
   .bt-list.master-off .bt-row .toggle,
   .bt-list.master-off .bt-row .break-type-delete-button,
   .bt-list.master-off .bt-row .bt-input{ pointer-events:none; }
-  .bt-badge{ font-size:10px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; padding:3px 8px; border-radius:10px; white-space:nowrap; }
-  .bt-badge.active{ background:rgba(51,165,66,0.12); color:var(--green); }
-  .bt-badge.inactive{ background:#EEF0F3; color:#8b8f99; }
-  .bt-badge.inuse{ background:#EEF1F8; color:var(--navy); }
+  /* No row-level status badges (Paulo, 09-14). The toggle alone carries active/inactive; "in use" is
+     no longer previewed in the list either — its definition isn't actually confirmed anywhere (real-time
+     selection vs. today's routes vs. something else — see the Jira comment flagged this same session),
+     so it stays purely as the internal gate on whether the confirmation dialog fires (AC7 / SCP-5107 AC1),
+     which already states "currently in use" in its own text when it triggers — nothing is lost by not
+     surfacing it as list chrome the admin has to interpret in advance. */
   .bt-label-wrap{ flex:1; min-width:0; }
   .bt-input{ width:100%; border:none; border-bottom:1px solid var(--border); background:transparent; font-family:inherit; font-size:14px; padding:4px 0; color:var(--text-body); }
   .bt-input:focus{ outline:none; border-bottom-color:var(--navy); }
@@ -468,8 +470,6 @@
             ${labelMarkup}
             ${counterMarkup}
           </div>
-          ${bt.inUse ? '<span class="bt-badge inuse">In use</span>' : ''}
-          <span class="bt-badge ${bt.active ? 'active' : 'inactive'}">${bt.active ? 'Active' : 'Inactive'}</span>
           <div class="bt-row-actions">
             <button class="toggle ${bt.active ? 'on' : ''}" data-idx="${i}" aria-label="Toggle active status"><span class="knob"></span></button>
             ${bt.isDefault ? '' : `<button class="break-type-delete-button" data-idx="${i}" aria-label="Delete break type" title="Delete">${TRASH_ICON}</button>`}
