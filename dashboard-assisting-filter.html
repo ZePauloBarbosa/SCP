@@ -1,0 +1,161 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:Montserrat;font-weight:300;src:url(package/files/montserrat-latin-300-normal.woff2) format('woff2')}
+@font-face{font-family:Montserrat;font-weight:400;src:url(package/files/montserrat-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:Montserrat;font-weight:500;src:url(package/files/montserrat-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:Montserrat;font-weight:600;src:url(package/files/montserrat-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:Montserrat;font-weight:700;src:url(package/files/montserrat-latin-700-normal.woff2) format('woff2')}
+:root{--navy:#20315A;--navy-dark:#242833;--green:#33A542;--bg:#FAFAFC;--border:#E5E7EB;--blue:#0066A6;--toggle-off:#CBD5E1;--acc:#EAEDF2;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Montserrat,sans-serif;background:#fff;color:var(--navy-dark);width:1840px}
+.wrap{display:flex;gap:28px;padding:24px;background:#F1F2F5}
+.state{display:flex;flex-direction:column;gap:10px}
+.state-label{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--navy);text-transform:uppercase}
+.screen{display:flex;width:700px;height:860px;border:1px solid var(--border);border-radius:5px;overflow:hidden;background:#fff}
+.panel{width:355px;flex:none;display:flex;flex-direction:column;box-shadow:rgba(36,40,51,.10) 0 3px 6px;z-index:2;background:#fff}
+.head{padding:14px 16px 10px}
+.title-row{display:flex;justify-content:space-between;align-items:baseline}
+h1{font-size:21px;font-weight:500}
+.link{color:var(--green);font-size:13px;text-decoration:underline}
+.sub{font-size:11px;font-weight:300;color:#555;margin-top:4px}
+.row{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.date{font-size:13px;font-weight:300;border-bottom:1px solid var(--border);width:118px;padding-bottom:6px;display:flex;justify-content:space-between}
+.seg{display:flex;border:1px solid var(--navy);border-radius:2px;overflow:hidden}
+.seg div{width:88px;text-align:center;font-size:13px;padding:6px 0;color:var(--navy)}
+.seg .on{background:var(--navy);color:#fff}
+.search{display:flex;align-items:center;gap:10px;margin-top:14px}
+.search .in{flex:1;font-size:14px;font-weight:300;color:#9AA0AA;border-bottom:1px solid var(--border);padding:6px 0 8px 28px;position:relative}
+.search .in:before{content:"";position:absolute;left:2px;top:7px;width:12px;height:12px;border:1.5px solid #B8BDC6;border-radius:50%}
+.dot{width:20px;height:20px;border-radius:50%;background:var(--navy)}
+.plus{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--navy-dark);text-align:center;line-height:16px;font-size:15px}
+.tg{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:13px}
+.track{width:36px;height:20px;border-radius:10px;background:var(--toggle-off);position:relative;flex:none}
+.track:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff}
+.track.on{background:var(--navy)}
+.track.on:after{left:18px}
+.info{width:12px;height:12px;border-radius:50%;background:#B8BDC6;color:#fff;font-size:9px;text-align:center;line-height:12px;font-weight:700}
+.new{outline:2px dashed var(--green);outline-offset:4px;border-radius:3px}
+.chip{font-size:10px;font-weight:700;color:var(--green);margin-left:auto}
+.list{flex:1;background:#F4F5F7;padding:6px 14px;overflow:hidden;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--border)}
+.count{font-size:11px;font-weight:300;color:#555;padding:4px 2px}
+.card{background:#fff;border:1px solid var(--border);box-shadow:rgba(36,40,51,.08) 0 1px 3px;padding:9px 10px;font-size:13px;line-height:17px}
+.card .top{display:flex;justify-content:space-between}
+.card .st{font-weight:300}
+.badge{display:inline-block;font-size:10px;font-weight:600;color:var(--blue);background:rgba(0,102,166,.10);border-radius:3px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.assist{margin-top:8px;background:var(--acc);border-left:3px solid var(--blue);padding:6px 8px;font-size:12px;line-height:16px}
+.assist .lbl{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--blue);margin-bottom:2px}
+.assist .k{color:#6B7280;font-weight:300;display:inline-block;width:52px}
+.card.ac .row-ac{display:flex;justify-content:space-between}
+.card.ac .right{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between}
+.chev{width:20px;height:17px;margin-bottom:0;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:3px;margin-right:-4px}
+.chev:hover{background:var(--acc)}
+.chev svg{transition:transform .15s}
+.card.ac:not(.collapsed) .chev svg{transform:rotate(180deg)}
+.card.ac.collapsed .assist{display:none}
+.card.ac .left{flex:1}
+.hint{font-size:10px;font-weight:600;color:var(--green);position:absolute;right:46px;bottom:14px}
+.map{flex:1;background:#E8EBEE;position:relative;overflow:hidden}
+.map .road{position:absolute;background:#F7F8F9}
+.map .stamp{position:absolute;z-index:3;top:10px;left:10px;font-size:10px;background:#E2E4E8;padding:3px 6px;border-radius:3px}
+.cl{position:absolute;width:34px;height:34px;border-radius:50%;background:#45B5CC;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px rgba(69,181,204,.25)}
+.notes{width:340px;flex:none;background:#fff;border:1px solid var(--border);border-radius:5px;padding:16px;font-size:12px;line-height:18px;align-self:flex-start;margin-top:22px}
+.notes h2{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px}
+.notes code{font-size:11px;background:var(--acc);padding:0 4px;border-radius:3px}
+.notes ul{padding-left:16px;margin-bottom:10px}
+</style></head><body>
+<div class="wrap">
+
+<!-- STATE A -->
+<div class="state">
+<div class="state-label">A · Default — toggle off, assisting cards closed (click chevron to open)</div>
+<div class="screen">
+ <div class="panel">
+  <div class="head">
+   <div class="title-row"><h1>Filters</h1><span class="link">Apply Last Filters</span></div>
+   <div class="sub">Filters will be applied to your dashboard</div>
+   <div class="row"><div class="date">10/05/2026 <span>⌄</span></div><div class="seg"><div class="on">Vehicles</div><div>Routes</div></div></div>
+   <div class="search"><div class="in">Search</div><div class="dot"></div><div class="plus">+</div></div>
+   <div class="tg"><div class="track"></div>Show Inactive Vehicles <div class="info">i</div></div>
+   <div class="tg new"><div class="track" id="dashboard-assisting-only-toggle"></div>Show Only Assisting <div class="info">i</div><span class="chip">NEW</span></div>
+  </div>
+  <div class="list">
+   <div class="card"><div class="top"><b style="font-weight:500">V-1043</b><span class="st">Active</span></div>A Driver<br>Delivery / Utility</div>
+   <div class="card ac collapsed" id="dashboard-vehicle-card-assisting"><div class="row-ac"><div class="left"><b style="font-weight:500">V-1067</b><span class="badge">Assisting</span><br>B Driver<br>Residential</div><div class="right"><span class="st">Active</span><button class="chev" aria-label="Show assisted vehicle" id="dashboard-assisted-details-chevron"><svg width="12" height="8" viewBox="0 0 12 8"><path d="M1 1.5l5 5 5-5" stroke="#242833" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button></div></div>
+    <div class="assist" id="dashboard-assisted-vehicle-details"><div class="lbl">ASSISTING</div><span class="k">Vehicle</span>V-1023<br><span class="k">Driver</span>C Driver<br><span class="k">Type</span>Residential</div></div>
+   <div class="card"><div class="top"><b style="font-weight:500">V-1023</b><span class="st">Active</span></div>C Driver<br>Residential</div>
+   <div class="card"><div class="top"><b style="font-weight:500">V-1018</b><span class="st">Active</span></div>D Driver<br>Residential</div>
+   <div class="card"><div class="top"><b style="font-weight:500">V-1044</b><span class="st">Active</span></div>E Driver<br>Residential</div>
+   <div class="card"><div class="top"><b style="font-weight:500">V-1013</b><span class="st">Active</span></div>F Driver<br>Delivery / Utility</div>
+   <div class="card"><div class="top"><b style="font-weight:500">V-1036</b><span class="st">Active</span></div>G Driver<br>Residential</div>
+  </div>
+ </div>
+ <div class="map">
+  <div class="stamp">Last Refreshed: 10/05/2026 03:18 PM</div>
+  <div class="road" style="left:0;top:300px;width:100%;height:4px"></div>
+  <div class="road" style="left:150px;top:0;width:4px;height:100%"></div>
+  <div class="road" style="left:0;top:520px;width:100%;height:3px;transform:rotate(-12deg)"></div>
+  <div class="cl" style="left:120px;top:250px">4</div>
+  <div class="cl" style="left:160px;top:330px">17</div>
+  <div class="cl" style="left:140px;top:420px">11</div>
+ </div>
+</div>
+</div>
+
+<!-- STATE B -->
+<div class="state">
+<div class="state-label">B · Show Only Assisting — on, cards open by default (click chevron to close)</div>
+<div class="screen">
+ <div class="panel">
+  <div class="head">
+   <div class="title-row"><h1>Filters</h1><span class="link">Apply Last Filters</span></div>
+   <div class="sub">Filters will be applied to your dashboard</div>
+   <div class="row"><div class="date">10/05/2026 <span>⌄</span></div><div class="seg"><div class="on">Vehicles</div><div>Routes</div></div></div>
+   <div class="search"><div class="in">Search</div><div class="dot"></div><div class="plus">+</div></div>
+   <div class="tg"><div class="track"></div>Show Inactive Vehicles <div class="info">i</div></div>
+   <div class="tg new"><div class="track on"></div>Show Only Assisting <div class="info">i</div><span class="chip">NEW</span></div>
+  </div>
+  <div class="list">
+   <div class="count">3 vehicles assisting</div>
+   <div class="card ac"><div class="row-ac"><div class="left"><b style="font-weight:500">V-1067</b><span class="badge">Assisting</span><br>B Driver<br>Residential</div><div class="right"><span class="st">Active</span><button class="chev" aria-label="Show assisted vehicle"><svg width="12" height="8" viewBox="0 0 12 8"><path d="M1 1.5l5 5 5-5" stroke="#242833" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button></div></div>
+    <div class="assist"><div class="lbl">ASSISTING</div><span class="k">Vehicle</span>V-1023<br><span class="k">Driver</span>C Driver<br><span class="k">Type</span>Residential</div></div>
+   <div class="card ac"><div class="row-ac"><div class="left"><b style="font-weight:500">V-1043</b><span class="badge">Assisting</span><br>A Driver<br>Delivery / Utility</div><div class="right"><span class="st">Active</span><button class="chev" aria-label="Show assisted vehicle"><svg width="12" height="8" viewBox="0 0 12 8"><path d="M1 1.5l5 5 5-5" stroke="#242833" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button></div></div>
+    <div class="assist"><div class="lbl">ASSISTING</div><span class="k">Vehicle</span>V-1013<br><span class="k">Driver</span>F Driver<br><span class="k">Type</span>Delivery / Utility</div></div>
+   <div class="card ac"><div class="row-ac"><div class="left"><b style="font-weight:500">V-1039</b><span class="badge">Assisting</span><br>H Driver<br>Residential</div><div class="right"><span class="st">Active</span><button class="chev" aria-label="Show assisted vehicle"><svg width="12" height="8" viewBox="0 0 12 8"><path d="M1 1.5l5 5 5-5" stroke="#242833" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button></div></div>
+    <div class="assist"><div class="lbl">ASSISTING</div><span class="k">Vehicle</span>V-1036<br><span class="k">Driver</span>G Driver<br><span class="k">Type</span>Residential</div></div>
+  </div>
+ </div>
+ <div class="map">
+  <div class="stamp">Last Refreshed: 10/05/2026 03:18 PM</div>
+  <div class="road" style="left:0;top:300px;width:100%;height:4px"></div>
+  <div class="road" style="left:150px;top:0;width:4px;height:100%"></div>
+  <div class="road" style="left:0;top:520px;width:100%;height:3px;transform:rotate(-12deg)"></div>
+  <div class="cl" style="left:150px;top:330px">3</div>
+ </div>
+</div>
+</div>
+
+<div class="notes">
+ <h2>Show Only Assisting — notes</h2>
+ <ul>
+  <li>New toggle sits under <b>Show Inactive Vehicles</b>; same toggle component (off #CBD5E1, on #20315A).</li>
+  <li>Toggle on → list and map show only vehicles currently in route-assist mode.</li>
+  <li>Assisting cards always show an <b>Assisting</b> tag and a chevron at the bottom-right, aligned with the vehicle type line.</li><li>Chevron opens/closes the assisted-vehicle block: vehicle name, driver, vehicle type of the vehicle being assisted.</li><li>Toggle off → assisting cards start <b>closed</b>. Toggle on → all cards start <b>open</b>; user can close any.</li>
+  <li>Map clusters reflect the filtered set.</li>
+ </ul>
+ <h2>Element IDs</h2>
+ <ul>
+  <li><code>dashboard-assisting-only-toggle</code></li>
+  <li><code>dashboard-vehicle-card-assisting</code></li>
+  <li><code>dashboard-assisted-vehicle-details</code></li>
+  <li><code>dashboard-assisted-details-chevron</code></li>
+ </ul>
+ <p style="color:#6B7280;font-weight:300">Functional reference only. Visuals must match the existing SmartCity Portal. Vehicle and driver values are placeholders.</p>
+</div>
+
+</div>
+<script>
+document.querySelectorAll('.chev').forEach(b=>b.addEventListener('click',()=>{const c=b.closest('.card');c.classList.toggle('collapsed');b.setAttribute('aria-expanded',!c.classList.contains('collapsed'))}));
+</script>
+</body></html>
