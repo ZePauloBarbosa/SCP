@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Route Details — Break Types Mock</title>
+<!--
+  SCP-5110 reference mock — Waste Route Details modal with Break Types.
+  Functional reference only. Visual tokens read from Figma M09kEEo1KNu48sLPl3b2av node 1213:6778 (2026-10-07).
+  Sample data is illustrative. All totals, the legend, and both Total Break Time values are computed from ACTIVITIES below.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Design-system tokens (node 1213:6778) */
+    --scp-navy: #20315a;          /* Navy (Primary) */
+    --scp-navy-dark: #242833;     /* Navy Dark / body text */
+    --scp-green: #33a542;         /* Green (Active) */
+    --scp-bg: #fafafc;            /* Page Background / alt row */
+    --scp-panel: #ffffff;         /* White (Panel) */
+    --scp-border: #e5e7eb;        /* Border */
+    --scp-row-border: #f0f0f2;    /* DataRow divider */
+    --scp-text-2: #80808c;        /* Secondary text / labels */
+    --scp-text-3: #b2b2bf;        /* Empty value (N/A) */
+    --scp-accordion: #eaedf1;     /* AccordionHeader bg */
+    --scp-active-bg: #eef0f7;     /* StatCard active bg — reused for hover highlight */
+    --scp-modal-shadow: 0 8px 32px rgba(0,0,0,.2);
+
+    /* Activity category colours — NOT in the design system (gap flagged); carried from the source mock */
+    --cat-service: #c084fc;
+    --cat-not-servicing: #e5e7eb;
+    --cat-breaktime: #fde68a;
+    --cat-driving-facility: #4ade80;
+    --cat-driving-dump: #a78bfa;
+    --cat-off-route: #f87171;
+    --cat-disposal: #9ca3af;
+    --cat-operational: #3b82f6;
+    --cat-stationary: #67e8f9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    font-weight: 300;
+    background: var(--scp-bg);
+    color: var(--scp-navy-dark);
+  }
+  .rd-page { min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 16px; }
+
+  /* Modal — DS: white, 1px border, 8px radius, 0 8 32 rgba(0,0,0,.2) */
+  .rd-panel {
+    background: var(--scp-panel); width: 100%; max-width: 1024px;
+    border: 1px solid var(--scp-border); border-radius: 8px;
+    box-shadow: var(--scp-modal-shadow); overflow: hidden;
+  }
+
+  /* Header — matches the live Route Details modal (Snow/Sweeper): centred Light title, boxed close button */
+  .rd-header { position: relative; padding: 24px 56px 8px; text-align: center; }
+  .rd-title { font-size: 24px; font-weight: 300; margin: 0; color: var(--scp-navy-dark); }
+  .rd-close-btn {
+    position: absolute; top: 8px; right: 8px; width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border: none; border-radius: 4px; background: #f0f0f2; cursor: pointer; color: var(--scp-text-2); padding: 0;
+  }
+  .rd-close-btn:hover { color: var(--scp-navy-dark); }
+
+  /* Tabs — matches the live Route Details modal (Snow/Sweeper): bordered navy control, square segments */
+  .rd-tabs { display: flex; margin: 16px 24px 0; border: 1px solid var(--scp-navy); border-radius: 4px; overflow: hidden; background: var(--scp-panel); }
+  .rd-tab {
+    flex: 1; height: 32px; font-size: 13px; font-weight: 300; font-family: inherit;
+    border: none; border-left: 1px solid var(--scp-navy); border-radius: 0;
+    cursor: pointer; background: var(--scp-panel); color: var(--scp-navy);
+  }
+  .rd-tab:first-child { border-left: none; }
+  .rd-tab.is-active { background: var(--scp-navy); color: #fff; }
+
+  /* StatCards — DS default state */
+  .rd-stats {
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px;
+    padding: 20px 24px; border-bottom: 1px solid var(--scp-border);
+  }
+  .rd-stat {
+    background: var(--scp-panel); border: 1px solid var(--scp-border); border-radius: 5px;
+    padding: 9px 11px; min-height: 68px; min-width: 0;
+  }
+  .rd-stat-label { display: block; font-size: 9px; font-weight: 500; letter-spacing: .5px; text-transform: uppercase; color: var(--scp-text-2); }
+  .rd-stat-value { display: block; margin-top: 6px; font-size: 22px; font-weight: 300; color: var(--scp-navy-dark); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rd-stat-value.is-empty { color: var(--scp-text-3); }
+
+  /* Route timeline — one lane per vehicle on a shared time axis */
+  .rd-timeline-section { padding: 20px 24px; border-bottom: 1px solid var(--scp-border); }
+  .rd-lane { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .rd-lane-label { font-size: 11px; color: var(--scp-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rd-lane-track { position: relative; height: 24px; background: var(--scp-bg); border: 1px solid var(--scp-border); border-radius: 4px; overflow: hidden; }
+  .rd-lane-seg { position: absolute; top: 0; bottom: 0; }
+  .rd-axis { display: grid; grid-template-columns: 150px 1fr; gap: 12px; }
+  .rd-axis-ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--scp-text-2); font-variant-numeric: tabular-nums; }
+  .rd-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 16px; }
+  .rd-legend-item { display: flex; align-items: center; gap: 6px; }
+  .rd-legend-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+  .rd-legend-label { font-size: 12px; color: var(--scp-navy-dark); white-space: nowrap; }
+
+  /* Collapsible sections — DS AccordionHeader */
+  .rd-section { border-bottom: 1px solid var(--scp-border); }
+  .rd-section-header {
+    width: 100%; height: 36px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 24px; background: var(--scp-accordion); border: none; cursor: pointer;
+    font-family: inherit; text-align: left;
+  }
+  .rd-section-title { font-size: 13px; font-weight: 500; color: var(--scp-navy-dark); }
+  .rd-chevron { width: 16px; height: 16px; color: var(--scp-navy-dark); transition: transform .2s; }
+  .rd-section.is-open .rd-chevron { transform: rotate(180deg); }
+  .rd-section-body { padding: 16px 24px 24px; display: none; }
+  .rd-section.is-open .rd-section-body { display: block; }
+
+  /* DataTable — DS */
+  .rd-table-wrap { border: 1px solid var(--scp-border); border-radius: 5px; overflow-x: auto; }
+  .rd-table { width: 100%; border-collapse: collapse; }
+  .rd-table th {
+    height: 40px; text-align: left; padding: 0 16px; font-size: 11px; font-weight: 300;
+    text-transform: uppercase; color: var(--scp-navy-dark); border-bottom: 1px solid var(--scp-border); white-space: nowrap;
+  }
+  .rd-table td { height: 39px; padding: 0 16px; font-size: 13px; font-weight: 300; color: var(--scp-navy-dark); border-bottom: 1px solid var(--scp-border); white-space: nowrap; }
+  .rd-table tbody tr:nth-child(even) td { background: var(--scp-bg); }
+  .rd-table tbody tr:last-child td { border-bottom: none; }
+
+  /* Time Management mini StatCards */
+  .rd-ministats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+
+  /* Vehicle list — header row uses DataTable header style */
+  .rd-vehicle-grid { display: grid; grid-template-columns: 2fr repeat(6, minmax(0, 1fr)) 24px; gap: 12px; align-items: center; }
+  .rd-col-headers { padding: 0 16px; height: 40px; border-bottom: 1px solid var(--scp-border); margin-bottom: 8px; }
+  .rd-col-header { font-size: 11px; font-weight: 300; text-transform: uppercase; color: var(--scp-navy-dark); white-space: nowrap; }
+
+  .rd-vehicle { border: 1px solid var(--scp-border); border-radius: 5px; margin-bottom: 12px; overflow: hidden; }
+  .rd-vehicle-summary { padding: 12px 16px; background: var(--scp-panel); }
+  .rd-vehicle.is-expanded .rd-vehicle-summary { border-bottom: 1px solid var(--scp-border); }
+  .rd-vehicle-name { font-size: 14px; font-weight: 500; color: var(--scp-navy-dark); }
+  .rd-vehicle-activity-sub { font-size: 12px; color: var(--scp-text-2); margin-top: 2px; }
+  .rd-field-value { font-size: 13px; color: var(--scp-navy-dark); font-variant-numeric: tabular-nums; }
+  .rd-field-value.is-empty { color: var(--scp-text-3); }
+  .rd-vehicle-toggle { border: none; background: none; cursor: pointer; padding: 0; color: var(--scp-navy-dark); justify-self: end; }
+  .rd-vehicle-toggle svg { width: 16px; height: 16px; transition: transform .2s; display: block; }
+  .rd-vehicle.is-expanded .rd-vehicle-toggle svg { transform: rotate(180deg); }
+
+  .rd-vehicle-expanded { background: var(--scp-bg); display: none; }
+  .rd-vehicle.is-expanded .rd-vehicle-expanded { display: block; }
+  .rd-mini-timeline-wrap { padding: 12px 16px; }
+  .rd-mini-bar { display: flex; height: 24px; border-radius: 4px; overflow: hidden; border: 1px solid var(--scp-border); }
+  .rd-mini-bar > div { height: 100%; cursor: pointer; transition: opacity .15s; }
+
+  /* Activity rows — DS DataRow: label Light 11px #80808C, divider #F0F0F2 */
+  .rd-activity-row {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;
+    padding: 10px 16px; border-top: 1px solid var(--scp-row-border); background: var(--scp-panel);
+    transition: background-color .15s;
+  }
+  .rd-activity-row.is-hovered { background: var(--scp-active-bg); }
+  .rd-activity-lead { display: flex; gap: 10px; }
+  .rd-activity-stripe { width: 4px; border-radius: 2px; flex-shrink: 0; }
+  .rd-field-label { font-size: 11px; font-weight: 300; color: var(--scp-text-2); margin-bottom: 2px; }
+  .rd-map-btn { border: none; background: none; cursor: pointer; padding: 0; color: var(--scp-navy-dark); }
+  .rd-map-btn:hover { color: var(--scp-navy); }
+  .rd-map-btn svg { width: 20px; height: 20px; display: block; }
+
+  @media (max-width: 760px) {
+    .rd-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rd-ministats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rd-lane, .rd-axis { grid-template-columns: 90px 1fr; }
+    .rd-col-headers { display: none; }
+    .rd-vehicle-grid { grid-template-columns: 1fr 24px; }
+    .rd-vehicle-grid > .rd-vf-metric { display: none; }
+    .rd-activity-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="rd-page">
+  <div class="rd-panel" id="route-details-panel" role="dialog" aria-labelledby="route-details-title">
+
+    <div class="rd-header">
+      <h1 class="rd-title" id="route-details-title">#01 Mon Resi Trash Details</h1>
+      <button class="rd-close-btn" id="route-details-close-button" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+
+    <div class="rd-tabs" role="tablist">
+      <button class="rd-tab" id="route-details-tab-service" role="tab">Service</button>
+      <button class="rd-tab" id="route-details-tab-fleet" role="tab">Fleet</button>
+      <button class="rd-tab is-active" id="route-details-tab-route" role="tab">Route</button>
+    </div>
+
+    <div class="rd-stats" id="route-details-stats-grid">
+      <div class="rd-stat" id="route-details-stat-trip-time"><span class="rd-stat-label">Total Trip Time</span><span class="rd-stat-value" data-stat="trip"></span></div>
+      <div class="rd-stat" id="route-details-stat-transit-time"><span class="rd-stat-label">Total Transit Time</span><span class="rd-stat-value" data-stat="transit"></span></div>
+      <div class="rd-stat" id="route-details-stat-service-time"><span class="rd-stat-label">Total Service Time</span><span class="rd-stat-value" data-stat="service"></span></div>
+      <div class="rd-stat" id="route-details-stat-not-servicing-time"><span class="rd-stat-label">Total Not Servicing Time</span><span class="rd-stat-value" data-stat="notServicing"></span></div>
+      <div class="rd-stat" id="route-details-stat-facility-time"><span class="rd-stat-label">Total Facility Time</span><span class="rd-stat-value" data-stat="facility"></span></div>
+      <div class="rd-stat" id="route-details-stat-break-time"><span class="rd-stat-label">Total Break Time</span><span class="rd-stat-value" id="route-details-total-break-time" data-stat="breaktime"></span></div>
+      <div class="rd-stat" id="route-details-stat-starting-location"><span class="rd-stat-label">Starting Location</span><span class="rd-stat-value is-empty">-</span></div>
+      <div class="rd-stat" id="route-details-stat-ending-location"><span class="rd-stat-label">Ending Location</span><span class="rd-stat-value is-empty">-</span></div>
+      <div class="rd-stat" id="route-details-stat-loads-dumped"><span class="rd-stat-label">Loads Dumped</span><span class="rd-stat-value" data-stat="loads"></span></div>
+      <div class="rd-stat" id="route-details-stat-water-fillups"><span class="rd-stat-label">Water Fill-ups</span><span class="rd-stat-value">0</span></div>
+    </div>
+
+    <div class="rd-timeline-section" id="route-details-timeline">
+      <div id="route-details-timeline-lanes"></div>
+      <div class="rd-axis"><span></span><div class="rd-axis-ticks" id="route-details-timeline-axis"></div></div>
+      <div class="rd-legend" id="route-details-timeline-legend"></div>
+    </div>
+
+    <div class="rd-section is-open" id="route-details-loads-dumped-section">
+      <button class="rd-section-header" id="route-details-loads-dumped-toggle" aria-expanded="true">
+        <span class="rd-section-title">Loads Dumped</span>
+        <svg class="rd-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+      </button>
+      <div class="rd-section-body">
+        <div class="rd-table-wrap">
+          <table class="rd-table" id="route-details-loads-dumped-table">
+            <thead><tr><th>Vehicle / Driver</th><th>Facility</th><th>Time</th><th>Load #</th><th>Material</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="rd-section is-open" id="route-details-time-management-section">
+      <button class="rd-section-header" id="route-details-time-management-toggle" aria-expanded="true">
+        <span class="rd-section-title">Time Management</span>
+        <svg class="rd-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+      </button>
+      <div class="rd-section-body">
+        <div class="rd-ministats">
+          <div class="rd-stat"><span class="rd-stat-label">Total Breaktime</span><span class="rd-stat-value" id="route-details-total-breaktime-mini" data-stat="breaktime"></span></div>
+          <div class="rd-stat"><span class="rd-stat-label">Total Driving to Dump Debris</span><span class="rd-stat-value" data-stat="drivingDump"></span></div>
+          <div class="rd-stat"><span class="rd-stat-label">Total Off Route</span><span class="rd-stat-value" data-stat="offRoute"></span></div>
+          <div class="rd-stat"><span class="rd-stat-label">Total Facility Transit</span><span class="rd-stat-value" data-stat="drivingFacility"></span></div>
+        </div>
+
+        <div class="rd-vehicle-grid rd-col-headers">
+          <div class="rd-col-header">Vehicle / Driver</div>
+          <div class="rd-col-header">Start Time</div>
+          <div class="rd-col-header">End Time</div>
+          <div class="rd-col-header">Total Time</div>
+          <div class="rd-col-header">Miles</div>
+          <div class="rd-col-header">Segments</div>
+          <div class="rd-col-header">Trips</div>
+          <div></div>
+        </div>
+        <div id="route-details-vehicle-list"></div>
+      </div>
+    </div>
+
+    <div style="height:24px;"></div>
+  </div>
+</div>
+
+<script>
+  // ---------- Categories (label, colour, bucket used for the stat totals) ----------
+  var CATEGORIES = {
+    service:          { label: 'Collecting',               color: 'var(--cat-service)',          bucket: 'service',      prefix: 'Service' },
+    notServicing:     { label: 'Not Servicing',            color: 'var(--cat-not-servicing)',    bucket: 'notServicing', prefix: 'Non Service', outlined: true },
+    breaktime:        { label: 'Breaktime',                color: 'var(--cat-breaktime)',        bucket: 'breaktime',    prefix: 'Non Service' },
+    drivingFacility:  { label: 'Driving to/from Facility', color: 'var(--cat-driving-facility)', bucket: 'transit',      prefix: 'Non Service' },
+    drivingDump:      { label: 'Driving to Dump Debris',   color: 'var(--cat-driving-dump)',     bucket: 'transit',      prefix: 'Non Service' },
+    offRoute:         { label: 'Off Route',                color: 'var(--cat-off-route)',        bucket: 'notServicing', prefix: 'Non Service' },
+    disposal:         { label: 'Disposal Facility Time',   color: 'var(--cat-disposal)',         bucket: 'facility',     prefix: 'Non Service' },
+    operational:      { label: 'Operational Facility Time',color: 'var(--cat-operational)',      bucket: 'facility',     prefix: 'Non Service' },
+    stationary:       { label: 'Stationary Time',          color: 'var(--cat-stationary)',       bucket: 'notServicing', prefix: 'Non Service' }
+  };
+
+  // ---------- Sample data (illustrative — production reads Waste Service History + Break Types, SCP-5103/5104) ----------
+  var DATE = '08/26/2026';
+  var VEHICLES = [
+    { id: '9273', driver: 'Gibb Charles', miles: '9.29', segments: '33 (5.81%)', trips: 1, activities: [
+      ['service',         '03:38:44', '01:35:00'],
+      ['drivingFacility', '05:13:44', '00:18:00'],
+      ['disposal',        '05:31:44', '00:22:00'],
+      ['drivingFacility', '05:53:44', '00:16:00'],
+      ['breaktime',       '06:09:44', '00:30:00'],
+      ['service',         '06:39:44', '01:20:00'],
+      ['notServicing',    '07:59:44', '00:12:30']
+    ]},
+    { id: '1236', driver: 'Rodney Houck', miles: '4.72', segments: '13 (2.29%)', trips: 0, activities: [
+      ['service',         '03:47:52', '01:25:14'],
+      ['notServicing',    '05:13:06', '00:14:00'],
+      ['offRoute',        '05:27:06', '00:08:20'],
+      ['service',         '05:35:26', '01:10:00'],
+      ['breaktime',       '06:45:26', '00:15:00'],
+      ['operational',     '07:00:26', '00:10:00'],
+      ['service',         '07:10:26', '00:45:00']
+    ]}
+  ];
+  var LOADS = [ { vehicle: '9273', driver: 'Gibb Charles', facility: 'Central Disposal', time: '05:40:10', load: 1, material: 'Trash' } ];
+
+  // ---------- Helpers ----------
+  function toSec(hms) { var p = hms.split(':').map(Number); return p[0]*3600 + p[1]*60 + p[2]; }
+  function toHMS(s) { var h = Math.floor(s/3600), m = Math.floor(s%3600/60), x = s%60; return [h,m,x].map(function(n){return String(n).padStart(2,'0');}).join(':'); }
+  function to12h(s, withSec) {
+    var h = Math.floor(s/3600), m = Math.floor(s%3600/60), x = s%60, ap = h >= 12 ? 'PM' : 'AM', hh = h % 12 || 12;
+    return String(hh).padStart(2,'0') + ':' + String(m).padStart(2,'0') + (withSec ? ':' + String(x).padStart(2,'0') : '') + ' ' + ap;
+  }
+  function swatchStyle(cat) { var c = CATEGORIES[cat]; return 'background:' + c.color + ';' + (c.outlined ? 'box-shadow: inset 0 0 0 1px #b2b2bf;' : ''); }
+  var MAP_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7" /></svg>';
+  var CHEVRON = '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" /></svg>';
+
+  // Normalise activities
+  VEHICLES.forEach(function (v) {
+    v.acts = v.activities.map(function (a) { var s = toSec(a[1]), d = toSec(a[2]); return { cat: a[0], start: s, dur: d, end: s + d }; });
+    v.start = v.acts[0].start; v.end = v.acts[v.acts.length - 1].end;
+  });
+  var routeStart = Math.min.apply(null, VEHICLES.map(function (v) { return v.start; }));
+  var routeEnd = Math.max.apply(null, VEHICLES.map(function (v) { return v.end; }));
+
+  // ---------- Totals: one computation feeds every stat card (stats grid + Time Management) ----------
+  var totals = { trip: routeEnd - routeStart, service: 0, notServicing: 0, facility: 0, transit: 0, breaktime: 0, drivingDump: 0, offRoute: 0, drivingFacility: 0 };
+  var present = {};
+  VEHICLES.forEach(function (v) { v.acts.forEach(function (a) {
+    totals[CATEGORIES[a.cat].bucket] += a.dur;
+    if (a.cat in totals && a.cat !== CATEGORIES[a.cat].bucket) totals[a.cat] += a.dur;
+    present[a.cat] = true;
+  }); });
+  document.querySelectorAll('[data-stat]').forEach(function (el) {
+    var key = el.getAttribute('data-stat');
+    el.textContent = key === 'loads' ? LOADS.length : toHMS(totals[key]);
+  });
+
+  // ---------- Route timeline: one lane per vehicle, shared axis ----------
+  var span = routeEnd - routeStart;
+  document.getElementById('route-details-timeline-lanes').innerHTML = VEHICLES.map(function (v) {
+    var segs = v.acts.map(function (a) {
+      return '<div class="rd-lane-seg" title="' + CATEGORIES[a.cat].label + ' · ' + toHMS(a.dur) + '" style="left:' + ((a.start - routeStart) / span * 100) + '%;width:' + (a.dur / span * 100) + '%;' + swatchStyle(a.cat) + '"></div>';
+    }).join('');
+    return '<div class="rd-lane" id="route-details-timeline-lane-' + v.id + '"><span class="rd-lane-label">' + v.id + ' / ' + v.driver + '</span><div class="rd-lane-track">' + segs + '</div></div>';
+  }).join('');
+  document.getElementById('route-details-timeline-axis').innerHTML = [0, .25, .5, .75, 1].map(function (f) { return '<span>' + to12h(Math.round(routeStart + span * f), false) + '</span>'; }).join('');
+
+  // Legend lists only categories that appear in the data, in a fixed order
+  document.getElementById('route-details-timeline-legend').innerHTML = Object.keys(CATEGORIES).filter(function (k) { return present[k]; }).map(function (k) {
+    return '<div class="rd-legend-item"><span class="rd-legend-swatch" style="' + swatchStyle(k) + '"></span><span class="rd-legend-label">' + CATEGORIES[k].label + '</span></div>';
+  }).join('');
+
+  // ---------- Loads Dumped ----------
+  document.querySelector('#route-details-loads-dumped-table tbody').innerHTML = !LOADS.length
+    ? '<tr><td colspan="5" id="route-details-loads-dumped-empty" style="color:var(--scp-text-2)">No loads dumped on this route.</td></tr>'
+    : LOADS.map(function (l) {
+    return '<tr><td>' + l.vehicle + ' / ' + l.driver + '</td><td>' + l.facility + '</td><td>' + DATE + ' ' + to12h(toSec(l.time), true) + '</td><td>' + l.load + '</td><td>' + l.material + '</td></tr>';
+  }).join('');
+
+  // ---------- Vehicle blocks ----------
+  document.getElementById('route-details-vehicle-list').innerHTML = VEHICLES.map(function (v) {
+    var cats = []; v.acts.forEach(function (a) { var l = CATEGORIES[a.cat].label; if (cats.indexOf(l) < 0) cats.push(l); });
+    var vSpan = v.end - v.start;
+    var bar = v.acts.map(function (a, i) {
+      return '<div data-idx="' + i + '" title="' + CATEGORIES[a.cat].label + '" style="width:' + (a.dur / vSpan * 100) + '%;' + swatchStyle(a.cat) + '"></div>';
+    }).join('');
+    var rows = v.acts.map(function (a, i) {
+      var c = CATEGORIES[a.cat];
+      return '<div class="rd-activity-row" data-idx="' + i + '">' +
+        '<div class="rd-activity-lead"><span class="rd-activity-stripe" style="' + swatchStyle(a.cat) + '"></span><div><div class="rd-field-label">Date / Timestamp</div><div class="rd-field-value">' + DATE + ' ' + to12h(a.start, false) + '</div></div></div>' +
+        '<div><div class="rd-field-label">Activity Type</div><div class="rd-field-value">' + c.prefix + ' - ' + c.label + '</div></div>' +
+        '<div><div class="rd-field-label">Duration</div><div class="rd-field-value">' + toHMS(a.dur) + '</div></div>' +
+        '<div><div class="rd-field-label">Location</div><button class="rd-map-btn" id="route-details-vehicle-' + v.id + '-location-' + i + '" aria-label="View location">' + MAP_ICON + '</button></div>' +
+      '</div>';
+    }).join('');
+    return '<div class="rd-vehicle is-expanded" id="route-details-vehicle-' + v.id + '">' +
+      '<div class="rd-vehicle-summary rd-vehicle-grid">' +
+        '<div><div class="rd-vehicle-name">' + v.id + ' / ' + v.driver + '</div><div class="rd-vehicle-activity-sub">' + cats.join(', ') + '</div></div>' +
+        '<div class="rd-field-value rd-vf-metric">' + to12h(v.start, true) + '</div>' +
+        '<div class="rd-field-value rd-vf-metric">' + to12h(v.end, true) + '</div>' +
+        '<div class="rd-field-value rd-vf-metric">' + toHMS(vSpan) + '</div>' +
+        '<div class="rd-field-value rd-vf-metric">' + v.miles + '</div>' +
+        '<div class="rd-field-value rd-vf-metric">' + v.segments + '</div>' +
+        '<div class="rd-field-value rd-vf-metric">' + v.trips + '</div>' +
+        '<button class="rd-vehicle-toggle" id="route-details-vehicle-' + v.id + '-toggle" aria-label="Toggle vehicle ' + v.id + ' detail" aria-expanded="true">' + CHEVRON + '</button>' +
+      '</div>' +
+      '<div class="rd-vehicle-expanded"><div class="rd-mini-timeline-wrap"><div class="rd-mini-bar">' + bar + '</div></div>' + rows + '</div>' +
+    '</div>';
+  }).join('');
+
+  // ---------- Interactions ----------
+  document.querySelectorAll('.rd-tab').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.rd-tab').forEach(function (b) { b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+    });
+  });
+  document.querySelectorAll('.rd-section-header').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var open = btn.closest('.rd-section').classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open);
+    });
+  });
+  document.querySelectorAll('.rd-vehicle-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var open = btn.closest('.rd-vehicle').classList.toggle('is-expanded');
+      btn.setAttribute('aria-expanded', open);
+    });
+  });
+  // Timeline segment <-> activity row hover linking, per vehicle
+  document.querySelectorAll('.rd-vehicle').forEach(function (block) {
+    var segs = block.querySelectorAll('.rd-mini-bar > div'), rows = block.querySelectorAll('.rd-activity-row');
+    function setHover(idx) {
+      segs.forEach(function (s) { s.style.opacity = (idx === null || s.dataset.idx === idx) ? '1' : '.45'; });
+      rows.forEach(function (r) { r.classList.toggle('is-hovered', idx !== null && r.dataset.idx === idx); });
+    }
+    [].concat([].slice.call(segs), [].slice.call(rows)).forEach(function (el) {
+      el.addEventListener('mouseenter', function () { setHover(el.dataset.idx); });
+      el.addEventListener('mouseleave', function () { setHover(null); });
+    });
+  });
+</script>
+
+</body>
+</html>
