@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vehicle Import Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Tokens read from Figma M09kEEo1KNu48sLPl3b2av node 1213:6778 (SCP Design System) */
+:root{
+  --navy:#20315A; --navy-dark:#242833; --green:#33A542; --page:#FAFAFC; --white:#FFFFFF;
+  --border:#E5E7EB; --accordion:#EAEDF2; --stat-active:#EEF1F8; --check-border:#D9D9E1;
+  --toggle-off:#CBD5E1; --seg-bg:#E0E1E8; --scheduled:#0066A6; --muted:#888888;
+  /* Status colours for alerts: not given as hex in the node — placeholders, match live app */
+  --info:#0066A6; --success:#33A542; --warning:#D97706; --error:#DC2626;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Montserrat,sans-serif;background:var(--page);color:var(--navy-dark);font-size:14px}
+.topnav{height:70px;background:var(--navy-dark);display:flex;align-items:center;padding:0 24px;gap:40px}
+.topnav .logo{color:#fff;font-weight:600;font-size:18px;width:140px}
+.topnav a{color:rgba(255,255,255,.8);text-decoration:none;font-size:15px;font-weight:500;height:70px;display:flex;align-items:center;border-bottom:4px solid transparent}
+.topnav a.active{border-bottom-color:var(--green);color:#fff}
+.subnav{height:48px;background:#fff;display:flex;align-items:center;gap:24px;padding:0 32px;border-bottom:1px solid var(--border)}
+.subnav a{font-size:16px;color:var(--navy-dark);text-decoration:none;height:48px;display:flex;align-items:center;border-bottom:3px solid transparent}
+.subnav a.active{color:var(--green);border-bottom-color:var(--green)}
+.page{padding:24px 32px}
+h1{font-size:28px;font-weight:600;color:var(--navy);margin:0 0 16px}
+.btn{font-family:inherit;font-size:14px;border-radius:5px;padding:8px 30px;cursor:pointer}
+.btn-primary{background:var(--navy);color:#fff;border:1px solid var(--navy)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-secondary{background:transparent;color:var(--navy);border:1px solid var(--navy)}
+.btn-link{background:none;border:none;color:var(--scheduled);font-family:inherit;font-size:13px;cursor:pointer;padding:0;text-decoration:underline}
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(36,40,51,.45);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}
+.modal{background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.2);width:100%;max-width:1040px}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--border)}
+.modal-header h2{margin:0;font-size:18px;font-weight:600;color:var(--navy)}
+.modal-header .file{font-size:12px;font-weight:300;color:var(--muted);margin-top:4px}
+.close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--navy-dark)}
+.modal-body{padding:24px}
+.modal-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 24px;border-top:1px solid var(--border)}
+.footer-note{font-size:13px;font-weight:300}
+.footer-actions{display:flex;gap:12px}
+/* Stat cards */
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.stat{width:148px;height:68px;border:1px solid var(--border);border-radius:5px;background:#fff;padding:10px 12px;cursor:pointer;text-align:left;font-family:inherit}
+.stat.active{background:var(--stat-active);border-color:var(--navy)}
+.stat .lbl{font-size:10px;font-weight:700;letter-spacing:.3px;color:var(--navy-dark)}
+.stat .num{font-size:22px;font-weight:600;color:var(--navy)}
+.stat .num.warn{color:var(--warning)} .stat .num.err{color:var(--error)}
+/* Segmented tabs */
+.seg{display:inline-flex;background:var(--seg-bg);border-radius:20px;padding:0;margin-bottom:16px;flex-wrap:wrap}
+.seg button{border:none;background:transparent;font-family:inherit;font-size:14px;padding:9px 16px;border-radius:20px;cursor:pointer;color:var(--navy-dark)}
+.seg button.active{background:var(--navy);color:#fff}
+/* Alerts */
+.alert{position:relative;padding:12px 16px 12px 19px;font-size:13px;border-radius:0 4px 4px 0;margin-bottom:14px;line-height:1.45}
+.alert::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+.alert.info{background:rgba(0,102,166,.09)} .alert.info::before{background:var(--info)}
+.alert.warning{background:rgba(217,119,6,.09)} .alert.warning::before{background:var(--warning)}
+.alert.error{background:rgba(220,38,38,.08)} .alert.error::before{background:var(--error)}
+.alert.success{background:rgba(51,165,66,.09)} .alert.success::before{background:var(--success)}
+/* Table */
+.table-wrap{border:1px solid var(--border);border-radius:5px;overflow-x:auto;background:#fff}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th{font-size:10px;font-weight:700;text-align:left;padding:13px 10px;border-bottom:1px solid var(--border);letter-spacing:.3px;white-space:nowrap}
+td{font-size:14px;font-weight:300;padding:10px;height:39px;border-bottom:1px solid var(--border)}
+tr:nth-child(even) td{background:var(--page)}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;font-size:12px;font-weight:300;padding:3px 8px;border-radius:12px;white-space:nowrap}
+.badge.custom{background:rgba(0,102,166,.1);color:var(--scheduled)}
+.badge.addon{background:rgba(51,165,66,.12);color:#23802F}
+.badge.ready{background:rgba(51,165,66,.12);color:#23802F}
+.badge.error{background:rgba(220,38,38,.1);color:var(--error)}
+.badge.conflict{background:rgba(217,119,6,.12);color:#9A5304}
+.badge.typo{background:rgba(217,119,6,.12);color:#9A5304}
+tr.typo-row td{background:rgba(217,119,6,.06)!important}
+.hint{display:block;font-size:12px;color:var(--warning);margin-top:3px}
+/* Conflict cards */
+.card{border:1px solid var(--border);border-radius:5px;margin-bottom:12px;background:#fff}
+.card-head{background:var(--accordion);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-radius:5px 5px 0 0}
+.card-head strong{font-size:14px;font-weight:600}
+.card-body{padding:12px 16px}
+.card-body p{margin:0 0 10px;font-size:13px;font-weight:300}
+.option{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px;cursor:pointer}
+.option input{accent-color:var(--navy);width:15px;height:15px}
+.resolved{font-size:12px;color:#23802F;font-weight:500}
+.panel{display:none} .panel.active{display:block}
+.success-state{text-align:center;padding:24px}
+.success-state h3{color:var(--navy);font-size:18px;margin:0 0 8px}
+.topnav,.subnav{overflow-x:auto}
+@media (max-width:600px){.topnav{gap:16px;padding:0 16px}.topnav .logo{width:auto}.subnav{padding:0 16px}.page{padding:16px}.modal-body{padding:16px}.stat{width:calc(50% - 6px)}.modal-footer{flex-direction:column;align-items:stretch}.footer-actions{justify-content:flex-end}}
+</style>
+</head>
+<body>
+<nav class="topnav"><span class="logo">⬡ Routeware</span><a href="#">DISPATCH</a><a href="#">CUSTOMERS</a><a href="#" class="active">FLEET</a><a href="#">INSIGHTS</a></nav>
+<div class="subnav"><a href="#" class="active">Vehicles</a><a href="#">Resources</a><a href="#">Devices</a></div>
+<main class="page"><h1>Vehicles</h1></main>
+
+<div class="overlay" id="vehicle-import-review-modal-overlay">
+<div class="modal" role="dialog" aria-labelledby="vehicle-import-review-title" id="vehicle-import-review-modal">
+  <div class="modal-header">
+    <div><h2 id="vehicle-import-review-title">Review Vehicle Import</h2><div class="file">Vehicle Upload Template.xlsx · 26 rows</div></div>
+    <button class="close" id="vehicle-import-review-close-button" aria-label="Close">×</button>
+  </div>
+
+  <div class="modal-body" id="vehicle-import-review-body">
+    <div class="stats">
+      <button class="stat active" id="vehicle-import-review-stat-vehicles" data-tab="vehicles"><div class="lbl">VEHICLES TO IMPORT</div><div class="num">24</div></button>
+      <button class="stat" id="vehicle-import-review-stat-new-subtypes" data-tab="subtypes"><div class="lbl">NEW SUBTYPES</div><div class="num">4</div></button>
+      <button class="stat" id="vehicle-import-review-stat-conflicts" data-tab="conflicts"><div class="lbl">CONFLICTS</div><div class="num warn" id="vehicle-import-review-conflict-count">2</div></button>
+      <button class="stat" id="vehicle-import-review-stat-errors" data-tab="errors"><div class="lbl">ROWS WITH ERRORS</div><div class="num err">2</div></button>
+    </div>
+
+    <div class="alert warning" id="vehicle-import-review-near-match-banner">1 new subtype name is close to an existing one: <strong>“Grapler”</strong> looks like <strong>“Grappler”</strong> (Residential). <button class="btn-link" id="vehicle-import-review-near-match-review-button">Review</button></div>
+
+    <div class="seg" role="tablist">
+      <button class="active" id="vehicle-import-review-tab-vehicles" data-tab="vehicles">Vehicles (24)</button>
+      <button id="vehicle-import-review-tab-subtypes" data-tab="subtypes">New Subtypes (4)</button>
+      <button id="vehicle-import-review-tab-conflicts" data-tab="conflicts">Conflicts (<span id="vehicle-import-review-tab-conflict-count">2</span>)</button>
+      <button id="vehicle-import-review-tab-errors" data-tab="errors">Errors (2)</button>
+    </div>
+
+    <!-- Vehicles -->
+    <section class="panel active" id="vehicle-import-review-panel-vehicles">
+      <div class="table-wrap"><table id="vehicle-import-review-vehicles-table">
+        <thead><tr><th>ROW</th><th>VEHICLE NAME</th><th>VEHICLE TYPE</th><th>VEHICLE SUBTYPE</th><th>ADD-ON</th><th>STATUS</th></tr></thead>
+        <tbody>
+          <tr><td>2</td><td>FL-101</td><td>Front Load</td><td>Rear Loader XL <span class="badge custom">New</span></td><td>No</td><td><span class="badge conflict" data-c="c1">Conflict</span></td></tr>
+          <tr><td>3</td><td>FL-102</td><td>Front Load</td><td>Front Load</td><td>No</td><td><span class="badge ready">Ready</span></td></tr>
+          <tr><td>4</td><td>FL-103</td><td>Front Load</td><td>Rear Loader XL <span class="badge custom">New</span></td><td>No</td><td><span class="badge conflict" data-c="c1">Conflict</span></td></tr>
+          <tr><td>5</td><td>RO-201</td><td>Roll off</td><td>Compactor</td><td>No</td><td><span class="badge ready">Ready</span></td></tr>
+          <tr><td>6</td><td>TR-01</td><td>Roll off</td><td>Pup Trailer <span class="badge custom">New</span></td><td>Yes</td><td><span class="badge conflict" data-c="c2">Conflict</span></td></tr>
+          <tr><td>7</td><td>TR-02</td><td>Roll off</td><td>Pup Trailer <span class="badge custom">New</span></td><td>Yes</td><td><span class="badge conflict" data-c="c2">Conflict</span></td></tr>
+          <tr><td>8</td><td>SP-01</td><td>Snow Plow</td><td>Wing Plow <span class="badge custom">New</span></td><td>Yes</td><td><span class="badge ready">Ready</span></td></tr>
+          <tr><td>9</td><td>RES-301</td><td>Residential</td><td id="vehicle-import-review-row-9-subtype">Grapler <span class="badge custom">New</span></td><td>No</td><td id="vehicle-import-review-row-9-status"><span class="badge typo">Possible typo</span></td></tr>
+          <tr><td>10</td><td>RES-302</td><td>Residential</td><td>Side Load</td><td>No</td><td><span class="badge error">Error</span></td></tr>
+          <tr><td colspan="6" style="font-size:12px;color:var(--muted)">… 17 more rows</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- New subtypes -->
+    <section class="panel" id="vehicle-import-review-panel-subtypes">
+      <div class="alert warning" id="vehicle-import-review-near-match-alert">Possible typo: “Grapler” is 1 letter away from the existing subtype “Grappler”. Choose <strong>Use Grappler instead</strong> to assign row 9 to the existing subtype, or leave it to create “Grapler” as a new subtype.</div>
+      <div class="alert info">These subtypes don't exist yet and will be created with the import. Check each name for typos. An add-on can't be changed back into a subtype after it's created.</div>
+      <div class="table-wrap"><table id="vehicle-import-review-new-subtypes-table">
+        <thead><tr><th>SUBTYPE NAME</th><th>VEHICLE TYPE</th><th>KIND</th><th>ALLOWS ADD-ONS</th><th>PRE &amp; POST TRIP</th><th>VEHICLES</th></tr></thead>
+        <tbody>
+          <tr><td>Rear Loader XL</td><td>Front Load</td><td><span class="badge custom">Custom</span></td><td id="vehicle-import-review-new-subtype-rear-loader-xl-allows-addons"><span class="badge conflict">Conflict</span></td><td>No</td><td>3</td></tr>
+          <tr><td>Pup Trailer</td><td>Roll off</td><td><span class="badge addon">Add-on</span></td><td>—</td><td id="vehicle-import-review-new-subtype-pup-trailer-pre-post"><span class="badge conflict">Conflict</span></td><td>2</td></tr>
+          <tr><td>Wing Plow</td><td>Snow Plow</td><td><span class="badge addon">Add-on</span></td><td>—</td><td>Yes</td><td>1</td></tr>
+          <tr id="vehicle-import-review-new-subtype-grapler-row" class="typo-row"><td><span id="vehicle-import-review-grapler-name">Grapler</span><span class="hint" id="vehicle-import-review-grapler-hint">Looks like the existing Residential subtype “Grappler”. Importing as-is creates a second, separate subtype. <button class="btn-link" id="vehicle-import-review-use-existing-grappler-button">Use Grappler instead</button></span></td><td>Residential</td><td><span class="badge custom">Custom</span></td><td>No</td><td>No</td><td>1</td></tr>
+        </tbody>
+      </table></div>
+      <div class="alert warning" style="margin-top:14px">Row 14 sets <strong>Allows Add-ons = Y</strong> for the existing subtype “Batch Side Load”. Existing subtypes keep their saved settings (Allows Add-ons = N). Change them on the Configure Vehicle Subtypes page.</div>
+    </section>
+
+    <!-- Conflicts -->
+    <section class="panel" id="vehicle-import-review-panel-conflicts">
+      <div class="alert warning">Rows that create the same new subtype disagree on its settings. Choose one value for each. The value applies to every vehicle with that subtype.</div>
+
+      <div class="card" id="vehicle-import-review-conflict-rear-loader-xl">
+        <div class="card-head"><strong>Rear Loader XL · Front Load · Allows Add-ons</strong><span class="resolved" id="vehicle-import-review-conflict-rear-loader-xl-status"></span></div>
+        <div class="card-body">
+          <p>Rows 2, 4 and 11 create this subtype with different values.</p>
+          <label class="option"><input type="radio" name="c1" value="Y" id="vehicle-import-review-conflict-rear-loader-xl-option-y"> Yes (rows 2, 11)</label>
+          <label class="option"><input type="radio" name="c1" value="N" id="vehicle-import-review-conflict-rear-loader-xl-option-n"> No (row 4)</label>
+        </div>
+      </div>
+
+      <div class="card" id="vehicle-import-review-conflict-pup-trailer">
+        <div class="card-head"><strong>Pup Trailer · Roll off · Pre &amp; Post Trip Inspection</strong><span class="resolved" id="vehicle-import-review-conflict-pup-trailer-status"></span></div>
+        <div class="card-body">
+          <p>Rows 6 and 7 create this add-on with different values.</p>
+          <label class="option"><input type="radio" name="c2" value="Y" id="vehicle-import-review-conflict-pup-trailer-option-y"> Yes (row 6)</label>
+          <label class="option"><input type="radio" name="c2" value="N" id="vehicle-import-review-conflict-pup-trailer-option-n"> No (row 7)</label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Errors -->
+    <section class="panel" id="vehicle-import-review-panel-errors">
+      <div class="alert error">These rows won't be imported. They come back in the error file after the import, with the problem cell highlighted.</div>
+      <div class="table-wrap"><table id="vehicle-import-review-errors-table">
+        <thead><tr><th>ROW</th><th>VEHICLE NAME</th><th>FIELD</th><th>PROBLEM</th></tr></thead>
+        <tbody>
+          <tr><td>10</td><td>RES-302</td><td>Unavailable End Date</td><td>Must be on or after Unavailable Start Date</td></tr>
+          <tr><td>19</td><td>—</td><td>Vehicle Name</td><td>Required when adding a new vehicle</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <div class="success-state panel" id="vehicle-import-review-success">
+      <div class="alert success" style="text-align:left">22 vehicles imported. 4 subtypes created. 2 rows skipped.</div>
+      <h3>Import complete</h3>
+      <button class="btn btn-secondary" id="vehicle-import-review-download-errors-button">Download error file</button>
+    </div>
+  </div>
+
+  <div class="modal-footer" id="vehicle-import-review-footer">
+    <span class="footer-note" id="vehicle-import-review-footer-note">Resolve 2 conflicts to continue. 2 rows with errors will be skipped.</span>
+    <div class="footer-actions">
+      <button class="btn btn-secondary" id="vehicle-import-review-cancel-button">Cancel</button>
+      <button class="btn btn-primary" id="vehicle-import-review-confirm-button" disabled>Import 22 vehicles</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  const tabs=['vehicles','subtypes','conflicts','errors'];
+  function show(t){
+    tabs.forEach(n=>{
+      document.getElementById('vehicle-import-review-panel-'+n).classList.toggle('active',n===t);
+      document.getElementById('vehicle-import-review-tab-'+n).classList.toggle('active',n===t);
+      const s=document.querySelector('.stat[data-tab="'+n+'"]'); if(s) s.classList.toggle('active',n===t);
+    });
+  }
+  document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+
+  const conflicts=[
+    {name:'c1',id:'rear-loader-xl',cell:'vehicle-import-review-new-subtype-rear-loader-xl-allows-addons'},
+    {name:'c2',id:'pup-trailer',cell:'vehicle-import-review-new-subtype-pup-trailer-pre-post'}
+  ];
+  function update(){
+    let open=0;
+    conflicts.forEach(c=>{
+      const sel=document.querySelector('input[name="'+c.name+'"]:checked');
+      const st=document.getElementById('vehicle-import-review-conflict-'+c.id+'-status');
+      if(sel){st.textContent='✓ Using '+(sel.value==='Y'?'Yes':'No');document.getElementById(c.cell).textContent=sel.value==='Y'?'Yes':'No';}
+      else open++;
+      if(sel) document.querySelectorAll('[data-c="'+c.name+'"]').forEach(b=>{b.className='badge ready';b.textContent='Ready';});
+    });
+    document.getElementById('vehicle-import-review-conflict-count').textContent=open;
+    document.getElementById('vehicle-import-review-tab-conflict-count').textContent=open;
+    const btn=document.getElementById('vehicle-import-review-confirm-button');
+    btn.disabled=open>0;
+    document.getElementById('vehicle-import-review-footer-note').textContent=
+      (open>0?'Resolve '+open+' conflict'+(open>1?'s':'')+' to continue. ':'All conflicts resolved. ')+'2 rows with errors will be skipped.';
+  }
+  document.getElementById('vehicle-import-review-near-match-review-button').addEventListener('click',()=>show('subtypes'));
+  document.querySelectorAll('input[type=radio]').forEach(r=>r.addEventListener('change',update));
+
+  document.getElementById('vehicle-import-review-use-existing-grappler-button').addEventListener('click',()=>{
+    document.getElementById('vehicle-import-review-new-subtype-grapler-row').style.display='none';
+    document.getElementById('vehicle-import-review-row-9-subtype').textContent='Grappler';
+    document.getElementById('vehicle-import-review-row-9-status').innerHTML='<span class="badge ready">Ready</span>';
+    document.getElementById('vehicle-import-review-near-match-alert').className='alert success';
+    document.getElementById('vehicle-import-review-near-match-alert').textContent='Row 9 now uses the existing subtype “Grappler”. No new subtype will be created for it.';
+    document.getElementById('vehicle-import-review-near-match-banner').style.display='none';
+    document.querySelector('#vehicle-import-review-stat-new-subtypes .num').textContent='3';
+    document.getElementById('vehicle-import-review-tab-subtypes').textContent='New Subtypes (3)';
+  });
+
+  document.getElementById('vehicle-import-review-confirm-button').addEventListener('click',()=>{
+    tabs.forEach(n=>document.getElementById('vehicle-import-review-panel-'+n).classList.remove('active'));
+    document.querySelector('.stats').style.display='none';document.querySelector('.seg').style.display='none';
+    document.getElementById('vehicle-import-review-success').classList.add('active');
+    document.getElementById('vehicle-import-review-footer').style.display='none';
+  });
+  const close=()=>{document.getElementById('vehicle-import-review-modal-overlay').style.display='none'};
+  document.getElementById('vehicle-import-review-close-button').addEventListener('click',close);
+  document.getElementById('vehicle-import-review-cancel-button').addEventListener('click',close);
+})();
+</script>
+</body>
+</html>
