@@ -287,7 +287,7 @@ const row = (r,i,pre)=>`<tr id="${pre}-row-${i+1}"><td>${r.name}</td><td class="
 // The new version keeps the original and is added as "<route name> ER"
 const imported = templates.filter(t=>t.erStops).map(t=>({...t, name:`${t.name} ER`, stops:t.erStops}));
 
-const renderPlanner = rows => $("planner-body").innerHTML = rows.map(t=>`<tr><td><input type="checkbox" class="cb"></td><td>${t.name}</td><td style="font-size:12px">${t.material}</td><td>${t.day}</td><td class="num">${t.stops}</td><td>${t.type}</td><td><span class="badge active">Active</span></td><td>&#9998; &#128465;</td></tr>`).join("");
+const renderPlanner = rows => $("planner-body").innerHTML = rows.map(t=>`<tr><td><input type="checkbox" class="cb"></td><td>${t.name}</td><td style="font-size:12px">${t.material}</td><td>${t.day}</td><td class="num">${t.stops}</td><td>${t.type}</td><td>${t.inactive?'<span class="badge inactive">Inactive</span>':'<span class="badge active">Active</span>'}</td><td>&#9998; &#128465;</td></tr>`).join("");
 renderPlanner(templates);
 let importDone=false;
 $("er-imported-body").innerHTML = imported.map((r,i)=>row(r,i,"er-imported")).join("");
@@ -309,7 +309,7 @@ document.addEventListener("click", ()=>$("route-planner-more-menu").classList.re
 $("route-planner-easyroute-import-button").onclick = ()=>{
   $("route-planner-more-menu").classList.remove("open");
   // First click runs the import: the "<name> ER" versions appear in Route Planner
-  if(!importDone){ renderPlanner([...templates, ...imported]); $("route-planner-easyroute-import-result-alert").style.display=""; importDone=true; }
+  if(!importDone){ templates.forEach(t=>{ if(t.erStops) t.inactive=true; }); renderPlanner([...templates, ...imported]); $("route-planner-easyroute-import-result-alert").style.display=""; importDone=true; }
   $("er-unmatched-overlay").classList.add("open");
 };
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") close(); });
