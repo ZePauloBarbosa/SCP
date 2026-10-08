@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EasyRoute Import Review — SCP Mock</title>
+<title>EasyRoute Import Unmatched Routes — SCP Mock</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Tokens — read from Figma M09kEEo1KNu48sLPl3b2av node 1213:6778 */
@@ -157,6 +157,13 @@ tr.row-off td{opacity:.5}
 .toast.show{display:flex}
 .mocknote{font-size:11px;color:var(--muted);text-align:center;margin-top:24px}
 </style>
+<style>
+.modal.sm{max-width:640px}
+.m-foot.end{justify-content:flex-end;align-items:center;gap:12px}
+.unm td{height:39px}
+section+section{margin-top:24px}
+.sec{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin:0 0 8px}
+</style>
 </head>
 <body>
 
@@ -173,22 +180,17 @@ tr.row-off td{opacity:.5}
     <div><h1>Route Planner</h1><a class="beta">Try Beta</a></div>
     <div class="actions">
       <div class="menu-wrap">
-        <button class="btn secondary" id="route-planner-more-button" aria-haspopup="menu">More<span class="dot" id="route-planner-more-pending-dot"></span><span class="caret">&#9660;</span></button>
+        <button class="btn secondary" id="route-planner-more-button" aria-haspopup="menu">More<span class="caret">&#9660;</span></button>
         <div class="menu" id="route-planner-more-menu" role="menu">
-          <button class="item" role="menuitem" id="route-planner-easyroute-import-button">Import from EasyRoute <span class="badge new" id="route-planner-easyroute-pending-count">6 NEW</span></button>
+          <button class="item" role="menuitem" id="route-planner-easyroute-import-button">Import from EasyRoute</button>
         </div>
       </div>
       <button class="btn">Plan A Route</button>
     </div>
   </div>
 
-  <div class="alert info" id="route-planner-easyroute-pending-alert">
-    <div class="grow" id="route-planner-easyroute-pending-text"></div>
-    <button class="link" id="route-planner-easyroute-review-link">Review routes</button>
-  </div>
-  <div class="alert success toast" id="route-planner-import-success-alert">
-    <div class="grow" id="success-text"></div>
-    <button class="link" id="route-planner-rtb-session-link" style="display:none">Open session</button>
+  <div class="alert success" id="route-planner-easyroute-import-result-alert" style="display:none">
+    <div class="grow" id="route-planner-easyroute-import-result-text"></div>
   </div>
 
   <div class="panel">
@@ -203,331 +205,123 @@ tr.row-off td{opacity:.5}
       <tbody id="planner-body"></tbody>
     </table>
   </div>
-  <p class="mocknote">Functional reference only — SCP-5157 · EasyRoute import: staged review (Phase 2). All visuals must match the existing SmartCity Portal look and feel.</p>
+  <p class="mocknote">Functional reference only — SCP-5156 · EasyRoute → SmartCity push (Phase 1): import results. All visuals must match the existing SmartCity Portal look and feel.</p>
 </main>
 
 <div class="bottombar">
   <button class="btn small">Schedule (1)</button><button class="btn small">Add To Groups (1)</button><button class="btn small">Export Route Upload Template (1)</button><button class="btn small">EasyRoute Export (1)</button>
 </div>
 
-<!-- ========== Import review modal ========== -->
-<div class="overlay" id="er-import-overlay">
-  <div class="modal" id="er-import-modal" role="dialog" aria-labelledby="er-import-title">
+<!-- ========== Unmatched routes modal ========== -->
+<div class="overlay" id="er-unmatched-overlay">
+  <div class="modal sm" id="er-unmatched-modal" role="dialog" aria-labelledby="er-unmatched-title">
     <div class="m-head">
-      <div><h2 id="er-import-title" style="display:inline">EasyRoute route importer</h2><span class="sub">Routes pushed from EasyRoute · 07 Oct 2026 14:32</span></div>
-      <button class="x" id="er-import-close-button" aria-label="Close">&times;</button>
+      <div><h2 id="er-unmatched-title">EasyRoute import</h2></div>
+      <button class="x" id="er-unmatched-close-button" aria-label="Close">&times;</button>
     </div>
-
     <div class="m-body">
-      <div class="alert error" id="er-import-failed-alert" style="display:none">
+      <div class="hint" style="font-size:12px;margin-bottom:16px">Published from EasyRoute · 07 Oct 2026 14:32 · <span id="er-unmatched-summary"></span></div>
+      <div class="alert error" id="er-import-failed-alert">
         <div class="grow" id="er-import-failed-text"></div>
       </div>
-      <div class="stats">
-        <div class="stat"><div class="l">ROUTES TO REVIEW</div><div class="v" id="st-routes">6</div><div class="u">Routes</div></div>
-        <div class="stat"><div class="l">STOPS</div><div class="v" id="st-stops">0</div><div class="u">Across all routes</div></div>
-        <div class="stat warn"><div class="l">STOPS CHANGED</div><div class="v" id="st-drift">0</div><div class="u">Routes</div></div>
-      </div>
-
-      <div class="alert warn" id="er-import-drift-alert">
-        <div class="grow" id="er-import-drift-text"></div>
-      </div>
-
-      <div class="panel" style="overflow-x:auto">
-        <table class="imp">
-          <thead><tr>
-            <th style="width:36px"><input type="checkbox" class="cb" id="er-import-select-all" checked></th>
-            <th style="min-width:160px">Original route name</th>
-            <th style="min-width:210px">New route name</th>
-            <th>Original stops</th>
-            <th>New stops</th>
-            <th>Old frequency</th>
-            <th style="min-width:190px">New frequency</th>
-            <th>Generate TP</th>
-            <th style="min-width:230px">Import as</th>
-            <th>Checks</th>
-          </tr></thead>
-          <tbody id="er-import-body"></tbody>
-        </table>
-      </div>
-      <p class="hint" style="margin-top:8px">Choose how each route imports in the Import as column. Select a new route name to preview its stops and map. Use the pencil to rename it before import.</p>
-    </div>
-
-    <div class="m-foot" style="justify-content:flex-end;align-items:center">
-      <div style="margin-right:auto"><div class="err-text" id="er-import-validation" style="text-align:left;max-width:none"></div><div class="hint" id="er-import-schedule-hint"></div></div>
-      <button class="btn secondary" id="er-import-cancel-button">Cancel</button>
-      <button class="btn" id="er-import-confirm-button">Import 6 routes</button>
-      <div class="menu-wrap">
-        <button class="btn secondary" id="er-import-schedule-button" aria-haspopup="dialog">Schedule<span class="caret">&#9650;</span></button>
-        <div class="menu up" id="er-import-schedule-menu">
-          <div class="pad">
-            <label for="er-import-schedule-date">Import on</label>
-            <input type="date" class="f" id="er-import-schedule-date" value="2026-10-19" style="width:100%">
-            <div class="hint" style="margin:6px 0 12px">Original routes stay in use until this date.</div>
-            <button class="btn small" id="er-import-schedule-confirm-button" style="width:100%">Schedule 6 routes</button>
-          </div>
+      <section id="er-imported-section">
+        <h4 class="sec">Imported as new version</h4>
+        <div class="panel">
+          <table class="unm" id="er-imported-table">
+            <thead><tr><th>Route name</th><th style="text-align:right">Stops</th></tr></thead>
+            <tbody id="er-imported-body"></tbody>
+          </table>
         </div>
-      </div>
+      </section>
+      <section id="er-unmatched-section">
+        <h4 class="sec">No matching route template</h4>
+        <div class="alert warn">
+          <div class="grow">No route template in SmartCity has the same name, so these routes were not imported.</div>
+        </div>
+        <div class="panel">
+          <table class="unm" id="er-unmatched-table">
+            <thead><tr><th>Route name</th><th style="text-align:right">Stops</th></tr></thead>
+            <tbody id="er-unmatched-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <section id="er-import-failed-section">
+        <h4 class="sec">Failed to import</h4>
+        <div class="panel">
+          <table class="unm" id="er-import-failed-table">
+            <thead><tr><th>Route name</th><th style="text-align:right">Stops</th></tr></thead>
+            <tbody id="er-import-failed-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+    <div class="m-foot end">
+      <button class="btn secondary" id="er-unmatched-download-button">Download</button>
+      <button class="btn" id="er-unmatched-ok-button">OK</button>
     </div>
   </div>
 </div>
 
-<!-- ========== Preview drawer ========== -->
-<aside class="drawer" id="er-import-preview-drawer" aria-hidden="true">
-  <div class="d-head">
-    <div><h3 id="pv-title">Route preview</h3><div class="hint" id="pv-sub"></div></div>
-    <button class="x" id="er-import-preview-close-button" aria-label="Close preview">&times;</button>
-  </div>
-  <div class="d-body">
-    <div class="kv" id="pv-kv"></div>
-    <svg class="map" id="pv-map" viewBox="0 0 500 220" preserveAspectRatio="none"></svg>
-    <div class="legend">
-      <span><i style="background:var(--navy)"></i>New sequence</span>
-      <span><i style="background:var(--green)"></i>Added in SmartCity after export</span>
-      <span><i style="background:var(--warn)"></i>On a different route</span>
-    </div>
-    <div class="acc">Stop changes</div>
-    <table class="stops"><thead><tr><th>Seq</th><th>Address</th><th>Old seq</th><th>Change</th></tr></thead><tbody id="pv-stops"></tbody></table>
-  </div>
-</aside>
-
 <script>
 const templates = [
-  {name:"com thursday", material:"Absorbent Hygiene Products (AHP)", day:"Thursday", stops:88, type:"Commercial", freq:"Weekly · Thursday"},
-  {name:"dom friday", material:"Absorbent Hygiene Products (AHP)", day:"Friday", stops:389, type:"Domestic", freq:"Weekly · Friday"},
-  {name:"dom thursday", material:"Absorbent Hygiene Products (AHP)", day:"Thursday", stops:412, type:"Domestic", freq:"Weekly · Thursday"},
-  {name:"garden comm", material:"Garden", day:"Monday", stops:64, type:"Commercial", freq:"Fortnightly · Monday (Wk A)"},
-  {name:"garden dom", material:"Garden", day:"Monday", stops:520, type:"Domestic", freq:"Fortnightly · Monday (Wk A)"},
-  {name:"Uk template", material:"Plastics", day:"Wednesday", stops:140, type:"Domestic", freq:"Weekly · Wednesday"},
-  {name:"york", material:"Absorbent Hygiene Products (AHP)", day:"Friday", stops:140, type:"Commercial", freq:"Weekly · Friday"},
+  {name:"com thursday", material:"Absorbent Hygiene Products (AHP)", day:"Thursday", stops:88, type:"Commercial", erStops:92},
+  {name:"dom friday", material:"Absorbent Hygiene Products (AHP)", day:"Friday", stops:389, type:"Domestic", erStops:371},
+  {name:"dom thursday", material:"Absorbent Hygiene Products (AHP)", day:"Thursday", stops:412, type:"Domestic", erStops:438},
+  {name:"garden comm", material:"Garden", day:"Monday", stops:64, type:"Commercial"},
+  {name:"garden dom", material:"Garden", day:"Monday", stops:520, type:"Domestic", erStops:505},
+  {name:"Uk template", material:"Plastics", day:"Wednesday", stops:140, type:"Domestic"},
+  {name:"york", material:"Absorbent Hygiene Products (AHP)", day:"Friday", stops:140, type:"Commercial"},
 ];
-const freqs = ["Weekly · Monday","Weekly · Tuesday","Weekly · Wednesday","Weekly · Thursday","Weekly · Friday","Fortnightly · Monday (Wk A)","Fortnightly · Monday (Wk B)","Fortnightly · Tuesday (Wk A)","Fortnightly · Friday (Wk A)","Fortnightly · Friday (Wk B)"];
-const MODES = {
-  replace:"Replace original",
-  newInactive:"New · original inactive",
-  newKeep:"New · original stays active",
-  new:"Create new",
-  rtb:"Route Template Builder"
-};
-// Next Route Template Builder session number for EasyRoute imports (increments per import)
-let rtbSessionNo = 3;
-
-// Routes pushed from EasyRoute. "drift" = stops that changed in SmartCity after the export.
-const routes = [
-  {id:1, orig:"dom thursday", newName:"Dom Thursday R1", newStops:438, newFreq:"Weekly · Thursday", tp:true, drift:{added:4,other:2}, mode:"replace"},
-  {id:2, orig:"dom friday", newName:"Dom Friday R1", newStops:371, newFreq:"Fortnightly · Friday (Wk A)", tp:true, drift:{added:0,other:18}, mode:"newInactive"},
-  {id:3, orig:"garden dom", newName:"Garden Dom Mon", newStops:505, newFreq:"Fortnightly · Monday (Wk A)", tp:false, drift:{added:0,other:15}, mode:"rtb"},
-  {id:4, orig:"com thursday", newName:"Comm Thursday", newStops:92, newFreq:"Weekly · Thursday", tp:false, drift:{added:4,other:0}, mode:"newKeep"},
-  {id:5, orig:"", newName:"Dom Tuesday R2", newStops:344, newFreq:"Weekly · Tuesday", tp:true, drift:null, mode:"new"},
-  {id:6, orig:"york", newName:"York Fri", newStops:137, newFreq:"Weekly · Friday", tp:false, drift:{added:0,other:3}, mode:"replace", failOnce:true},
+// Routes published from EasyRoute with no matching SmartCity route template
+const unmatched = [
+  {name:"dom monday", stops:402},
+  {name:"garden tuesday", stops:318},
 ];
-routes.forEach(r=>r.sel=true);
-const tpl = n => templates.find(t=>t.name===n);
+// Routes that failed to transfer (communication error)
+const failed = [
+  {name:"york", stops:141},
+];
 const $ = id => document.getElementById(id);
-const stopsChanged = r => { const t=tpl(r.orig); return !!(r.drift || (t && t.stops!==r.newStops)); };
+const row = (r,i,pre)=>`<tr id="${pre}-row-${i+1}"><td>${r.name}</td><td class="num" style="text-align:right">${r.stops}</td></tr>`;
+// Matched by exact route name -> imported as a new version of that route template
+// The new version keeps the original and is added as "<route name> ER"
+const imported = templates.filter(t=>t.erStops).map(t=>({...t, name:`${t.name} ER`, stops:t.erStops}));
 
-const addedRows=[];
-function renderPlanner(extra=[]){
-  addedRows.push(...extra);
-  const rows = [...templates.map(t=>({...t,status:t.status||"Active"})), ...addedRows];
-  $("planner-body").innerHTML = rows.map(t=>`<tr><td><input type="checkbox" class="cb"></td><td>${t.name}${t.isNew?' <span class="badge new">NEW</span>':''}</td><td style="font-size:12px">${t.material}</td><td>${t.day}</td><td class="num">${t.stops}</td><td>${t.type}</td><td><span class="badge ${t.status.toLowerCase()}">${t.status}</span></td><td>&#9998; &#128465;</td></tr>`).join("");
-}
+const renderPlanner = rows => $("planner-body").innerHTML = rows.map(t=>`<tr><td><input type="checkbox" class="cb"></td><td>${t.name}</td><td style="font-size:12px">${t.material}</td><td>${t.day}</td><td class="num">${t.stops}</td><td>${t.type}</td><td>${t.inactive?'<span class="badge inactive">Inactive</span>':'<span class="badge active">Active</span>'}</td><td>&#9998; &#128465;</td></tr>`).join("");
+renderPlanner(templates);
+let importDone=false;
+$("er-imported-body").innerHTML = imported.map((r,i)=>row(r,i,"er-imported")).join("");
+$("er-unmatched-body").innerHTML = unmatched.map((r,i)=>row(r,i,"er-unmatched")).join("");
+$("er-import-failed-body").innerHTML = failed.map((r,i)=>row(r,i,"er-import-failed")).join("");
+$("er-imported-section").style.display = imported.length ? "" : "none";
+$("er-unmatched-section").style.display = unmatched.length ? "" : "none";
+$("er-import-failed-section").style.display = failed.length ? "" : "none";
+$("er-import-failed-alert").style.display = failed.length ? "" : "none";
+$("er-import-failed-text").innerHTML = `<b>${failed.length} route${failed.length===1?'':'s'} failed to import.</b> Communication with SmartCity failed. Publish ${failed.length===1?'it':'them'} again from EasyRoute.`;
+$("er-unmatched-summary").textContent = `${imported.length} imported, ${unmatched.length} not matched${failed.length?`, ${failed.length} failed`:''}`;
+$("route-planner-easyroute-import-result-text").innerHTML = `<b>${imported.length} routes imported from EasyRoute as new versions.</b> ${unmatched.length+failed.length} routes were not imported.`;
 
+const close = ()=>$("er-unmatched-overlay").classList.remove("open");
+$("er-unmatched-ok-button").onclick = close;
+$("er-unmatched-close-button").onclick = close;
+$("route-planner-more-button").onclick = e=>{ e.stopPropagation(); $("route-planner-more-menu").classList.toggle("open"); };
+document.addEventListener("click", ()=>$("route-planner-more-menu").classList.remove("open"));
+$("route-planner-easyroute-import-button").onclick = ()=>{
+  $("route-planner-more-menu").classList.remove("open");
+  // First click runs the import: the "<name> ER" versions appear in Route Planner
+  if(!importDone){ templates.forEach(t=>{ if(t.erStops) t.inactive=true; }); renderPlanner([...templates, ...imported]); $("route-planner-easyroute-import-result-alert").style.display=""; importDone=true; }
+  $("er-unmatched-overlay").classList.add("open");
+};
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") close(); });
 
-function modeOptions(r){
-  const keys = r.orig ? ["replace","newInactive","newKeep","rtb"] : ["new","rtb"];
-  if(!keys.includes(r.mode)) r.mode = keys[0];
-  return keys.map(k=>`<option value="${k}" ${k===r.mode?'selected':''}>${MODES[k]}</option>`).join("");
-}
-
-function renderImport(){
-  const list = routes;
-  $("er-import-body").innerHTML = list.map(r=>{
-    const t = tpl(r.orig);
-    const os = t? t.stops : null;
-    const d = os!=null ? r.newStops-os : null;
-    const flags = [];
-    if(stopsChanged(r)){
-      const parts=[];
-      if(d) parts.push(`stop count ${d>0?'up':'down'} by ${Math.abs(d)} vs the original route`);
-      if(r.drift&&r.drift.added) parts.push(`${r.drift.added} stop(s) added in SmartCity after the export`);
-      if(r.drift&&r.drift.other) parts.push(`${r.drift.other} stop(s) now on a different route`);
-      flags.push(`<span class="flag warn" id="er-import-row-${r.id}-stops-changed-flag" title="Stops changed: ${parts.join('; ')}. Preview the route to see which stops.">&#9888; Stops changed</span>`);
-    }
-    if(!r.orig) flags.push(`<span class="badge scheduled">New route</span>`);
-    return `<tr class="${r.sel?'':'row-off'}" id="er-import-row-${r.id}">
-      <td><input type="checkbox" class="cb" id="er-import-row-${r.id}-select" data-sel="${r.id}" ${r.sel?'checked':''}></td>
-      <td><select id="er-import-row-${r.id}-original-route" data-orig="${r.id}">
-        <option value="" ${!r.orig?'selected':''}>— None (new route) —</option>
-        ${templates.map(x=>`<option ${x.name===r.orig?'selected':''}>${x.name}</option>`).join("")}
-      </select></td>
-      <td><div class="namecell">${r.editing
-        ? `<input class="txt" id="er-import-row-${r.id}-new-name-input" data-name="${r.id}" value="${r.newName}">`
-        : `<button class="namebtn" id="er-import-row-${r.id}-preview-link" data-prev="${r.id}">${r.newName}</button><button class="pencil" id="er-import-row-${r.id}-rename-button" data-edit="${r.id}" title="Rename">&#9998;</button>`}</div></td>
-      <td class="num">${os!=null?os:'—'}</td>
-      <td class="num">${r.newStops}${d?`<span class="delta">(${d>0?'+':''}${d})</span>`:''}</td>
-      <td style="font-size:13px">${t?t.freq:'—'}</td>
-      <td><select id="er-import-row-${r.id}-new-frequency" data-freq="${r.id}">${freqs.map(f=>`<option ${f===r.newFreq?'selected':''}>${f}</option>`).join("")}</select></td>
-      <td style="text-align:center"><input type="checkbox" class="cb" id="er-import-row-${r.id}-generate-tp" data-tp="${r.id}" ${r.tp&&r.mode!=="rtb"?'checked':''} ${r.mode==="rtb"?'disabled title="Not available for Route Template Builder"':'title="Generate Travel Path"'}></td>
-      <td><select id="er-import-row-${r.id}-import-mode" data-mode="${r.id}">${modeOptions(r)}</select></td>
-      <td>${flags.join(" ")||'<span class="hint">OK</span>'}</td>
-    </tr>`;
-  }).join("") || `<tr><td colspan="10" class="hint" style="text-align:center;height:60px">No routes waiting for review.</td></tr>`;
-  updateSummary();
-}
-
-function updatePending(){
-  const n=routes.length;
-  $("route-planner-easyroute-pending-text").textContent = `${n} optimised route${n===1?' was':'s were'} pushed from EasyRoute on 07 Oct 2026 at 14:32 and ${n===1?'is':'are'} waiting for your review.`;
-  $("route-planner-easyroute-pending-alert").style.display = n ? "" : "none";
-  $("route-planner-easyroute-pending-count").style.display = n ? "" : "none";
-  $("route-planner-easyroute-pending-count").textContent = `${n} NEW`;
-  $("route-planner-more-pending-dot").style.display = n ? "" : "none";
-}
-
-function updateSummary(){
-  $("st-routes").textContent = routes.length;
-  const sel = routes.filter(r=>r.sel);
-  const changed = routes.filter(stopsChanged).length;
-  $("st-stops").textContent = routes.reduce((a,r)=>a+r.newStops,0).toLocaleString();
-  $("st-drift").textContent = changed;
-  $("er-import-drift-alert").style.display = changed ? "" : "none";
-  $("er-import-drift-text").innerHTML = `<b>Stops changed on ${changed} route${changed===1?'':'s'}.</b> The stops on these routes differ from the original route in SmartCity — stops may have been added after the export, or moved to a different route. Preview a route to see which stops changed.`;
-  $("er-import-select-all").checked = sel.length===routes.length;
-  const n = `${sel.length} route${sel.length===1?'':'s'}`;
-  $("er-import-confirm-button").textContent = `Import ${n}`;
-  $("er-import-schedule-confirm-button").textContent = `Schedule ${n}`;
-  const dupes = sel.filter(r=>r.orig).map(r=>r.orig).filter((v,i,a)=>a.indexOf(v)!==i);
-  let msg="";
-  if(!routes.length) msg="";
-  else if(!sel.length) msg="Select at least one route to import.";
-  else if(dupes.length) msg=`More than one route is mapped to “${dupes[0]}”. Map each original route once.`;
-  $("er-import-validation").textContent = msg;
-  $("er-import-confirm-button").disabled = !!msg || !sel.length;
-  const rtbSel = sel.filter(r=>r.mode==="rtb").length;
-  $("er-import-schedule-button").disabled = !!msg || !sel.length || rtbSel>0;
-  $("er-import-schedule-button").title = rtbSel ? `Schedule isn't available while ${rtbSel} selected route${rtbSel===1?' is':'s are'} set to Route Template Builder. Deselect ${rtbSel===1?'it':'them'} or change Import as.` : "";
-  $("er-import-schedule-hint").textContent = rtbSel && !msg ? `To schedule, deselect ${rtbSel===1?'the route':`the ${rtbSel} routes`} set to Route Template Builder.` : "";
-  if(rtbSel) toggleMenu("er-import-schedule-menu", false);
-  $("er-import-schedule-confirm-button").disabled = !!msg;
-}
-
-// Menus
-function toggleMenu(id, force){ const m=$(id); const open = force!==undefined?force:!m.classList.contains("open"); document.querySelectorAll(".menu.open").forEach(x=>x.classList.remove("open")); if(open) m.classList.add("open"); }
-$("route-planner-more-button").onclick = e=>{ e.stopPropagation(); toggleMenu("route-planner-more-menu"); };
-$("er-import-schedule-button").onclick = e=>{ e.stopPropagation(); toggleMenu("er-import-schedule-menu"); };
-document.querySelectorAll(".menu").forEach(m=>m.addEventListener("click",e=>e.stopPropagation()));
-document.addEventListener("click", ()=>document.querySelectorAll(".menu.open").forEach(x=>x.classList.remove("open")));
-
-// Modal
-const openModal = ()=>{ toggleMenu("route-planner-more-menu",false); $("er-import-overlay").classList.add("open"); renderImport(); };
-$("route-planner-easyroute-import-button").onclick = openModal;
-$("route-planner-easyroute-review-link").onclick = openModal;
-const closeModal = ()=>{ $("er-import-overlay").classList.remove("open"); $("er-import-failed-alert").style.display="none"; toggleMenu("er-import-schedule-menu",false); closeDrawer(); };
-$("er-import-close-button").onclick = closeModal;
-$("er-import-cancel-button").onclick = closeModal;
-
-$("er-import-select-all").onchange = e=>{ routes.forEach(r=>r.sel=e.target.checked); renderImport(); };
-
-$("er-import-body").addEventListener("change", e=>{
-  const ds=e.target.dataset, r=id=>routes.find(x=>x.id==id);
-  if(ds.sel){ r(ds.sel).sel=e.target.checked; renderImport(); }
-  if(ds.orig!==undefined){ r(ds.orig).orig=e.target.value; renderImport(); }
-  if(ds.freq){ r(ds.freq).newFreq=e.target.value; }
-  if(ds.tp){ r(ds.tp).tp=e.target.checked; }
-  if(ds.mode){ r(ds.mode).mode=e.target.value; renderImport(); }
-});
-$("er-import-body").addEventListener("click", e=>{
-  const b=e.target.closest("button"); if(!b) return;
-  if(b.dataset.prev) openDrawer(+b.dataset.prev);
-  if(b.dataset.edit){ const r=routes.find(x=>x.id==b.dataset.edit); r.editing=true; renderImport(); const i=$(`er-import-row-${r.id}-new-name-input`); i.focus(); i.select(); }
-});
-$("er-import-body").addEventListener("focusout", e=>{
-  if(e.target.dataset.name){ const r=routes.find(x=>x.id==e.target.dataset.name); r.newName=e.target.value.trim()||r.newName; r.editing=false; renderImport(); }
-});
-$("er-import-body").addEventListener("keydown", e=>{ if(e.key==="Enter"&&e.target.dataset.name) e.target.blur(); });
-
-function runImport(sched){
-  // Mock: a route flagged failOnce fails on its first attempt (communication error)
-  const failed=routes.filter(r=>r.sel && r.failOnce);
-  failed.forEach(r=>{ r.failOnce=false; r.sel=false; });
-  const sel=routes.filter(r=>r.sel);
-  const date=new Date($("er-import-schedule-date").value+"T12:00").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
-  const status=sched?"Scheduled":"Active";
-  const extra=[];
-  const rtb=sel.filter(r=>r.mode==="rtb"), direct=sel.filter(r=>r.mode!=="rtb");
-  const sessionName=`EasyRoute import #${rtbSessionNo}`;
-  direct.forEach(r=>{
-    const t=tpl(r.orig);
-    const base={name:r.newName, material:t?t.material:"Absorbent Hygiene Products (AHP)", day:r.newFreq.split("· ")[1].split(" ")[0], stops:r.newStops, type:t?t.type:"Domestic", status, isNew:true};
-    if(r.mode==="replace" && t){ Object.assign(t,{...base,isNew:false}); }
-    else { extra.push(base); if(t && r.mode==="newInactive" && !sched) t.status="Inactive"; }
-  });
-  renderPlanner(extra);
-  const tp=direct.filter(r=>r.tp).length;
-  const parts=[];
-  if(direct.length) parts.push(`<b>${direct.length} route${direct.length===1?'':'s'} ${sched?`scheduled to import on ${date}`:'imported'}.</b>${tp?` ${tp} Travel Path${tp===1?' is':'s are'} ${sched?'generated on import':'being generated'}.`:''}`);
-  if(rtb.length) parts.push(`<b>${rtb.length} route${rtb.length===1?'':'s'} added to Route Template Builder session “${sessionName}”.</b>`);
-  $("success-text").innerHTML = parts.join(" ");
-  $("route-planner-rtb-session-link").style.display = rtb.length ? "" : "none";
-  $("route-planner-rtb-session-link").textContent = `Open “${sessionName}”`;
-  if(rtb.length) rtbSessionNo++;
-  if(sel.length) $("route-planner-import-success-alert").classList.add("show");
-  // Imported routes leave the review list; unselected and failed routes stay pending
-  for(let i=routes.length-1;i>=0;i--) if(routes[i].sel) routes.splice(i,1);
-  updatePending();
-  toggleMenu("er-import-schedule-menu", false);
-  if(failed.length){
-    // Failed routes stay in the list, selected, with a message on top; the modal stays open
-    failed.forEach(r=>r.sel=true);
-    const names=failed.map(r=>r.newName).join(", ");
-    $("er-import-failed-text").innerHTML = `<b>${failed.length} route${failed.length===1?'':'s'} failed to import: ${names}.</b> Communication with SmartCity failed. Try again.${sel.length?` The other ${sel.length} route${sel.length===1?' was':'s were'} imported.`:''}`;
-    $("er-import-failed-alert").style.display="";
-    renderImport();
-    $("er-import-modal").scrollIntoView({block:"start"});
-  } else {
-    $("er-import-failed-alert").style.display="none";
-    closeModal();
-  }
-}
-$("er-import-confirm-button").onclick = ()=>runImport(false);
-$("er-import-schedule-confirm-button").onclick = ()=>runImport(true);
-
-// Preview drawer — deterministic fake stops
-function rng(seed){ return ()=>{ seed=(seed*9301+49297)%233280; return seed/233280; }; }
-const streets=["High St","Church Rd","Station Rd","Mill Ln","Park Ave","Victoria Rd","King St","Queens Rd","Manor Way","Green Ln"];
-const otherRoutes=["dom friday","garden dom","com thursday","york","Uk template"];
-function openDrawer(id){
-  const r=routes.find(x=>x.id===id), t=tpl(r.orig), rand=rng(id*7+3);
-  $("pv-title").textContent=r.newName;
-  $("pv-sub").textContent = t?`${MODES[r.mode]} · original “${t.name}”`:"New route — no original route";
-  $("pv-kv").innerHTML=`
-    <div><div class="k">Original stops</div>${t?t.stops:'—'}</div><div><div class="k">New stops</div>${r.newStops}</div>
-    <div><div class="k">Old frequency</div>${t?t.freq:'—'}</div><div><div class="k">New frequency</div>${r.newFreq}</div>
-    <div><div class="k">Est. distance</div>${(r.newStops*0.09).toFixed(1)} mi</div><div><div class="k">Est. duration</div>${Math.floor(r.newStops/60)}h ${r.newStops%60}m</div>`;
-  let pts=[],x=30,y=110;
-  for(let i=0;i<40;i++){ x+=8+rand()*6; y=Math.max(20,Math.min(200,y+(rand()-.5)*50)); pts.push([x,y]); }
-  let svg=`<polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#20315A" stroke-width="2"/>`;
-  svg+=pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#20315A"/>`).join("");
-  const nAdd=r.drift?r.drift.added:0, nOther=r.drift?Math.min(r.drift.other,6):0;
-  for(let i=0;i<nAdd;i++) svg+=`<circle cx="${60+rand()*400}" cy="${30+rand()*160}" r="5" fill="#33A542"/>`;
-  for(let i=0;i<nOther;i++) svg+=`<circle cx="${60+rand()*400}" cy="${30+rand()*160}" r="5" fill="#D9A100"/>`;
-  $("pv-map").innerHTML=svg;
-  const rows=[];
-  for(let i=0;i<nAdd;i++) rows.push(["—",addr(rand),"—",'<span class="chg added">Added after export</span>']);
-  for(let i=0;i<nOther;i++) rows.push(["—",addr(rand),Math.ceil(rand()*300),(()=>{const pool=otherRoutes.filter(n=>n!==r.orig);return `<span class="chg other">On ${pool[Math.floor(rand()*pool.length)]}</span>`;})()]);
-  if(r.drift && r.drift.other>nOther) rows.push(["","",""," <span class='hint'>+ "+(r.drift.other-nOther)+" more on other routes</span>"]);
-  for(let i=1;i<=10;i++){ const old=Math.max(1,i+Math.round((rand()-.5)*20)); rows.push([i,addr(rand),t?old:'—', t&&old!==i?'<span class="chg moved">Resequenced</span>':'<span class="hint">—</span>']); }
-  $("pv-stops").innerHTML=rows.map(c=>`<tr>${c.map(v=>`<td>${v}</td>`).join("")}</tr>`).join("")+`<tr><td colspan="4" class="hint" style="text-align:center">+ ${Math.max(0,r.newStops-10)} more stops</td></tr>`;
-  $("er-import-preview-drawer").classList.add("open");
-  $("er-import-preview-drawer").setAttribute("aria-hidden","false");
-}
-function addr(rand){ return `${Math.ceil(rand()*180)} ${streets[Math.floor(rand()*streets.length)]}`; }
-function closeDrawer(){ $("er-import-preview-drawer").classList.remove("open"); $("er-import-preview-drawer").setAttribute("aria-hidden","true"); }
-$("er-import-preview-close-button").onclick=closeDrawer;
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if($("er-import-preview-drawer").classList.contains("open")) closeDrawer(); else closeModal(); }});
-
-renderPlanner();
-updatePending();
+$("er-unmatched-download-button").onclick = ()=>{
+  const rows = [...imported.map(r=>[r.name,r.stops,"Imported as new version"]), ...unmatched.map(r=>[r.name,r.stops,"Not imported - no matching route template"]), ...failed.map(r=>[r.name,r.stops,"Failed - communication failed, publish again from EasyRoute"])];
+  const csv = "Route name,Stops,Result\n" + rows.map(r=>`"${r[0]}",${r[1]},"${r[2]}"`).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = "easyroute-import-results-2026-10-07.csv";
+  a.click(); URL.revokeObjectURL(a.href);
+};
 </script>
 </body>
 </html>
