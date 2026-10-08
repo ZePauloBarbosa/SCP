@@ -107,6 +107,7 @@ tbody tr:nth-child(even){background:var(--page)}
 .delta{font-size:11px;font-weight:500;margin-left:4px}
 .delta{color:var(--muted);font-weight:400}
 .namecell{display:flex;align-items:center;gap:6px}
+.routename{font-weight:500;font-size:14px}
 .namebtn{background:none;border:none;color:var(--navy);font-weight:600;font-size:14px;text-decoration:underline;padding:0;text-align:left}
 .pencil{background:none;border:none;padding:2px;color:var(--nav);opacity:.6}
 .flag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:300;padding:3px 8px;border-radius:5px;white-space:nowrap;cursor:help}
@@ -249,7 +250,7 @@ tr.row-off td{opacity:.5}
           <tbody id="er-import-body"></tbody>
         </table>
       </div>
-      <p class="hint" style="margin-top:8px">Choose how each route imports in the Import as column. Select a new route name to preview its stops and map. Use the pencil to rename it before import.</p>
+      <p class="hint" style="margin-top:8px">Choose how each route imports in the Import as column. Use the pencil to rename a route before import.</p>
     </div>
 
     <div class="m-foot" style="justify-content:flex-end;align-items:center">
@@ -271,24 +272,7 @@ tr.row-off td{opacity:.5}
   </div>
 </div>
 
-<!-- ========== Preview drawer ========== -->
-<aside class="drawer" id="er-import-preview-drawer" aria-hidden="true">
-  <div class="d-head">
-    <div><h3 id="pv-title">Route preview</h3><div class="hint" id="pv-sub"></div></div>
-    <button class="x" id="er-import-preview-close-button" aria-label="Close preview">&times;</button>
-  </div>
-  <div class="d-body">
-    <div class="kv" id="pv-kv"></div>
-    <svg class="map" id="pv-map" viewBox="0 0 500 220" preserveAspectRatio="none"></svg>
-    <div class="legend">
-      <span><i style="background:var(--navy)"></i>New sequence</span>
-      <span><i style="background:var(--green)"></i>Added in SmartCity after export</span>
-      <span><i style="background:var(--warn)"></i>On a different route</span>
-    </div>
-    <div class="acc">Stop changes</div>
-    <table class="stops"><thead><tr><th>Seq</th><th>Address</th><th>Old seq</th><th>Change</th></tr></thead><tbody id="pv-stops"></tbody></table>
-  </div>
-</aside>
+
 
 <script>
 const templates = [
@@ -360,7 +344,7 @@ function renderImport(){
       if(d) parts.push(`stop count ${d>0?'up':'down'} by ${Math.abs(d)} vs the original route`);
       if(r.drift&&r.drift.added) parts.push(`${r.drift.added} stop(s) added in SmartCity after the export`);
       if(r.drift&&r.drift.other) parts.push(`${r.drift.other} stop(s) now on a different route`);
-      flags.push(`<span class="flag warn" id="er-import-row-${r.id}-stops-changed-flag" title="Stops changed: ${parts.join('; ')}. Preview the route to see which stops.">&#9888; Stops changed</span>`);
+      flags.push(`<span class="flag warn" id="er-import-row-${r.id}-stops-changed-flag" title="Stops changed: ${parts.join('; ')}.">&#9888; Stops changed</span>`);
     }
     if(!r.orig) flags.push(`<span class="badge scheduled">New route</span>`);
     return `<tr class="${r.sel?'':'row-off'}" id="er-import-row-${r.id}">
@@ -371,7 +355,7 @@ function renderImport(){
       </select></td>
       <td><div class="namecell">${r.editing
         ? `<input class="txt" id="er-import-row-${r.id}-new-name-input" data-name="${r.id}" value="${r.newName}">`
-        : `<button class="namebtn" id="er-import-row-${r.id}-preview-link" data-prev="${r.id}">${r.newName}</button><button class="pencil" id="er-import-row-${r.id}-rename-button" data-edit="${r.id}" title="Rename">&#9998;</button>`}</div></td>
+        : `<span class="routename" id="er-import-row-${r.id}-new-name">${r.newName}</span><button class="pencil" id="er-import-row-${r.id}-rename-button" data-edit="${r.id}" title="Rename">&#9998;</button>`}</div></td>
       <td class="num">${os!=null?os:'—'}</td>
       <td class="num">${r.newStops}${d?`<span class="delta">(${d>0?'+':''}${d})</span>`:''}</td>
       <td style="font-size:13px">${t?t.freq:'—'}</td>
@@ -400,7 +384,7 @@ function updateSummary(){
   $("st-stops").textContent = routes.reduce((a,r)=>a+r.newStops,0).toLocaleString();
   $("st-drift").textContent = changed;
   $("er-import-drift-alert").style.display = changed ? "" : "none";
-  $("er-import-drift-text").innerHTML = `<b>Stops changed on ${changed} route${changed===1?'':'s'}.</b> The stops on these routes differ from the original route in SmartCity — stops may have been added after the export, or moved to a different route. Preview a route to see which stops changed.`;
+  $("er-import-drift-text").innerHTML = `<b>Stops changed on ${changed} route${changed===1?'':'s'}.</b> The stops on these routes differ from the original route in SmartCity — stops may have been added after the export, or moved to a different route.`;
   $("er-import-select-all").checked = sel.length===routes.length;
   const n = `${sel.length} route${sel.length===1?'':'s'}`;
   $("er-import-confirm-button").textContent = `Import ${n}`;
@@ -432,7 +416,7 @@ document.addEventListener("click", ()=>document.querySelectorAll(".menu.open").f
 const openModal = ()=>{ toggleMenu("route-planner-more-menu",false); $("er-import-overlay").classList.add("open"); renderImport(); };
 $("route-planner-easyroute-import-button").onclick = openModal;
 $("route-planner-easyroute-review-link").onclick = openModal;
-const closeModal = ()=>{ $("er-import-overlay").classList.remove("open"); $("er-import-failed-alert").style.display="none"; toggleMenu("er-import-schedule-menu",false); closeDrawer(); };
+const closeModal = ()=>{ $("er-import-overlay").classList.remove("open"); $("er-import-failed-alert").style.display="none"; toggleMenu("er-import-schedule-menu",false); };
 $("er-import-close-button").onclick = closeModal;
 $("er-import-cancel-button").onclick = closeModal;
 
@@ -448,7 +432,6 @@ $("er-import-body").addEventListener("change", e=>{
 });
 $("er-import-body").addEventListener("click", e=>{
   const b=e.target.closest("button"); if(!b) return;
-  if(b.dataset.prev) openDrawer(+b.dataset.prev);
   if(b.dataset.edit){ const r=routes.find(x=>x.id==b.dataset.edit); r.editing=true; renderImport(); const i=$(`er-import-row-${r.id}-new-name-input`); i.focus(); i.select(); }
 });
 $("er-import-body").addEventListener("focusout", e=>{
@@ -502,39 +485,7 @@ function runImport(sched){
 $("er-import-confirm-button").onclick = ()=>runImport(false);
 $("er-import-schedule-confirm-button").onclick = ()=>runImport(true);
 
-// Preview drawer — deterministic fake stops
-function rng(seed){ return ()=>{ seed=(seed*9301+49297)%233280; return seed/233280; }; }
-const streets=["High St","Church Rd","Station Rd","Mill Ln","Park Ave","Victoria Rd","King St","Queens Rd","Manor Way","Green Ln"];
-const otherRoutes=["dom friday","garden dom","com thursday","york","Uk template"];
-function openDrawer(id){
-  const r=routes.find(x=>x.id===id), t=tpl(r.orig), rand=rng(id*7+3);
-  $("pv-title").textContent=r.newName;
-  $("pv-sub").textContent = t?`${MODES[r.mode]} · original “${t.name}”`:"New route — no original route";
-  $("pv-kv").innerHTML=`
-    <div><div class="k">Original stops</div>${t?t.stops:'—'}</div><div><div class="k">New stops</div>${r.newStops}</div>
-    <div><div class="k">Old frequency</div>${t?t.freq:'—'}</div><div><div class="k">New frequency</div>${r.newFreq}</div>
-    <div><div class="k">Est. distance</div>${(r.newStops*0.09).toFixed(1)} mi</div><div><div class="k">Est. duration</div>${Math.floor(r.newStops/60)}h ${r.newStops%60}m</div>`;
-  let pts=[],x=30,y=110;
-  for(let i=0;i<40;i++){ x+=8+rand()*6; y=Math.max(20,Math.min(200,y+(rand()-.5)*50)); pts.push([x,y]); }
-  let svg=`<polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#20315A" stroke-width="2"/>`;
-  svg+=pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#20315A"/>`).join("");
-  const nAdd=r.drift?r.drift.added:0, nOther=r.drift?Math.min(r.drift.other,6):0;
-  for(let i=0;i<nAdd;i++) svg+=`<circle cx="${60+rand()*400}" cy="${30+rand()*160}" r="5" fill="#33A542"/>`;
-  for(let i=0;i<nOther;i++) svg+=`<circle cx="${60+rand()*400}" cy="${30+rand()*160}" r="5" fill="#D9A100"/>`;
-  $("pv-map").innerHTML=svg;
-  const rows=[];
-  for(let i=0;i<nAdd;i++) rows.push(["—",addr(rand),"—",'<span class="chg added">Added after export</span>']);
-  for(let i=0;i<nOther;i++) rows.push(["—",addr(rand),Math.ceil(rand()*300),(()=>{const pool=otherRoutes.filter(n=>n!==r.orig);return `<span class="chg other">On ${pool[Math.floor(rand()*pool.length)]}</span>`;})()]);
-  if(r.drift && r.drift.other>nOther) rows.push(["","",""," <span class='hint'>+ "+(r.drift.other-nOther)+" more on other routes</span>"]);
-  for(let i=1;i<=10;i++){ const old=Math.max(1,i+Math.round((rand()-.5)*20)); rows.push([i,addr(rand),t?old:'—', t&&old!==i?'<span class="chg moved">Resequenced</span>':'<span class="hint">—</span>']); }
-  $("pv-stops").innerHTML=rows.map(c=>`<tr>${c.map(v=>`<td>${v}</td>`).join("")}</tr>`).join("")+`<tr><td colspan="4" class="hint" style="text-align:center">+ ${Math.max(0,r.newStops-10)} more stops</td></tr>`;
-  $("er-import-preview-drawer").classList.add("open");
-  $("er-import-preview-drawer").setAttribute("aria-hidden","false");
-}
-function addr(rand){ return `${Math.ceil(rand()*180)} ${streets[Math.floor(rand()*streets.length)]}`; }
-function closeDrawer(){ $("er-import-preview-drawer").classList.remove("open"); $("er-import-preview-drawer").setAttribute("aria-hidden","true"); }
-$("er-import-preview-close-button").onclick=closeDrawer;
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if($("er-import-preview-drawer").classList.contains("open")) closeDrawer(); else closeModal(); }});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeModal(); });
 
 renderPlanner();
 updatePending();
