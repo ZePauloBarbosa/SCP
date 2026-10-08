@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EasyRoute Import Unmatched Routes — SCP Mock</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Tokens — read from Figma M09kEEo1KNu48sLPl3b2av node 1213:6778 */
+:root{
+  --navy:#20315A; --nav:#242833; --green:#33A542; --page:#FAFAFC; --panel:#FFFFFF;
+  --border:#E5E7EB; --progress:#9FC5F9; --scheduled:#0066A6; --accordion:#EAEDF2;
+  --tabs:#E0E1E8; --cb-border:#D9D9E1; --toggle-off:#CBD5E1; --card-active:#EEF1F8;
+  --muted:#888;
+  /* Alert / Badge values read via get_design_context on 1227:6798, 1227:6801, 1222:6798 */
+  --warn:#D9A100; --warn-text:#8C6600; --warn-badge:#B27800;
+  --error:#D9544F; --error-text:#A32926;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Montserrat,sans-serif;background:var(--page);color:var(--nav);font-size:14px}
+button{font-family:inherit;cursor:pointer}
+input,select{font-family:inherit}
+
+/* Top nav */
+.topnav{height:70px;background:var(--nav);display:flex;align-items:center;padding:0 24px;gap:8px}
+.logo{color:#fff;font-weight:700;font-size:18px;width:200px;display:flex;align-items:center;gap:8px}
+.logo span{color:var(--green);font-size:22px}
+.navlink{height:70px;display:flex;align-items:center;padding:0 18px;color:rgba(255,255,255,.8);font-weight:500;font-size:15px;border-bottom:4px solid transparent;letter-spacing:.3px}
+.navlink.active{border-bottom-color:var(--green);color:#fff}
+.subnav{height:48px;background:#fff;display:flex;justify-content:center;gap:32px;border-bottom:1px solid var(--border)}
+.subnav a{display:flex;align-items:center;font-size:16px;color:var(--nav);text-decoration:none;border-bottom:3px solid transparent}
+.subnav a.active{color:var(--green);border-bottom-color:var(--green)}
+
+.page{max-width:1240px;margin:0 auto;padding:32px 24px 110px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}
+h1{font-size:36px;font-weight:300;margin:0}
+.beta{font-size:12px;color:var(--green);text-decoration:underline}
+.actions{display:flex;gap:12px}
+
+.btn{border-radius:5px;font-size:14px;padding:8px 30px;border:1px solid var(--navy);background:var(--navy);color:#fff;font-weight:500}
+.btn.secondary{background:transparent;color:var(--navy)}
+.btn.small{padding:6px 16px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.link{background:none;border:none;color:var(--navy);font-weight:600;text-decoration:underline;padding:0;font-size:inherit}
+
+/* Panels & tables */
+.panel{background:#fff;border:1px solid var(--border);border-radius:5px}
+.filters{display:flex;gap:16px;padding:12px;border-bottom:1px solid var(--border)}
+.f{height:34px;border:1px solid var(--border);border-radius:5px;background:#fff;font-size:13px;font-weight:300;padding:0 10px;color:var(--nav)}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:left;padding:12px 10px;color:var(--nav);border-bottom:1px solid var(--border);white-space:nowrap}
+td{font-size:14px;font-weight:300;padding:0 10px;height:39px;border-bottom:1px solid var(--border)}
+tbody tr:nth-child(even){background:var(--page)}
+
+.badge{display:inline-block;font-size:12px;font-weight:300;padding:3px 8px;border-radius:5px}
+.badge.active{color:var(--green);background:rgba(51,165,66,.1)}
+.badge.scheduled{color:var(--scheduled);background:rgba(0,102,166,.1)}
+.badge.inactive{color:#666;background:#eee}
+.badge.new{color:#fff;background:var(--green);font-weight:600;font-size:10px;padding:2px 6px}
+
+/* Custom checkbox 15x15 */
+.cb{appearance:none;width:15px;height:15px;border:1px solid var(--cb-border);border-radius:3px;margin:0;vertical-align:middle;cursor:pointer;background:transparent;position:relative}
+.cb:checked{background:var(--navy);border-color:var(--navy)}
+.cb:checked::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.cb:disabled{opacity:.4;cursor:not-allowed}
+
+/* Alerts */
+.alert{position:relative;overflow:hidden;padding:12px 16px 12px 19px;font-size:12px;border-radius:5px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.alert::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+.alert.info{background:rgba(0,102,166,.08)}.alert.info::before{background:var(--scheduled)}
+.alert.success{background:rgba(51,165,66,.1)}.alert.success::before{background:var(--green)}
+.alert.warn{background:rgba(217,161,0,.1);color:var(--warn-text)}.alert.warn::before{background:var(--warn)}
+.alert.error{background:rgba(217,84,79,.08);color:var(--error-text)}.alert.error::before{background:var(--error)}
+.alert .grow{flex:1}
+
+/* Bottom bar */
+.bottombar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--border);padding:14px;display:flex;justify-content:center;gap:12px}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(36,40,51,.45);display:none;align-items:flex-start;justify-content:center;padding:32px 16px;z-index:10;overflow:auto}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.2);width:100%;max-width:1400px}
+.m-head{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border)}
+.m-head h2{font-size:18px;font-weight:600;margin:0}
+.m-head .sub{font-size:12px;font-weight:300;color:var(--muted);margin-left:12px}
+.x{background:none;border:none;font-size:24px;color:var(--nav);line-height:1}
+.m-body{padding:24px}
+.imp td{padding:0 8px}.imp th{padding:12px 8px}
+.m-foot{border-top:1px solid var(--border);padding:16px 24px;display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap}
+
+.stats{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.stat{width:148px;height:68px;border:1px solid var(--border);border-radius:5px;padding:10px 12px;background:#fff}
+.stat .l{font-size:10px;font-weight:700;letter-spacing:.3px}
+.stat .v{font-size:22px;font-weight:600;line-height:1.3}
+.stat .u{font-size:10px;font-weight:300}
+.stat.warn .v{color:var(--warn-badge)}
+
+.tabs{display:inline-flex;background:var(--tabs);border-radius:20px;padding:0;height:36px}
+.tabs button{border:none;background:transparent;border-radius:20px;padding:0 16px;font-size:14px;color:var(--nav)}
+.tabs button.on{background:var(--navy);color:#fff}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px}
+
+.imp td{height:52px}
+.imp select,.imp .txt{height:34px;border:1px solid var(--border);border-radius:5px;background:#fff;font-size:13px;padding:0 8px;width:100%;color:var(--nav)}
+.imp select:focus,.imp .txt:focus{outline:none;border-color:var(--navy)}
+.num{font-variant-numeric:tabular-nums}
+.delta{font-size:11px;font-weight:500;margin-left:4px}
+.delta{color:var(--muted);font-weight:400}
+.namecell{display:flex;align-items:center;gap:6px}
+.namebtn{background:none;border:none;color:var(--navy);font-weight:600;font-size:14px;text-decoration:underline;padding:0;text-align:left}
+.pencil{background:none;border:none;padding:2px;color:var(--nav);opacity:.6}
+.flag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:300;padding:3px 8px;border-radius:5px;white-space:nowrap;cursor:help}
+.flag.warn{color:var(--warn-badge);background:rgba(217,161,0,.12)}
+.flag.err{color:var(--error-text);background:rgba(217,84,79,.08)}
+tr.row-off td{opacity:.5}
+.hint{font-size:11px;font-weight:300;color:var(--muted)}
+
+.group h4{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin:0 0 8px}
+.radio{display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0;cursor:pointer}
+.radio input{accent-color:var(--navy);margin:0}
+.radio.sub{margin-left:22px}
+.radio.disabled{opacity:.4;cursor:not-allowed}
+.foot-cta{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.err-text{color:var(--error);font-size:12px;max-width:340px;text-align:right}
+
+/* Dropdown menus (children of buttons) — panel styling from SidebarPanel spec */
+.menu-wrap{position:relative;display:inline-block}
+.menu{position:absolute;right:0;top:calc(100% + 4px);min-width:240px;background:#fff;border:1px solid var(--border);border-radius:5px;box-shadow:rgba(36,40,51,.1) 0 3px 6px;padding:4px 0;display:none;z-index:5}
+.menu.up{top:auto;bottom:calc(100% + 4px)}
+.menu.open{display:block}
+.menu button.item{display:flex;justify-content:space-between;align-items:center;width:100%;background:none;border:none;text-align:left;padding:10px 16px;font-size:14px;color:var(--nav)}
+.menu button.item:hover{background:var(--accordion)}
+.menu .pad{padding:12px 16px}
+.menu label{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;display:block;margin-bottom:6px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-left:6px;vertical-align:middle}
+.caret{font-size:10px;margin-left:6px}
+
+/* Preview drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:560px;max-width:100%;background:#fff;box-shadow:rgba(36,40,51,.1) 0 3px 6px, -8px 0 32px rgba(0,0,0,.15);transform:translateX(100%);transition:transform .2s;z-index:20;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.d-head{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
+.d-head h3{margin:0;font-size:16px;font-weight:600}
+.d-body{overflow:auto;padding:16px 24px;flex:1}
+.acc{background:var(--accordion);font-weight:500;font-size:14px;padding:9px 16px;margin:16px -24px 0}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;margin-top:8px}
+.kv .k{font-size:11px;font-weight:300;color:var(--muted)}
+.map{width:100%;height:220px;border:1px solid var(--border);border-radius:5px;background:#F3F5F9;margin-top:12px}
+.legend{display:flex;gap:16px;font-size:11px;margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.stops td{height:32px;font-size:13px}
+.chg{font-size:12px;font-weight:300;padding:3px 8px;border-radius:5px;white-space:nowrap}
+.chg.added{color:var(--green);background:rgba(51,165,66,.1)}
+.chg.other{color:var(--warn-badge);background:rgba(217,161,0,.12)}
+.chg.moved{color:var(--scheduled);background:rgba(0,102,166,.1)}
+
+.toast{display:none}
+.toast.show{display:flex}
+.mocknote{font-size:11px;color:var(--muted);text-align:center;margin-top:24px}
+</style>
+<style>
+.modal.sm{max-width:640px}
+.m-foot.end{justify-content:flex-end;align-items:center;gap:12px}
+.unm td{height:39px}
+section+section{margin-top:24px}
+.sec{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin:0 0 8px}
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="logo"><span>&#x21bb;</span>Routeware</div>
+  <a class="navlink active">DISPATCH</a><a class="navlink">CUSTOMERS</a><a class="navlink">FLEET</a><a class="navlink">INSIGHTS</a>
+</header>
+<nav class="subnav">
+  <a>Waste Tracker</a><a>Winter Tracker</a><a>Sweeper Tracker</a><a class="active">Route Planner</a><a>Dispatch Board</a>
+</nav>
+
+<main class="page">
+  <div class="page-head">
+    <div><h1>Route Planner</h1><a class="beta">Try Beta</a></div>
+    <div class="actions">
+      <div class="menu-wrap">
+        <button class="btn secondary" id="route-planner-more-button" aria-haspopup="menu">More<span class="caret">&#9660;</span></button>
+        <div class="menu" id="route-planner-more-menu" role="menu">
+          <button class="item" role="menuitem" id="route-planner-easyroute-import-button">Import from EasyRoute</button>
+        </div>
+      </div>
+      <button class="btn">Plan A Route</button>
+    </div>
+  </div>
+
+  <div class="alert success" id="route-planner-easyroute-import-result-alert" style="display:none">
+    <div class="grow" id="route-planner-easyroute-import-result-text"></div>
+  </div>
+
+  <div class="panel">
+    <div class="filters">
+      <input class="f" style="width:280px" placeholder="&#128269; Search">
+      <select class="f"><option>All Days</option></select>
+      <select class="f"><option>All Groups</option></select>
+      <select class="f"><option>All Status</option></select>
+    </div>
+    <table>
+      <thead><tr><th style="width:36px"><input type="checkbox" class="cb"></th><th>Route Name</th><th>Material Type</th><th>Day of Service</th><th>Stops</th><th>Type</th><th>Status</th><th>Options</th></tr></thead>
+      <tbody id="planner-body"></tbody>
+    </table>
+  </div>
+  <p class="mocknote">Functional reference only — SCP-5156 · EasyRoute → SmartCity push (Phase 1): import results. All visuals must match the existing SmartCity Portal look and feel.</p>
+</main>
+
+<div class="bottombar">
+  <button class="btn small">Schedule (1)</button><button class="btn small">Add To Groups (1)</button><button class="btn small">Export Route Upload Template (1)</button><button class="btn small">EasyRoute Export (1)</button>
+</div>
+
+<!-- ========== Unmatched routes modal ========== -->
+<div class="overlay" id="er-unmatched-overlay">
+  <div class="modal sm" id="er-unmatched-modal" role="dialog" aria-labelledby="er-unmatched-title">
+    <div class="m-head">
+      <div><h2 id="er-unmatched-title">EasyRoute import</h2></div>
+      <button class="x" id="er-unmatched-close-button" aria-label="Close">&times;</button>
+    </div>
+    <div class="m-body">
+      <div class="hint" style="font-size:12px;margin-bottom:16px">Published from EasyRoute · 07 Oct 2026 14:32 · <span id="er-unmatched-summary"></span></div>
+      <div class="alert error" id="er-import-failed-alert">
+        <div class="grow" id="er-import-failed-text"></div>
+      </div>
+      <section id="er-imported-section">
+        <h4 class="sec">Imported as new version</h4>
+        <div class="panel">
+          <table class="unm" id="er-imported-table">
+            <thead><tr><th>Route name</th><th style="text-align:right">Stops</th></tr></thead>
+            <tbody id="er-imported-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <section id="er-unmatched-section">
+        <h4 class="sec">No matching route template</h4>
+        <div class="alert warn">
+          <div class="grow">No route template in SmartCity has the same name, so these routes were not imported.</div>
+        </div>
+        <div class="panel">
+          <table class="unm" id="er-unmatched-table">
+            <thead><tr><th>Route name</th><th style="text-align:right">Stops</th></tr></thead>
+            <tbody id="er-unmatched-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <section id="er-import-failed-section">
+        <h4 class="sec">Failed to import</h4>
+        <div class="panel">
+          <table class="unm" id="er-import-failed-table">
+            <thead><tr><th>Route name</th><th style="text-align:right">Stops</th></tr></thead>
+            <tbody id="er-import-failed-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+    <div class="m-foot end">
+      <button class="btn secondary" id="er-unmatched-download-button">Download</button>
+      <button class="btn" id="er-unmatched-ok-button">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const templates = [
+  {name:"com thursday", material:"Absorbent Hygiene Products (AHP)", day:"Thursday", stops:88, type:"Commercial", erStops:92},
+  {name:"dom friday", material:"Absorbent Hygiene Products (AHP)", day:"Friday", stops:389, type:"Domestic", erStops:371},
+  {name:"dom thursday", material:"Absorbent Hygiene Products (AHP)", day:"Thursday", stops:412, type:"Domestic", erStops:438},
+  {name:"garden comm", material:"Garden", day:"Monday", stops:64, type:"Commercial"},
+  {name:"garden dom", material:"Garden", day:"Monday", stops:520, type:"Domestic", erStops:505},
+  {name:"Uk template", material:"Plastics", day:"Wednesday", stops:140, type:"Domestic"},
+  {name:"york", material:"Absorbent Hygiene Products (AHP)", day:"Friday", stops:140, type:"Commercial"},
+];
+// Routes published from EasyRoute with no matching SmartCity route template
+const unmatched = [
+  {name:"dom monday", stops:402},
+  {name:"garden tuesday", stops:318},
+];
+// Routes that failed to transfer (communication error)
+const failed = [
+  {name:"york", stops:141},
+];
+const $ = id => document.getElementById(id);
+const row = (r,i,pre)=>`<tr id="${pre}-row-${i+1}"><td>${r.name}</td><td class="num" style="text-align:right">${r.stops}</td></tr>`;
+// Matched by exact route name -> imported as a new version of that route template
+// The new version keeps the original and is added as "<route name> ER"
+const imported = templates.filter(t=>t.erStops).map(t=>({...t, name:`${t.name} ER`, stops:t.erStops}));
+
+const renderPlanner = rows => $("planner-body").innerHTML = rows.map(t=>`<tr><td><input type="checkbox" class="cb"></td><td>${t.name}</td><td style="font-size:12px">${t.material}</td><td>${t.day}</td><td class="num">${t.stops}</td><td>${t.type}</td><td><span class="badge active">Active</span></td><td>&#9998; &#128465;</td></tr>`).join("");
+renderPlanner(templates);
+let importDone=false;
+$("er-imported-body").innerHTML = imported.map((r,i)=>row(r,i,"er-imported")).join("");
+$("er-unmatched-body").innerHTML = unmatched.map((r,i)=>row(r,i,"er-unmatched")).join("");
+$("er-import-failed-body").innerHTML = failed.map((r,i)=>row(r,i,"er-import-failed")).join("");
+$("er-imported-section").style.display = imported.length ? "" : "none";
+$("er-unmatched-section").style.display = unmatched.length ? "" : "none";
+$("er-import-failed-section").style.display = failed.length ? "" : "none";
+$("er-import-failed-alert").style.display = failed.length ? "" : "none";
+$("er-import-failed-text").innerHTML = `<b>${failed.length} route${failed.length===1?'':'s'} failed to import.</b> Communication with SmartCity failed. Publish ${failed.length===1?'it':'them'} again from EasyRoute.`;
+$("er-unmatched-summary").textContent = `${imported.length} imported, ${unmatched.length} not matched${failed.length?`, ${failed.length} failed`:''}`;
+$("route-planner-easyroute-import-result-text").innerHTML = `<b>${imported.length} routes imported from EasyRoute as new versions.</b> ${unmatched.length+failed.length} routes were not imported.`;
+
+const close = ()=>$("er-unmatched-overlay").classList.remove("open");
+$("er-unmatched-ok-button").onclick = close;
+$("er-unmatched-close-button").onclick = close;
+$("route-planner-more-button").onclick = e=>{ e.stopPropagation(); $("route-planner-more-menu").classList.toggle("open"); };
+document.addEventListener("click", ()=>$("route-planner-more-menu").classList.remove("open"));
+$("route-planner-easyroute-import-button").onclick = ()=>{
+  $("route-planner-more-menu").classList.remove("open");
+  // First click runs the import: the "<name> ER" versions appear in Route Planner
+  if(!importDone){ renderPlanner([...templates, ...imported]); $("route-planner-easyroute-import-result-alert").style.display=""; importDone=true; }
+  $("er-unmatched-overlay").classList.add("open");
+};
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") close(); });
+
+$("er-unmatched-download-button").onclick = ()=>{
+  const rows = [...imported.map(r=>[r.name,r.stops,"Imported as new version"]), ...unmatched.map(r=>[r.name,r.stops,"Not imported - no matching route template"]), ...failed.map(r=>[r.name,r.stops,"Failed - communication failed, publish again from EasyRoute"])];
+  const csv = "Route name,Stops,Result\n" + rows.map(r=>`"${r[0]}",${r[1]},"${r[2]}"`).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = "easyroute-import-results-2026-10-07.csv";
+  a.click(); URL.revokeObjectURL(a.href);
+};
+</script>
+</body>
+</html>
