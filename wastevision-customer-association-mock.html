@@ -42,7 +42,12 @@
   .map svg{width:100%;height:100%;display:block;cursor:grab}
   .mapctl{position:absolute;left:20px;bottom:24px;display:flex;flex-direction:column;gap:12px}
   .mapctl button{width:40px;height:40px;border-radius:50%;border:0;background:#fff;box-shadow:0 2px 6px rgba(36,40,51,.2);font:600 18px Montserrat,sans-serif;color:var(--navy-dark);cursor:pointer}
-  .legend{position:absolute;right:20px;bottom:20px;background:#fff;box-shadow:0 3px 6px rgba(36,40,51,.15);padding:10px 12px;font-size:13px;min-width:210px}
+  .legend{position:absolute;right:20px;bottom:20px;background:#fff;box-shadow:0 2px 6px rgba(36,40,51,.12);border-radius:6px;font-size:13px;min-width:200px;display:flex;flex-direction:column-reverse;overflow:hidden}
+  .legend .lg-head{display:flex;align-items:center;justify-content:space-between;gap:24px;width:100%;border:0;background:#fff;padding:12px 14px;font:400 16px Montserrat,sans-serif;color:var(--navy-dark);cursor:pointer;text-align:left}
+  .legend .lg-head .chev{width:9px;height:9px;border-left:2px solid #B4B8C8;border-top:2px solid #B4B8C8;transform:translateY(2px) rotate(45deg);transition:transform .15s}
+  .legend.open .lg-head .chev{transform:translateY(-3px) rotate(225deg)}
+  .legend .lg-body{display:none;padding:10px 14px 4px;border-bottom:1px solid var(--border)}
+  .legend.open .lg-body{display:block}
   .legend .row{display:flex;align-items:center;gap:8px;margin:4px 0}
   .legend hr{border:0;border-top:1px solid var(--navy-dark);margin:8px 0}
   .legend .heat{color:var(--green);font-size:13px}
@@ -248,6 +253,8 @@
       </div>
 
       <div class="legend" id="community-insights-map-legend">
+        <button class="lg-head" id="map-legend-toggle" aria-expanded="false">Legend<span class="chev"></span></button>
+        <div class="lg-body" id="map-legend-body">
         <div class="row"><span class="ico-insight"></span>Material Contamination</div>
         <div class="matchkey">
           <div class="row"><span class="dot green"></span>Auto-matched</div>
@@ -258,6 +265,7 @@
         </div>
         <hr>
         <div class="heat">&#9638; Heat Map</div>
+        </div>
       </div>
     </div>
 
@@ -735,6 +743,11 @@ document.addEventListener('click',e=>{
   if(e.target.closest('#community-insights-map, #community-insights-table, .tbl-head, #insight-image-modal, #mock-notes, #mock-notes-toggle')) return;
   clearSelection(); animateTo(OVERVIEW);
 });
+document.getElementById('map-legend-toggle').onclick=e=>{
+  e.stopPropagation();
+  const lg=document.getElementById('community-insights-map-legend'), open=lg.classList.toggle('open');
+  e.currentTarget.setAttribute('aria-expanded',open);
+};
 document.getElementById('mock-notes-toggle').onclick=()=>document.getElementById('mock-notes').classList.toggle('open');
 renderTable();
 </script>
