@@ -91,6 +91,10 @@
   .ins-panel .ad{font-weight:300;color:#666;font-size:12px}
   .ins-panel .dist{margin-left:auto;font-weight:500;color:var(--navy-dark);font-size:12px;white-space:nowrap}
   .ins-panel .sel-wrap{position:relative;margin:4px 0 8px}
+  .ins-panel .status-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 10px}
+  .ins-panel .status-val{font:400 15px Montserrat,sans-serif;color:var(--navy-dark)}
+  .ins-panel .status-val small{font:300 12px Montserrat,sans-serif;color:#6B7393}
+  .ins-panel .status-btn{padding:7px 18px;font-size:14px}
   .ins-panel .sel-wrap select{appearance:none;-webkit-appearance:none;width:100%;border:0;background:transparent;font:400 15px Montserrat,sans-serif;color:var(--navy-dark);padding:4px 28px 10px 2px;cursor:pointer}
   .ins-panel .sel-wrap select:focus{outline:none}
   .ins-panel .sel-wrap::after{content:"";position:absolute;right:8px;top:6px;width:8px;height:8px;border-right:2px solid var(--green);border-bottom:2px solid var(--green);transform:rotate(45deg);pointer-events:none}
@@ -238,7 +242,8 @@
           <div class="sec" id="card-sec"></div>
           <ul id="card-list"></ul>
           <div class="sec" id="insight-panel-status-header">Status</div>
-          <div class="sel-wrap"><select id="insight-panel-status-select"><option>Open</option><option>Cleared</option></select></div>
+          <div class="status-row"><div class="status-val" id="insight-panel-status-value"></div>
+          <button class="btn-secondary status-btn" id="insight-panel-status-button"></button></div>
         </div>
         <div class="foot">
           <button class="btn-secondary" id="insight-panel-prev-button">&#8249; Previous</button>
@@ -305,7 +310,7 @@
       Red — 2+ candidates, no clear leader. Nothing selected.</li>
     <li><b>Hover a row</b> → its marker highlights on the map. <b>Click outside</b> the map and table (search, page margins, title) → zooms back to the full view.</li>
     <li><b>One table.</b> Options = images only. Status column = Open/Cleared with × (clear) or undo (reopen). "Confirm" is a text link under the dropdown, right-aligned — the same spot and style as "Change" on confirmed rows. Picking a customer (table dropdown, panel list or map letter) only selects it; ✓ or "Confirm &amp; next" confirms. Confirmed rows show a check before the name and a Change link; the ✓ spot is left blank. Picking a different customer on the map for a confirmed or auto-matched row un-confirms it until you confirm again. Undo appears only on cleared rows (reopen).</li>
-    <li><b>Panel:</b> "Confirm &amp; next" confirms the selected customer, or a Status change (Open ⇄ Cleared), and moves to the next row. A Status change in the panel isn't applied until confirmed; leaving the insight discards it. Plain "Next" when there's nothing to confirm.</li>
+    <li><b>Panel:</b> "Confirm &amp; next" confirms the selected customer, or a Status change (Open ⇄ Cleared), and moves to the next row. Dismiss / Restore in the panel stages a Status change (Open ⇄ Cleared) that isn't applied until confirmed; leaving the insight discards it. Plain "Next" when there's nothing to confirm.</li>
     <li><b>Cleared rows</b> show "No customer selected" and "Cleared · who · date".</li>
     <li><b>Click any row</b> → map zooms to the inference, highlights nearby properties (A–D) with distances. Click a letter on the map or in the card to pick that customer.</li>
     <li><b>Right panel</b> (Edit Street pattern): no Save — picking a customer or changing Status applies immediately. Previous / Next (or ← →) steps through the table rows. Esc or X closes.</li>
@@ -522,9 +527,10 @@ document.getElementById('insight-panel-next-button').onclick=()=>{
   else if(r && r.status==='Open' && !isDone(r) && r.choice!==null && r.choice!==undefined){ act(r.id,doConfirm); }
   stepRecord(1);
 };
-document.getElementById('insight-panel-status-select').onchange=e=>{
-  const r=rec(selected);
-  if(e.target.value===r.status) delete r.pendingStatus; else r.pendingStatus=e.target.value;   // applied on Confirm
+document.getElementById('insight-panel-status-button').onclick=e=>{
+  e.stopPropagation();
+  const r=rec(selected), target=panelStatus(r)==='Open'?'Cleared':'Open';
+  if(target===r.status) delete r.pendingStatus; else r.pendingStatus=target;   // staged; applied by Confirm & next
   drawCandidates(r);
 };
 function custLine(r){
@@ -700,7 +706,11 @@ function drawCandidates(r){
   const label={green:'Auto-matched',yellow:'Suggested — confirm or change',red:'No clear match — pick a customer'}[r.match];
   document.getElementById('insight-panel-date').textContent=r.date;
   document.getElementById('insight-panel-vehicle').textContent=r.truck;
-  document.getElementById('insight-panel-status-select').value=panelStatus(r);
+  const ps=panelStatus(r);
+  document.getElementById('insight-panel-status-value').innerHTML = ps==='Cleared'
+    ? (r.pendingStatus ? 'Cleared' : `Cleared <small>· ${r.clearedBy||ME} · ${r.clearedOn||TODAY}</small>`)
+    : 'Open';
+  document.getElementById('insight-panel-status-button').textContent = ps==='Open' ? 'Dismiss' : 'Restore';
   document.getElementById('insight-panel-status-header').innerHTML = r.pendingStatus ? 'Status <small>Not applied yet — Confirm to apply</small>' : 'Status';
   const vl=records.filter(inView), vi=vl.findIndex(x=>x.id===r.id);
   document.getElementById('insight-panel-position').textContent=`${vi+1} of ${vl.length}`;
