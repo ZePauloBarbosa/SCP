@@ -119,7 +119,7 @@
   .car-bar{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:12px 20px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font:400 15px Montserrat,sans-serif}
   .car-bar .dl{justify-self:end;cursor:pointer}
   /* Table */
-  .tbl-head,.tbl-row{display:grid;grid-template-columns:130px 260px 340px 120px 120px 90px 120px;align-items:center;padding:0 20px}
+  .tbl-head,.tbl-row{display:grid;grid-template-columns:130px 260px 380px 140px 140px 120px;align-items:center;padding:0 20px}
   .tbl-head{height:44px;font:500 12px Montserrat,sans-serif;letter-spacing:.5px;color:#555;border-bottom:1px solid var(--border);border-top:1px solid var(--border)}
   .tbl-body{max-height:560px;overflow:auto}
   .tbl-row{min-height:82px;border-bottom:1px solid var(--border);font:300 14px Montserrat,sans-serif;cursor:pointer}
@@ -175,6 +175,7 @@
   .act-link:hover{color:var(--navy-dark)}
   .act-link.disabled{color:#b0b4bd;text-decoration:none;cursor:not-allowed}
   .done-line a.act-link{margin-left:0}
+  .stat-txt{font:300 14px Montserrat,sans-serif}
   .tbl-row.is-done{color:#6b7280}
   .tbl-row.is-done .insight{color:#6b7280}
   .tbl-row.is-cleared{background:#F7F7F9;color:#9aa0aa}
@@ -275,7 +276,7 @@
     </div>
 
     <div class="tbl-head">
-      <div>DATE</div><div>INSIGHT</div><div>CUSTOMER</div><div>ROUTE</div><div>VEHICLE</div><div>OPTIONS</div><div>STATUS</div>
+      <div>DATE</div><div>INSIGHT</div><div>CUSTOMER</div><div>ROUTE</div><div>VEHICLE</div><div>STATUS</div>
     </div>
     <div class="tbl-body" id="community-insights-table"></div>
   </section>
@@ -309,12 +310,12 @@
       Yellow — 2+ candidates, closest is ≤ half the distance of the next. Closest pre-selected.<br>
       Red — 2+ candidates, no clear leader. Nothing selected.</li>
     <li><b>Hover a row</b> → its marker highlights on the map. <b>Click outside</b> the map and table (search, page margins, title) → zooms back to the full view.</li>
-    <li><b>One table.</b> Options = images only. Status column = Open/Cleared with × (clear) or undo (reopen). "Confirm" is a text link under the dropdown, right-aligned — the same spot and style as "Change" on confirmed rows. Picking a customer (table dropdown, panel list or map letter) only selects it; ✓ or "Confirm &amp; next" confirms. Confirmed rows show a check before the name and a Change link; the ✓ spot is left blank. Picking a different customer on the map for a confirmed or auto-matched row un-confirms it until you confirm again. Undo appears only on cleared rows (reopen).</li>
-    <li><b>Panel:</b> "Confirm &amp; next" confirms the selected customer, or a Status change (Open ⇄ Cleared), and moves to the next row. Dismiss / Restore in the panel stages a Status change (Open ⇄ Cleared) that isn't applied until confirmed; leaving the insight discards it. Plain "Next" when there's nothing to confirm.</li>
+    <li><b>Rows are read-only (v10, per 10-09 Three Amigos).</b> Clicking a row only selects the insight: the map zooms to it and the right panel opens. All actions live in the panel: pick a customer (panel list or map letter), Confirm &amp; next, Dismiss / Restore. The row shows the match dot, the selected or suggested customer, a short hint, and Status as plain text. The Options column (images) is gone; images open from the panel thumbnail.</li>
+    <li><b>Panel:</b> "Confirm &amp; next" confirms the selected customer and moves to the next row. <b>Dismiss applies immediately (v11):</b> the row's Status changes Open → Cleared and its customer shows "No customer selected · Cleared · who · date". <b>Restore</b> sets it back to Open and brings back the previous match or suggestion. Plain "Next" when there's nothing to confirm.</li>
     <li><b>Cleared rows</b> show "No customer selected" and "Cleared · who · date".</li>
     <li><b>Click any row</b> → map zooms to the inference, highlights nearby properties (A–D) with distances. Click a letter on the map or in the card to pick that customer.</li>
     <li><b>Right panel</b> (Edit Street pattern): no Save — picking a customer or changing Status applies immediately. Previous / Next (or ← →) steps through the table rows. Esc or X closes.</li>
-    <li><b>X</b> in the row clears the insight. A cleared row shows an <b>undo</b> icon in the same spot to reopen it, and its customer can't be changed until it's reopened.</li>
+
     <li>Image viewer is a carousel: hopper-camera image first, then street-view images of nearby properties (arrows or ← → keys).</li>
     <li>Card keeps today's popup fields (Date, Customer, Vehicle, Status, image). Click the image for the full-size viewer.</li>
     <li>Yellow / red / purple are not in the SCP design system — need design tokens.</li>
@@ -529,9 +530,10 @@ document.getElementById('insight-panel-next-button').onclick=()=>{
 };
 document.getElementById('insight-panel-status-button').onclick=e=>{
   e.stopPropagation();
-  const r=rec(selected), target=panelStatus(r)==='Open'?'Cleared':'Open';
-  if(target===r.status) delete r.pendingStatus; else r.pendingStatus=target;   // staged; applied by Confirm & next
-  drawCandidates(r);
+  const r=rec(selected);
+  delete r.pendingStatus;
+  act(r.id, r.status==='Open' ? doClear : doReopen);   // applies immediately; table row updates
+  const row=document.getElementById('insight-row-'+r.id); if(row) row.classList.add('selected');
 };
 function custLine(r){
   if(r.choice===null||r.choice===undefined) return '<span style="color:var(--match-red)">Not selected — pick below</span>';
@@ -584,7 +586,7 @@ const checkSvg='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stro
 function chosenHouse(r){ return r.choice===null||r.choice===undefined? null : r.cands[r.choice].h; }
 function doneLine(r){
   if(r.status==='Cleared') return `<div class="done-line gray">Cleared · ${r.clearedBy||ME} · ${r.clearedOn||TODAY}</div>`;
-  if(r.confirmed) return `<div class="done-line w244"><span>Confirmed · ${r.confirmedBy} · ${r.confirmedOn}</span><a class="act-link" id="insight-change-customer-${r.id}" data-r="${r.id}">Change</a></div>`;
+  if(r.confirmed) return `<div class="done-line">Confirmed · ${r.confirmedBy} · ${r.confirmedOn}</div>`;
   return `<div class="done-line">&#128274; Auto-matched · ${r.cands[0].d} yd</div>`;
 }
 function custCell(r){
@@ -596,10 +598,11 @@ function custCell(r){
       (h?`<div class="nm">${h.name}</div><div class="ad">${h.num} ${h.street}</div>`:`<div class="ad">No customer selected</div>`)+
       `${doneLine(r)}</div></div>`;
   }
-  const opts=(r.choice===null?`<option value="" selected disabled>Select customer…</option>`:'')+
-    r.cands.map((c,i)=>`<option value="${i}" ${r.choice===i?'selected':''}>${c.letter} · ${c.h.name} — ${c.h.num} ${c.h.street} (${c.d} yd)</option>`).join('');
-  const canConfirm=r.choice!==null&&r.choice!==undefined;
-  return `<div class="cust"><span class="dot ${r.match}"></span><div><div class="ctl"><select id="insight-customer-select-${r.id}" class="${r.choice===null?'unset':''}" data-r="${r.id}">${opts}</select></div><div class="meta w244"><span>${metaFor[r.match]}</span><a class="act-link ${canConfirm?'':'disabled'}" id="insight-confirm-button-${r.id}" data-r="${r.id}" title="${canConfirm?'Confirm customer':'Pick a customer first'}">Confirm</a></div></div></div>`;
+  const pick=(r.choice!==null&&r.choice!==undefined)? r.cands[r.choice] : null;
+  const hint={green:`Changed from auto-match · confirm in panel`, yellow:`Suggested · ${r.cands.length} nearby · confirm in panel`, red:`${r.cands.length} nearby · pick one in panel`};
+  return `<div class="cust" id="insight-customer-${r.id}"><span class="dot ${r.match}"></span><div>`+
+    (pick?`<div class="nm">${pick.h.name}</div><div class="ad">${pick.h.num} ${pick.h.street} (${pick.d} yd)</div>`:`<div class="ad">No customer selected</div>`)+
+    `<div class="meta">${hint[r.match]}</div></div></div>`;
 }
 function confirmSlot(r){
   if(r.status==='Cleared' || (r.match==='green' && !r.touched && !r.confirmed)) return `<span class="slot spacer"></span>`;
@@ -621,34 +624,13 @@ function renderTable(){
       <div>${custCell(r)}</div>
       <div>${r.route}</div>
       <div>${r.truck.replace('Truck','<br>Truck')}</div>
-      <div class="opts" style="justify-content:flex-start">
-        <button id="insight-images-button-${r.id}" title="Images">${camSvg} ${r.imgs}</button>
-      </div>
-      <div class="opts stat">
-        ${r.status==='Open'
-          ? `<button class="stat-btn" id="insight-clear-button-${r.id}" title="Clear"><span>Open</span><span class="ic" style="font-size:20px">&times;</span></button>`
-          : `<button class="stat-btn" id="insight-reopen-button-${r.id}" title="Reopen (set status to Open)"><span>Cleared</span><span class="ic">${undoSvg}</span></button>`}
-      </div>
+      <div class="stat-txt" id="insight-status-${r.id}">${r.status}</div>
     </div>`;}).join('');
   tbody.querySelectorAll('.tbl-row').forEach(row=>{
-    row.addEventListener('click',e=>{
-      if(e.target.closest('button,select,a')) return;
-      selectRecord(row.dataset.r);
-    });
+    row.addEventListener('click',()=>selectRecord(row.dataset.r));
     row.addEventListener('mouseenter',()=>hoverRecord(row.dataset.r));
     row.addEventListener('mouseleave',()=>hoverRecord(null));
   });
-  tbody.querySelectorAll('select').forEach(sl=>{
-    sl.addEventListener('mousedown',e=>{e.stopPropagation(); if(selected!==sl.dataset.r) selectRecord(sl.dataset.r,{keepTable:true});});
-    sl.addEventListener('click',e=>e.stopPropagation());
-    sl.addEventListener('change',()=>choose(sl.dataset.r,+sl.value));
-  });
-  tbody.querySelectorAll('[id^="insight-confirm-button"]').forEach(bt=>bt.addEventListener('click',e=>{e.stopPropagation(); if(bt.classList.contains('disabled')) return; act(bt.dataset.r,doConfirm);}));
-  tbody.querySelectorAll('button[id^="insight-unconfirm-button"]').forEach(bt=>bt.addEventListener('click',e=>{e.stopPropagation(); act(bt.dataset.r,doUnconfirm);}));
-  tbody.querySelectorAll('a[id^="insight-change-customer"]').forEach(a=>a.addEventListener('click',e=>{e.stopPropagation(); act(a.dataset.r,doUnconfirm); selectRecord(a.dataset.r,{keepTable:true});}));
-  tbody.querySelectorAll('button[id^="insight-images"]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation(); const id=b.id.replace('insight-images-button-',''); selectRecord(id); openImage(rec(id));}));
-  tbody.querySelectorAll('button[id^="insight-reopen"]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation(); act(b.id.replace('insight-reopen-button-',''),doReopen);}));
-  tbody.querySelectorAll('button[id^="insight-clear"]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation(); act(b.id.replace('insight-clear-button-',''),doClear);}));
   styleMarkers();
 }
 const rec=id=>records.find(r=>r.id===id);
