@@ -176,6 +176,7 @@
   .act-link.disabled{color:#b0b4bd;text-decoration:none;cursor:not-allowed}
   .done-line a.act-link{margin-left:0}
   .stat-txt{font:300 14px Montserrat,sans-serif}
+  #card-list li.far{opacity:.6}
   .tbl-row.is-done{color:#6b7280}
   .tbl-row.is-done .insight{color:#6b7280}
   .tbl-row.is-cleared{background:#F7F7F9;color:#9aa0aa}
@@ -267,7 +268,7 @@
           <div class="row"><span class="dot yellow"></span>Suggested — review</div>
           <div class="row"><span class="dot red"></span>No clear match — pick one</div>
           <div class="row"><span class="letter" style="width:16px;height:16px;font-size:9px">A</span>Nearby customer</div>
-          <div class="row"><span style="width:16px;height:16px;border:1.5px dashed var(--insight-purple);border-radius:50%;flex:none;display:inline-block"></span>Search area: 20 yd radius (40 yd across)</div>
+          <div class="row"><span style="width:16px;height:16px;border:1.5px dashed var(--insight-purple);border-radius:50%;flex:none;display:inline-block"></span>Search area: 82 yd (75 m) radius</div>
         </div>
         <hr>
         <div class="heat">&#9638; Heat Map</div>
@@ -304,16 +305,14 @@
   <h3>Mock notes (not part of the UI)</h3>
   <ul>
     <li><b>Address → Customer.</b> The reverse-geocoded address is replaced by the matched customer (name + service address).</li>
-    <li><b>Candidates</b> = customers on the truck's route whose pickup location is within 20 yd of the inference point. The dashed circle shows that area: 20 yd radius, 40 yd across (configurable; 20 yd set by Product 10-12).</li>
-    <li><b>Placeholder color rules</b> (to be defined with Ryan / data team):<br>
-      Green — one candidate. Auto-assigned, locked.<br>
-      Yellow — 2+ candidates, closest is ≤ half the distance of the next. Closest pre-selected.<br>
-      Red — 2+ candidates, no clear leader. Nothing selected.</li>
+    <li><b>Matching (v13 — Inference Stop Matching rules, Paulo + Jared 10-13).</b> Candidates = stops on the route whose bin pickup location is within 75 m (82 yd) of the inference. Per stop: closeness = exp(−½·(distance ÷ 30 m)²); ×2 if this vehicle recorded the stop's pickup; probability = weighted ÷ Σ weighted. Confidence = min(1, best weighted) × best probability. High ≥ 0.60 → <b>Green</b> (auto-matched, counts as confirmed, button says Next). Medium 0.30–0.59 → <b>Yellow</b> (best stop suggested, Confirm &amp; next). Low &lt; 0.30 → <b>Red</b> (nothing selected). No stop in range → <b>no dot</b>.</li>
+    <li><b>Every stop in range is pickable.</b> The panel lists all candidates in the 75 m circle, best first; stops far behind the best (below 50% of its score) are dimmed, and only contenders get distance lines on the map. Picking a different stop on a green row un-confirms it until the user confirms.</li>
+    <li><b>Units:</b> US accounts show yards (this mock), UK accounts show meters. 1 m = 1.0936 yd.</li>
     <li><b>Hover a row</b> → its marker highlights on the map. <b>Click outside</b> the map and table (search, page margins, title) → zooms back to the full view.</li>
     <li><b>Rows are read-only (v10, per 10-09 Three Amigos).</b> Clicking a row only selects the insight: the map zooms to it and the right panel opens. All actions live in the panel: pick a customer (panel list or map letter), Confirm &amp; next, Dismiss / Restore. The row shows the match dot, the selected or suggested customer, a short hint, and Status as plain text. The Options column (images) is gone; images open from the panel thumbnail.</li>
     <li><b>Panel:</b> "Confirm &amp; next" confirms the selected customer and moves to the next row. <b>Dismiss applies immediately (v11):</b> the row's Status changes Open → Cleared and its customer shows "No customer selected · Cleared · who · date". <b>Restore</b> sets it back to Open and brings back the previous match or suggestion. Plain "Next" when there's nothing to confirm.</li>
     <li><b>Cleared rows</b> show "No customer selected" and "Cleared · who · date".</li>
-    <li><b>Click any row</b> → map zooms to the inference, highlights nearby properties (A–D) with distances. Click a letter on the map or in the card to pick that customer.</li>
+    <li><b>Click any row</b> → map zooms to the inference, highlights the candidate properties (A, B, C…) with distances. Click a letter on the map or in the card to pick that customer.</li>
     <li><b>Right panel</b> (Edit Street pattern): no Save — picking a customer or changing Status applies immediately. Previous / Next (or ← →) steps through the table rows. Esc or X closes.</li>
 
     <li>Image viewer is a carousel: hopper-camera image first, then street-view images of nearby properties (arrows or ← → keys).</li>
@@ -385,23 +384,33 @@ const records=[
   {id:'r1',date:'03/04/2026',type:'Plastic',      x:1185+4, y:555, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
   {id:'r2',date:'03/04/2026',type:'Paper',        x:1091,   y:205, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
   {id:'r3',date:'03/04/2026',type:'Plastic Bag',  x:216,    y:254, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
-  {id:'r4',date:'03/04/2026',type:'Other',        x:543,    y:254, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
+  {id:'r4',date:'03/04/2026',type:'Other',        x:1250,   y:478, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
   {id:'r5',date:'03/04/2026',type:'Plastic Bag',  x:1322,   y:205, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
-  {id:'r6',date:'03/11/2026',type:'Styrofoam',    x:305-3,  y:555, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
+  {id:'r6',date:'03/11/2026',type:'Styrofoam',    x:1504,   y:204, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
   {id:'r7',seedConfirm:{by:'Paulo B.',on:'10/08/2026'},date:'03/11/2026',type:'Bag',          x:736,    y:266, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
   {id:'r8',seedClear:{by:'Ryan A.',on:'03/12/2026'},date:'03/11/2026',type:'Plastic Bottle',x:795+5, y:555, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Cleared', imgs:3},
 ];
-const RADIUS=20;
-const LETTERS='ABCDEFG';
+/* Matching — Inference Stop Matching rules (Paulo + Jared, 10-13). Map units are yards (US account). */
+const YD_PER_M=1.0936, SEARCH_M=75, SIGMA_M=30, VEH_W=2, HIGH=0.60, MED=0.30, CONTENDER=0.5;
+const RADIUS=Math.round(SEARCH_M*YD_PER_M);   // 82 yd
+const LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 records.forEach(r=>{
-  const c=houses.map(h=>({h,d:Math.hypot(h.cx-r.x,h.cy-r.y)})).filter(o=>o.d<=RADIUS).sort((a,b)=>a.d-b.d);
-  r.cands=c.slice(0,4).map((o,i)=>({...o,letter:LETTERS[i],d:Math.round(o.d)}));
-  const n=r.cands.length;
-  if(n===1){r.match='green'; r.choice=0;}
-  else if(n>=2 && r.cands[0].d <= 0.5*r.cands[1].d){r.match='yellow'; r.choice=0;}
+  let c=houses.map(h=>({h,d:Math.hypot(h.cx-r.x,h.cy-r.y)})).filter(o=>o.d<=RADIUS);
+  c.forEach(o=>{ const m=o.d/YD_PER_M; o.close=Math.exp(-0.5*(m/SIGMA_M)**2); o.veh=(r.servicedBy===o.h.id); o.w=o.close*(o.veh?VEH_W:1); });
+  c.sort((a,b)=>b.w-a.w);
+  const sum=c.reduce((t,o)=>t+o.w,0);
+  c.forEach(o=>{o.p=sum?o.w/sum:0;});
+  const best=c[0];
+  r.conf= best? Math.min(1,best.w)*best.p : 0;
+  r.rating= !best?'None': r.conf>=HIGH?'High': r.conf>=MED?'Medium':'Low';
+  r.cands=c.map((o,i)=>({...o,letter:LETTERS[i],d:Math.round(o.d),contender:o.w>=CONTENDER*best.w}));
+  r.nContenders=r.cands.filter(o=>o.contender).length;
+  if(r.rating==='None'){r.match='none'; r.choice=null;}
+  else if(r.rating==='High'){r.match='green'; r.choice=0;}
+  else if(r.rating==='Medium'){r.match='yellow'; r.choice=0;}
   else {r.match='red'; r.choice=null;}
   r.confirmed=false;
-  if(r.seedConfirm){r.confirmed=true;r.confirmedBy=r.seedConfirm.by;r.confirmedOn=r.seedConfirm.on;}
+  if(r.seedConfirm){if(r.choice===null)r.choice=0;r.confirmed=true;r.confirmedBy=r.seedConfirm.by;r.confirmedOn=r.seedConfirm.on;}
   if(r.seedClear){r.clearedBy=r.seedClear.by;r.clearedOn=r.seedClear.on;}
 });
 const ME='Paulo B.', TODAY='10/09/2026';
@@ -590,8 +599,8 @@ function doneLine(r){
   return `<div class="done-line">&#128274; Auto-matched · ${r.cands[0].d} yd</div>`;
 }
 function custCell(r){
-  if(r.cands.length===0) return `<div class="cust"><span class="dot red"></span><div><div class="ad">No customer within ${RADIUS} yd</div></div></div>`;
-  const metaFor={green:`Changed from auto-match · confirm`, yellow:`Suggested · ${r.cands.length} nearby`, red:`${r.cands.length} nearby · pick one`};
+  if(r.cands.length===0) return `<div class="cust" id="insight-customer-${r.id}"><span class="dot" style="visibility:hidden"></span><div><div class="ad">No customer selected</div><div class="meta">No customer within ${RADIUS} yd (${SEARCH_M} m)</div></div></div>`;
+  const metaFor={green:`Changed from auto-match · confirm`, yellow:`Suggested · ${r.nContenders} nearby`, red:`${r.nContenders} nearby · pick one`};
   if(isDone(r) && !r.editing){
     const h=r.status==='Cleared' ? null : (chosenHouse(r) || (r.match==='green'?r.cands[0].h:null));
     return `<div class="cust" id="insight-customer-${r.id}"><span class="chk ${r.status==='Cleared'?'gray':''}"></span><div>`+
@@ -599,7 +608,7 @@ function custCell(r){
       `${doneLine(r)}</div></div>`;
   }
   const pick=(r.choice!==null&&r.choice!==undefined)? r.cands[r.choice] : null;
-  const hint={green:`Changed from auto-match · confirm in panel`, yellow:`Suggested · ${r.cands.length} nearby · confirm in panel`, red:`${r.cands.length} nearby · pick one in panel`};
+  const hint={green:`Changed from auto-match · confirm in panel`, yellow:`Suggested · ${r.nContenders} nearby · confirm in panel`, red:`${r.nContenders} nearby · pick one in panel`};
   return `<div class="cust" id="insight-customer-${r.id}"><span class="dot ${r.match}"></span><div>`+
     (pick?`<div class="nm">${pick.h.name}</div><div class="ad">${pick.h.num} ${pick.h.street} (${pick.d} yd)</div>`:`<div class="ad">No customer selected</div>`)+
     `<div class="meta">${hint[r.match]}</div></div></div>`;
@@ -668,12 +677,14 @@ function drawCandidates(r){
   r.cands.forEach((c,i)=>{
     const chosen=r.choice===i;
     bldgEls[c.h.id].setAttribute('class','bldg cand'+(chosen?' chosen':'')+(panelStatus(r)==='Cleared'?' locked':''));
+    if(c.contender||chosen){
     el('line',{x1:r.x,y1:r.y,x2:c.h.cx,y2:c.h.cy,stroke:'var(--navy)','stroke-width':chosen?.7:.4,'stroke-dasharray':'1.4 1'},candLayer);
-    // distance label at midpoint
+    // distance label at midpoint (contenders and the selected stop only)
     const mx=(r.x+c.h.cx)/2, my=(r.y+c.h.cy)/2;
     const lg=el('g',{},candLayer);
     el('rect',{x:mx-4.2,y:my-1.9,width:8.4,height:3.6,rx:1.6,fill:'#fff',stroke:'#cfd4dc','stroke-width':.25},lg);
     el('text',{x:mx,y:my+.9,'text-anchor':'middle',style:'font:500 2.4px Montserrat,sans-serif;fill:#242833'},lg).textContent=c.d+' yd';
+    }
     // letter badge on property
     const bx=c.h.x+c.h.w/2, by=c.h.y+c.h.h/2;
     const g=el('g',{id:`map-candidate-pin-${r.id}-${c.letter}`,style:'cursor:pointer'},candLayer);
@@ -685,7 +696,7 @@ function drawCandidates(r){
   });
   // card
   document.getElementById('card-title').textContent=`Material Contamination: ${r.type}`;
-  const label={green:'Auto-matched',yellow:'Suggested — confirm or change',red:'No clear match — pick a customer'}[r.match];
+  const label={green:'Auto-matched',yellow:'Suggested — confirm or change',red:'No clear match — pick a customer',none:'No customer nearby'}[r.match];
   document.getElementById('insight-panel-date').textContent=r.date;
   document.getElementById('insight-panel-vehicle').textContent=r.truck;
   const ps=panelStatus(r);
@@ -708,7 +719,7 @@ function drawCandidates(r){
   const ul=document.getElementById('card-list');
   ul.classList.toggle('locked', panelStatus(r)==='Cleared');
   ul.title = panelStatus(r)==='Cleared' ? 'Cleared — set Status to Open to change the customer' : '';
-  ul.innerHTML=r.cands.map((c,i)=>`<li id="map-candidate-option-${r.id}-${c.letter}" class="${r.choice===i?'sel':''}" data-i="${i}">
+  ul.innerHTML=r.cands.map((c,i)=>`<li id="map-candidate-option-${r.id}-${c.letter}" class="${r.choice===i?'sel':''} ${c.contender?'':'far'}" data-i="${i}">
       <span class="letter">${c.letter}</span>
       <div><div class="nm">${c.h.name}</div><div class="ad">${c.h.num} ${c.h.street}</div></div>
       <span class="dist">${c.d} yd</span></li>`).join('');
