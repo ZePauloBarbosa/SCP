@@ -267,7 +267,7 @@
           <div class="row"><span class="dot yellow"></span>Suggested — review</div>
           <div class="row"><span class="dot red"></span>No clear match — pick one</div>
           <div class="row"><span class="letter" style="width:16px;height:16px;font-size:9px">A</span>Nearby customer</div>
-          <div class="row"><span style="width:16px;height:16px;border:1.5px dashed var(--insight-purple);border-radius:50%;flex:none;display:inline-block"></span>Search area: 40 yd radius (80 yd across)</div>
+          <div class="row"><span style="width:16px;height:16px;border:1.5px dashed var(--insight-purple);border-radius:50%;flex:none;display:inline-block"></span>Search area: 20 yd radius (40 yd across)</div>
         </div>
         <hr>
         <div class="heat">&#9638; Heat Map</div>
@@ -304,7 +304,7 @@
   <h3>Mock notes (not part of the UI)</h3>
   <ul>
     <li><b>Address → Customer.</b> The reverse-geocoded address is replaced by the matched customer (name + service address).</li>
-    <li><b>Candidates</b> = customers on the truck's route whose pickup location is within 40 yd of the inference point. The dashed circle shows that area: 40 yd radius, 80 yd across.</li>
+    <li><b>Candidates</b> = customers on the truck's route whose pickup location is within 20 yd of the inference point. The dashed circle shows that area: 20 yd radius, 40 yd across (configurable; 20 yd set by Product 10-12).</li>
     <li><b>Placeholder color rules</b> (to be defined with Ryan / data team):<br>
       Green — one candidate. Auto-assigned, locked.<br>
       Yellow — 2+ candidates, closest is ≤ half the distance of the next. Closest pre-selected.<br>
@@ -384,14 +384,14 @@ runs.forEach(r=>{
 const records=[
   {id:'r1',date:'03/04/2026',type:'Plastic',      x:1185+4, y:555, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
   {id:'r2',date:'03/04/2026',type:'Paper',        x:1091,   y:205, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
-  {id:'r3',date:'03/04/2026',type:'Plastic Bag',  x:451,    y:261, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
-  {id:'r4',date:'03/04/2026',type:'Other',        x:1246,   y:395, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
+  {id:'r3',date:'03/04/2026',type:'Plastic Bag',  x:216,    y:254, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
+  {id:'r4',date:'03/04/2026',type:'Other',        x:543,    y:254, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
   {id:'r5',date:'03/04/2026',type:'Plastic Bag',  x:1322,   y:205, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
   {id:'r6',date:'03/11/2026',type:'Styrofoam',    x:305-3,  y:555, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
-  {id:'r7',seedConfirm:{by:'Paulo B.',on:'10/08/2026'},date:'03/11/2026',type:'Bag',          x:1412,   y:395, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
+  {id:'r7',seedConfirm:{by:'Paulo B.',on:'10/08/2026'},date:'03/11/2026',type:'Bag',          x:736,    y:266, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Open', imgs:3},
   {id:'r8',seedClear:{by:'Ryan A.',on:'03/12/2026'},date:'03/11/2026',type:'Plastic Bottle',x:795+5, y:555, route:'RES-WED-02', truck:'Paso Robles Truck 64', status:'Cleared', imgs:3},
 ];
-const RADIUS=40;
+const RADIUS=20;
 const LETTERS='ABCDEFG';
 records.forEach(r=>{
   const c=houses.map(h=>({h,d:Math.hypot(h.cx-r.x,h.cy-r.y)})).filter(o=>o.d<=RADIUS).sort((a,b)=>a.d-b.d);
