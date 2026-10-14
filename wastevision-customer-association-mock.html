@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- CHANGELOG
+v13 2026-10-13 Inference Stop Matching rules (75 m / 82 yd search, confidence-based Green/Yellow/Red, contenders).
+v14 2026-10-14 Row-level action column: X clears an Open insight, undo icon restores a Cleared one. Panel "Dismiss" renamed "Clear".
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -119,7 +123,7 @@
   .car-bar{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:12px 20px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font:400 15px Montserrat,sans-serif}
   .car-bar .dl{justify-self:end;cursor:pointer}
   /* Table */
-  .tbl-head,.tbl-row{display:grid;grid-template-columns:130px 260px 380px 140px 140px 120px;align-items:center;padding:0 20px}
+  .tbl-head,.tbl-row{display:grid;grid-template-columns:130px 260px 380px 140px 140px 120px 40px;align-items:center;padding:0 20px}
   .tbl-head{height:44px;font:500 12px Montserrat,sans-serif;letter-spacing:.5px;color:#555;border-bottom:1px solid var(--border);border-top:1px solid var(--border)}
   .tbl-body{max-height:560px;overflow:auto}
   .tbl-row{min-height:82px;border-bottom:1px solid var(--border);font:300 14px Montserrat,sans-serif;cursor:pointer}
@@ -177,6 +181,8 @@
   .done-line a.act-link{margin-left:0}
   .stat-txt{font:300 14px Montserrat,sans-serif}
   #card-list li.far{opacity:.6}
+  .row-act{width:28px;height:28px;border:0;border-radius:4px;background:none;color:#888;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;justify-self:end;padding:0}
+  .row-act:hover{color:var(--navy-dark);background:var(--active-bg)}
   .tbl-row.is-done{color:#6b7280}
   .tbl-row.is-done .insight{color:#6b7280}
   .tbl-row.is-cleared{background:#F7F7F9;color:#9aa0aa}
@@ -277,7 +283,7 @@
     </div>
 
     <div class="tbl-head">
-      <div>DATE</div><div>INSIGHT</div><div>CUSTOMER</div><div>ROUTE</div><div>VEHICLE</div><div>STATUS</div>
+      <div>DATE</div><div>INSIGHT</div><div>CUSTOMER</div><div>ROUTE</div><div>VEHICLE</div><div>STATUS</div><div></div>
     </div>
     <div class="tbl-body" id="community-insights-table"></div>
   </section>
@@ -309,9 +315,10 @@
     <li><b>Every stop in range is pickable.</b> The panel lists all candidates in the 75 m circle, best first; stops far behind the best (below 50% of its score) are dimmed, and only contenders get distance lines on the map. Picking a different stop on a green row un-confirms it until the user confirms.</li>
     <li><b>Units:</b> US accounts show yards (this mock), UK accounts show meters. 1 m = 1.0936 yd.</li>
     <li><b>Hover a row</b> → its marker highlights on the map. <b>Click outside</b> the map and table (search, page margins, title) → zooms back to the full view.</li>
-    <li><b>Rows are read-only (v10, per 10-09 Three Amigos).</b> Clicking a row only selects the insight: the map zooms to it and the right panel opens. All actions live in the panel: pick a customer (panel list or map letter), Confirm &amp; next, Dismiss / Restore. The row shows the match dot, the selected or suggested customer, a short hint, and Status as plain text. The Options column (images) is gone; images open from the panel thumbnail.</li>
-    <li><b>Panel:</b> "Confirm &amp; next" confirms the selected customer and moves to the next row. <b>Dismiss applies immediately (v11):</b> the row's Status changes Open → Cleared and its customer shows "No customer selected · Cleared · who · date". <b>Restore</b> sets it back to Open and brings back the previous match or suggestion. Plain "Next" when there's nothing to confirm.</li>
+    <li><b>Rows are read-only (v10, per 10-09 Three Amigos).</b> Clicking a row only selects the insight: the map zooms to it and the right panel opens. All actions live in the panel: pick a customer (panel list or map letter), Confirm &amp; next, Clear / Restore. The row shows the match dot, the selected or suggested customer, a short hint, and Status as plain text. The Options column (images) is gone; images open from the panel thumbnail.</li>
+    <li><b>Panel:</b> "Confirm &amp; next" confirms the selected customer and moves to the next row. <b>Clear applies immediately (v11; renamed from Dismiss in v14):</b> the row's Status changes Open → Cleared and its customer shows "No customer selected · Cleared · who · date". <b>Restore</b> sets it back to Open and brings back the previous match or suggestion. Plain "Next" when there's nothing to confirm.</li>
     <li><b>Cleared rows</b> show "No customer selected" and "Cleared · who · date".</li>
+    <li><b>Row action (v14).</b> The last column has one action per row: <b>X</b> clears an Open insight (Open → Cleared); on a Cleared row it turns into an <b>undo</b> icon that restores it (Cleared → Open, previous match or suggestion comes back). Both apply immediately, same as the panel's Clear / Restore, and don't select the row. This is the one exception to "rows are read-only".</li>
     <li><b>Click any row</b> → map zooms to the inference, highlights the candidate properties (A, B, C…) with distances. Click a letter on the map or in the card to pick that customer.</li>
     <li><b>Right panel</b> (Edit Street pattern): no Save — picking a customer or changing Status applies immediately. Previous / Next (or ← →) steps through the table rows. Esc or X closes.</li>
 
@@ -591,6 +598,12 @@ document.getElementById('insight-image-modal').onclick=e=>{ if(e.target.id==='in
 const tbody=document.getElementById('community-insights-table');
 const undoSvg='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h6.5a3.5 3.5 0 0 1 0 7H7"/><path d="M6.5 3.5 4 6l2.5 2.5"/></svg>';
 const camSvg='<svg width="16" height="14" viewBox="0 0 16 14"><path fill="currentColor" d="M5 1h6l1.2 2H15v10H1V3h2.8z" opacity=".75"/><circle cx="8" cy="8" r="2.8" fill="#fff"/></svg>';
+const clearSvg='<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg>';
+function actCell(r){
+  return r.status==='Cleared'
+    ? `<button class="row-act" id="insight-restore-button-${r.id}" data-r="${r.id}" data-act="restore" title="Restore (set Status to Open)" aria-label="Restore insight">${undoSvg}</button>`
+    : `<button class="row-act" id="insight-clear-button-${r.id}" data-r="${r.id}" data-act="clear" title="Clear (set Status to Cleared)" aria-label="Clear insight">${clearSvg}</button>`;
+}
 const checkSvg='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>';
 function chosenHouse(r){ return r.choice===null||r.choice===undefined? null : r.cands[r.choice].h; }
 function doneLine(r){
@@ -634,12 +647,17 @@ function renderTable(){
       <div>${r.route}</div>
       <div>${r.truck.replace('Truck','<br>Truck')}</div>
       <div class="stat-txt" id="insight-status-${r.id}">${r.status}</div>
+      ${actCell(r)}
     </div>`;}).join('');
   tbody.querySelectorAll('.tbl-row').forEach(row=>{
     row.addEventListener('click',()=>selectRecord(row.dataset.r));
     row.addEventListener('mouseenter',()=>hoverRecord(row.dataset.r));
     row.addEventListener('mouseleave',()=>hoverRecord(null));
   });
+  tbody.querySelectorAll('.row-act').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation();                               // acting on a row doesn't select it
+    act(b.dataset.r, x=>{ delete x.pendingStatus; (b.dataset.act==='clear'?doClear:doReopen)(x); });
+  }));
   styleMarkers();
 }
 const rec=id=>records.find(r=>r.id===id);
@@ -703,7 +721,7 @@ function drawCandidates(r){
   document.getElementById('insight-panel-status-value').innerHTML = ps==='Cleared'
     ? (r.pendingStatus ? 'Cleared' : `Cleared <small>· ${r.clearedBy||ME} · ${r.clearedOn||TODAY}</small>`)
     : 'Open';
-  document.getElementById('insight-panel-status-button').textContent = ps==='Open' ? 'Dismiss' : 'Restore';
+  document.getElementById('insight-panel-status-button').textContent = ps==='Open' ? 'Clear' : 'Restore';
   document.getElementById('insight-panel-status-header').innerHTML = r.pendingStatus ? 'Status <small>Not applied yet — Confirm to apply</small>' : 'Status';
   const vl=records.filter(inView), vi=vl.findIndex(x=>x.id===r.id);
   document.getElementById('insight-panel-position').textContent=`${vi+1} of ${vl.length}`;
