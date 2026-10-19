@@ -6,6 +6,7 @@
               Icons redrawn inline: Figma asset URLs are not downloadable from the build environment.
 2026-10-19 v2 — Modal widened to 1640px (fits viewport). More spacing between columns and rows.
               Name, dropdown choices and access summaries wrap onto extra lines instead of cutting off (as Figma wraps long names).
+2026-10-19 v3 — Roles replaced with the live SmartCity Edit User roles: Admin, Manager, View Only, Support.
 -->
 <html lang="en">
 <head>
@@ -154,7 +155,7 @@
   <label id="mock-role-wrap" hidden>Viewing as
     <select id="mock-role-select"></select>
   </label>
-  <span class="note">Role names are illustrative. Confirm the SmartCity role list before build.</span>
+  <span class="note">Roles match the SmartCity Edit User modal: Admin, Manager, View Only, Support.</span>
 </div>
 
 <header class="topnav">
@@ -263,20 +264,20 @@
 <div class="toast" id="mock-toast"></div>
 
 <script>
-const ROLES = ['Administrator','Supervisor','Customer Service','Dispatcher','View Only'];
+const ROLES = ['Admin','Manager','Support','View Only'];
 const ALL = () => ROLES.slice();
 
 let fields = [
-  {id:1,name:'Collection notes',type:'Text field',format:'Large',def:'Enter text here',req:false,view:ALL(),edit:['Administrator','Supervisor','Customer Service'],value:'Bins kept behind side gate'},
-  {id:2,name:'Zone',type:'Dropdown',format:'Single Selection',def:'North, South, East, West',req:true,view:ALL(),edit:['Administrator','Supervisor'],value:'North'},
-  {id:3,name:'VIP residence',type:'Checkmark',format:'',def:'Active',req:false,view:ALL(),edit:['Administrator','Supervisor','Customer Service'],value:true},
-  {id:4,name:'Metal plate in driveway',type:'Toggle',format:'',def:'Inactive',req:false,view:ALL(),edit:['Administrator','Supervisor','Customer Service','Dispatcher'],value:true},
-  {id:5,name:'Assisted collection review date',type:'Date picker',format:'Single Date',def:'12/12/2025',req:false,view:['Administrator','Supervisor','Customer Service'],edit:['Administrator','Supervisor'],value:'2026-11-30'},
-  {id:6,name:'Medical contact (GP)',type:'Text field',format:'Small',def:'Enter text here',req:false,view:['Administrator','Supervisor'],edit:['Administrator'],value:'Dr A. Example, High St Surgery'},
-  {id:7,name:'Number of bins on site',type:'Number count',format:'Integer',def:'0',req:true,view:ALL(),edit:['Administrator','Supervisor','Customer Service'],value:'3'}
+  {id:1,name:'Collection notes',type:'Text field',format:'Large',def:'Enter text here',req:false,view:ALL(),edit:['Admin','Manager','Support'],value:'Bins kept behind side gate'},
+  {id:2,name:'Zone',type:'Dropdown',format:'Single Selection',def:'North, South, East, West',req:true,view:ALL(),edit:['Admin','Manager'],value:'North'},
+  {id:3,name:'VIP residence',type:'Checkmark',format:'',def:'Active',req:false,view:ALL(),edit:['Admin','Manager','Support'],value:true},
+  {id:4,name:'Metal plate in driveway',type:'Toggle',format:'',def:'Inactive',req:false,view:ALL(),edit:['Admin','Manager','Support'],value:true},
+  {id:5,name:'Assisted collection review date',type:'Date picker',format:'Single Date',def:'12/12/2025',req:false,view:['Admin','Manager','Support'],edit:['Admin','Manager'],value:'2026-11-30'},
+  {id:6,name:'Medical contact (GP)',type:'Text field',format:'Small',def:'Enter text here',req:false,view:['Admin','Manager'],edit:['Admin'],value:'Dr A. Example, High St Surgery'},
+  {id:7,name:'Number of bins on site',type:'Number count',format:'Integer',def:'0',req:true,view:ALL(),edit:['Admin','Manager','Support'],value:'3'}
 ];
 let nextId = 8;
-let currentRole = 'Customer Service';
+let currentRole = 'Support';
 
 const TYPES = ['Text field','Dropdown','Date picker','Checkmark','Toggle','Number count'];
 const FORMATS = {'Text field':['Small','Large'],'Dropdown':['Single Selection','Multiple Selection'],'Date picker':['Single Date','Date Range'],'Checkmark':[],'Toggle':[],'Number count':['Integer','2 Decimal Fields']};
@@ -384,7 +385,7 @@ window.addEventListener('resize',growAll);
 document.addEventListener('input', e => { const el=e.target; if (el.dataset.k && (el.tagName==='TEXTAREA' || (el.tagName==='INPUT' && el.type!=='checkbox'))){ getField(el.dataset.f)[el.dataset.k]=el.value; if(el.tagName==='TEXTAREA') grow(el); } });
 
 $('#cf-add-field-button').onclick = () => {
-  fields.push({id:nextId++,name:'',type:'Text field',format:'Small',def:'',req:false,view:ALL(),edit:['Administrator'],value:''});
+  fields.push({id:nextId++,name:'',type:'Text field',format:'Small',def:'',req:false,view:ALL(),edit:['Admin'],value:''});
   renderRows();
   document.querySelector(`#cf-field-${nextId-1}-name-input`).focus();
 };
