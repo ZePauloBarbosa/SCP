@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<!-- CHANGELOG
+2026-10-19 v1 — SCP-4395. Built from Figma M09kEEo1KNu48sLPl3b2av node 153:21166 (modal 126:3892, customer details 48:5163, app settings 199:3538) and design system 1213:6778.
+              Modal widened from ~960px to 1200px. Added per-field View access and Edit access (role multi-select, edit ⊆ view).
+              Added Customer Details "view as role" preview to show hidden and read-only behaviour.
+              Icons redrawn inline: Figma asset URLs are not downloadable from the build environment.
+2026-10-19 v2 — Modal widened to 1640px (fits viewport). More spacing between columns and rows.
+              Name, dropdown choices and access summaries wrap onto extra lines instead of cutting off (as Figma wraps long names).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCP-4395 Custom Fields – Permissions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* Tokens from Figma 1213:6778 and 126:3892 */
+  :root{
+    --navy:#20315A; --nav:#242833; --green:#33A542; --page:#FAFAFC; --white:#FFFFFF;
+    --border:#E5E7EB; --line:#F2F2F5; --label:#B4B4C4; --muted:#76768C; --chk:#D9D9E1;
+    --close:#EBEBF0; --overlay:rgba(36,40,51,.3); --text:#242833;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:Montserrat,sans-serif;background:var(--page);color:var(--text);font-weight:300;font-size:14px}
+  button{font-family:inherit}
+
+  /* Mock-only control bar (not product UI) */
+  #mock-bar{position:sticky;top:0;z-index:100;background:#FFF8E1;border-bottom:1px solid #F0D98C;padding:8px 24px;display:flex;gap:16px;align-items:center;font-size:12px;font-weight:400;flex-wrap:wrap}
+  #mock-bar b{font-weight:700}
+  #mock-bar .seg{display:flex;background:#E0E1E8;border-radius:20px;padding:2px}
+  #mock-bar .seg button{border:0;background:transparent;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:12px;color:var(--text)}
+  #mock-bar .seg button.on{background:var(--navy);color:#fff}
+  #mock-bar select{font-family:inherit;font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:5px}
+  #mock-bar .note{color:#7a6400}
+
+  /* Top nav — 70px, #242833, active 4px green underline */
+  .topnav{height:70px;background:var(--nav);display:flex;align-items:center;padding:0 0 0 224px;position:relative}
+  .logo{color:#fff;font-weight:700;font-size:24px;display:flex;align-items:center;gap:6px;width:240px;letter-spacing:-.5px}
+  .logo i{width:30px;height:30px;border-radius:50%;background:var(--green);display:inline-block}
+  .navlinks{display:flex;height:70px}
+  .navlinks a{color:rgba(255,255,255,.8);text-decoration:none;font-size:15px;font-weight:400;display:flex;align-items:center;gap:8px;padding:0 28px;height:70px;border-bottom:4px solid transparent}
+  .navlinks a.on{border-bottom-color:var(--green)}
+  .navlinks svg{width:24px;height:24px}
+  .navright{position:absolute;right:224px;display:flex;gap:10px;align-items:center}
+  .abc{background:#B4B4C4;color:var(--nav);font-size:10px;border-radius:3px;padding:2px 5px;font-weight:500}
+  .subnav{height:52px;background:#fff;display:flex;justify-content:center;gap:46px;align-items:center;font-size:14px;font-weight:400}
+
+  .wrap{width:1140px;margin:0 auto}
+  .pagehead{display:flex;justify-content:space-between;align-items:center;padding:30px 0 26px}
+  .pagehead h1{font-size:36px;font-weight:300;margin:0;display:flex;align-items:center;gap:12px}
+  .btn{background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:5px;padding:8px 30px;font-size:14px;font-weight:400;cursor:pointer}
+  .btn.sec{background:transparent;color:var(--navy);padding:6px 22px;font-size:13px}
+  .btn.danger{background:transparent;color:#E5484D;border-color:#E5484D;padding:6px 22px;font-size:13px}
+  .panel{background:#fff;box-shadow:0 3px 6px rgba(36,40,51,.10);margin-bottom:40px}
+
+  /* Application settings */
+  .settings{padding:30px 20px}
+  .settings h2{font-size:22px;font-weight:300;margin:0 0 24px 4px}
+  .settings h3{font-size:16px;font-weight:300;margin:0 0 18px 4px}
+  .cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+  .frow{height:34.5px;display:flex;align-items:center;gap:8px;padding:0 4px;font-size:13px;font-weight:400}
+  .frow span{flex:1}
+  .frow.dim{color:#9a9aae}
+  .frow.hl{background:#EEF1F8;border-radius:5px}
+  .pencil{width:16px;height:16px;color:#B4B4C4;cursor:pointer;background:none;border:0;padding:0}
+  .pencil:hover{color:var(--navy)}
+
+  /* Checkbox — 15px, 3px radius, #20315A checked, #D9D9E1 unchecked */
+  .cb{appearance:none;-webkit-appearance:none;width:15px;height:15px;border:1px solid var(--chk);border-radius:3px;margin:0;cursor:pointer;position:relative;flex:none;background:#fff}
+  .cb:checked{background:var(--navy);border-color:var(--navy)}
+  .cb:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid #fff;border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
+  .cb:disabled{opacity:.5;cursor:default}
+
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:var(--overlay);z-index:50;display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:60px 24px}
+  .overlay.open{display:flex}
+  .modal{background:#fff;width:1640px;max-width:calc(100vw - 48px);padding:36px 40px;display:flex;flex-direction:column;gap:10px;align-items:center}
+  .closex{align-self:flex-end;width:20px;height:20px;border-radius:4px;background:var(--close);border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#76768C}
+  .mtitle{font-size:27px;font-weight:300;color:#000;padding-bottom:10px}
+  .entity{width:355px}
+  .sect{width:100%;background:var(--line);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:11px;font-weight:400;color:var(--muted);cursor:pointer;margin-top:1px}
+
+  /* Underline inputs (Input Fields) */
+  .inp{border-bottom:1px solid var(--line);min-height:33px;display:flex;flex-direction:column;justify-content:center;position:relative}
+  .inp > label{font-size:12px;font-weight:400;color:var(--label);line-height:22px}
+  .inp .val{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 8px 0;line-height:22px;font-size:14px;font-weight:300;color:#000;gap:6px}
+  .inp input:not(.cb),.inp select{border:0;outline:0;font-family:inherit;font-size:14px;font-weight:300;color:#000;background:transparent;padding:0;width:100%;line-height:22px}
+  .inp select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:16px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='6' viewBox='0 0 11 6'%3E%3Cpath d='M1 1l4.5 4L10 1' fill='none' stroke='%23242833' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat right center}
+  .inp:focus-within{border-bottom-color:var(--navy)}
+  .chev{width:11px;height:6px;flex:none}
+  .inp textarea{border:0;outline:0;resize:none;overflow:hidden;font-family:inherit;font-size:14px;font-weight:300;color:#000;background:transparent;padding:0;width:100%;line-height:22px;display:block;field-sizing:content;min-height:22px}
+
+  .rows{width:100%;padding:8px 18px 0}
+  .row{display:flex;align-items:flex-start}
+  .drag{width:44px;align-self:stretch;display:flex;align-items:center;color:#c9c9d6;cursor:grab}
+  .cells{flex:1;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1.05fr) minmax(0,1.15fr) minmax(0,1.35fr) minmax(0,1.35fr) minmax(0,1.35fr) 72px;column-gap:40px}
+  .cell{padding-bottom:24px}
+  .req .val{justify-content:flex-end;padding-top:8px}
+  .del{width:44px;margin-left:12px;display:flex;align-items:center;justify-content:center;padding-top:30px;color:#B4B4C4;background:none;border:0;cursor:pointer}
+  .del:hover{color:#E5484D}
+
+  /* Access multi-select */
+  .acc{cursor:pointer}
+  .acc .val{font-size:14px}
+  .acc .sum{flex:1;white-space:normal;line-height:20px}
+  .lock{width:12px;height:12px;flex:none;color:var(--navy)}
+  .acc .val{align-items:flex-start}.acc .val .chev,.acc .val .lock{margin-top:7px}.acc.restricted .sum{color:var(--navy);font-weight:400}
+  .pop{position:absolute;top:100%;left:0;z-index:20;background:#fff;width:260px;border-radius:5px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:12px 0 8px;display:none}
+  .pop.open{display:block}
+  .pop h4{margin:0 14px 6px;font-size:11px;font-weight:400;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+  .pop .opt{display:flex;color:var(--text);line-height:18px;align-items:center;gap:10px;padding:7px 14px;font-size:13px;font-weight:400;cursor:pointer}
+  .pop .opt:hover{background:var(--page)}
+  .pop .opt.forced{color:#9a9aae}
+  .pop .hint{margin:6px 14px 0;font-size:11px;color:var(--muted);line-height:15px;border-top:1px solid var(--line);padding-top:8px}
+  .pop .all{border-bottom:1px solid var(--line);margin-bottom:4px;padding-bottom:9px}
+
+  .colnote{width:100%;display:flex;gap:8px;align-items:center;background:rgba(0,102,166,.08);border-left:3px solid #0066A6;padding:11px 14px;font-size:13px;font-weight:400;margin:4px 0 6px}
+  .actions{width:100%;display:flex;justify-content:flex-end;gap:10px;padding:30px 0}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--nav);color:#fff;padding:10px 18px;border-radius:5px;font-size:13px;font-weight:400;opacity:0;transition:opacity .2s;z-index:200;pointer-events:none}
+  .toast.show{opacity:1}
+
+  /* Customer details */
+  .card-h{display:flex;justify-content:space-between;align-items:center;padding:30px 12px 14px;border-bottom:1px solid var(--line);font-size:16px;font-weight:300}
+  .kv{display:grid;grid-template-columns:repeat(5,1fr);padding:22px 12px 30px}
+  .kv label{display:block;font-size:12px;color:var(--label);font-weight:400;margin-bottom:12px}
+  .kv div{font-size:13px;font-weight:400}
+  .cfgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px 30px;padding:30px 22px 40px}
+  .cfgrid .wide{grid-column:span 2}
+  .ro .val{color:var(--text)}
+  .ro{border-bottom-color:transparent}
+  .ro > label{display:flex;align-items:center;gap:5px}
+  .toggle{width:28px;height:16px;border-radius:10px;background:#CBD5E1;position:relative;cursor:pointer;flex:none;border:0;padding:0}
+  .toggle::after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .15s}
+  .toggle.on{background:var(--navy)}
+  .toggle.on::after{left:14px}
+  .toggle:disabled{opacity:.5;cursor:default}
+  .rolechip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:400;color:var(--muted)}
+  .empty{padding:30px 22px 40px;color:var(--muted);font-size:13px;font-weight:400}
+  .map{height:260px;background:linear-gradient(180deg,#BED3E2,#B9CFDF);position:relative}
+  .map span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px;color:#5c7486;font-weight:400}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div id="mock-bar" role="region" aria-label="Mock controls">
+  <b>MOCK · SCP-4395</b>
+  <div class="seg">
+    <button id="mock-view-admin" class="on" type="button">1 · Configure fields (admin)</button>
+    <button id="mock-view-customer" type="button">2 · Customer Details</button>
+  </div>
+  <label id="mock-role-wrap" hidden>Viewing as
+    <select id="mock-role-select"></select>
+  </label>
+  <span class="note">Role names are illustrative. Confirm the SmartCity role list before build.</span>
+</div>
+
+<header class="topnav">
+  <div class="logo"><i></i>Routeware</div>
+  <nav class="navlinks">
+    <a href="#" id="nav-dispatch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="10"/><path d="M8 7v10l4-2 4 2V7l-4 2z"/></svg>DISPATCH</a>
+    <a href="#" id="nav-customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M6.5 18c1.2-2.4 3.2-3.5 5.5-3.5s4.3 1.1 5.5 3.5"/></svg>CUSTOMERS</a>
+    <a href="#" id="nav-fleet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="10"/><path d="M6 14h9v-4H6zM15 11h2l1.5 3H15"/><circle cx="8.5" cy="15.5" r="1"/><circle cx="16" cy="15.5" r="1"/></svg>FLEET</a>
+    <a href="#" id="nav-insights"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="10"/><path d="M8 16v-3M11 16v-5M14 16v-7M17 16v-4"/></svg>INSIGHTS</a>
+  </nav>
+  <div class="navright"><span class="abc">ABC</span>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.3"><circle cx="12" cy="12" r="10.5"/><circle cx="12" cy="12" r="3"/><path d="M12 5v2M12 17v2M5 12h2M17 12h2M7 7l1.4 1.4M15.6 15.6L17 17M7 17l1.4-1.4M15.6 8.4L17 7"/></svg>
+  </div>
+</header>
+
+<!-- ============ VIEW 1: Application Settings + modal ============ -->
+<main id="view-admin">
+  <div class="wrap">
+    <div class="pagehead">
+      <h1>Application Settings</h1>
+      <div style="display:flex;gap:10px"><button class="btn danger" type="button">Log Out</button><button class="btn" type="button">Create Vendor</button></div>
+    </div>
+    <section class="panel settings">
+      <h2>Features</h2>
+      <div class="cols">
+        <div>
+          <h3>Account Management</h3>
+          <div class="frow dim"><input type="checkbox" class="cb" disabled><span>Billing Settings</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Cart Fill Level</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>City Alerts</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Customer notification</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Location Alerts</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Material Types</span></div>
+          <div class="frow hl"><input type="checkbox" class="cb" id="settings-custom-fields-toggle" checked><span>Custom Fields</span>
+            <button class="pencil" id="settings-custom-fields-edit-button" type="button" aria-label="Edit Custom Fields"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 11.5V14h2.5l7.4-7.4-2.5-2.5L2 11.5zm11.8-6.8a.7.7 0 000-1L12.3 2.2a.7.7 0 00-1 0l-1.2 1.2 2.5 2.5 1.2-1.2z"/></svg></button>
+          </div>
+        </div>
+        <div>
+          <h3>Fleet Management</h3>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Alternate Fleet</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Fault Code Notifications</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Fleet Maintenance</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Fuel Tickets</span></div>
+        </div>
+        <div>
+          <h3>Route Management</h3>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>App Experience</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Exception Management Tool</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Geo-fencing</span></div>
+          <div class="frow"><input type="checkbox" class="cb" checked><span>Route Builder</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="overlay open" id="cf-modal-overlay">
+  <div class="modal" id="cf-modal" role="dialog" aria-modal="true" aria-labelledby="cf-modal-title">
+    <button class="closex" id="cf-modal-close-button" type="button" aria-label="Close"><svg width="10" height="10" viewBox="0 0 10 10" stroke="currentColor" stroke-width="1.4"><path d="M1 1l8 8M9 1l-8 8"/></svg></button>
+    <div class="mtitle" id="cf-modal-title">Customer / Location Custom Fields</div>
+    <div class="inp entity">
+      <div class="val"><select id="cf-entity-select" aria-label="Entity"><option>Location</option><option>Customer</option></select></div>
+    </div>
+
+    <div class="sect" id="cf-active-section-toggle"><span>ACTIVE CUSTOM FIELDS</span><svg width="12" height="8" viewBox="0 0 12 8" fill="#76768C"><path d="M6 0l6 8H0z"/></svg></div>
+    <div class="colnote" id="cf-access-note">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#0066A6" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><path d="M8 7v4M8 4.6v.1"/></svg>
+      <span><b style="font-weight:700">View access</b> decides who sees a field. <b style="font-weight:700">Edit access</b> decides who can change its value. Anyone with edit access also gets view access.</span>
+    </div>
+    <div class="rows" id="cf-rows"></div>
+
+    <div class="actions">
+      <button class="btn" id="cf-add-field-button" type="button">Add Custom Field</button>
+      <button class="btn" id="cf-save-button" type="button">Save</button>
+    </div>
+    <div class="sect" id="cf-hidden-section-toggle"><span>HIDDEN CUSTOM FIELDS</span><svg width="12" height="8" viewBox="0 0 12 8" fill="#76768C"><path d="M6 8L0 0h12z"/></svg></div>
+  </div>
+</div>
+
+<!-- ============ VIEW 2: Customer Details ============ -->
+<main id="view-customer" hidden>
+  <nav class="subnav"><span>Customers</span><span>Suspended Locations</span><span>Service Network</span></nav>
+  <div class="wrap">
+    <div class="pagehead">
+      <h1><svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="#20315A" stroke-width="1.6"><path d="M15 7H2M7 1L1 7l6 6"/></svg>Customer Details</h1>
+      <button class="btn sec" type="button">Service History</button>
+    </div>
+    <section class="panel">
+      <div class="card-h"><span>User Profile</span></div>
+      <div class="kv">
+        <div><label>Customer Name</label><div>PEORIA RES 1 2</div></div>
+        <div><label>Customer Type</label><div>Business</div></div>
+        <div><label>Phone</label><div>-</div></div>
+        <div><label>Account Number</label><div>PEORIA_1001</div></div>
+        <div><label>Account Status</label><div>Active</div></div>
+      </div>
+      <div class="card-h"><span>Customer Notes</span>
+        <span class="rolechip" id="customer-role-chip"></span>
+      </div>
+      <div class="cfgrid" id="customer-custom-fields-grid"></div>
+      <div class="map"><span>Map</span></div>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="mock-toast"></div>
+
+<script>
+const ROLES = ['Administrator','Supervisor','Customer Service','Dispatcher','View Only'];
+const ALL = () => ROLES.slice();
+
+let fields = [
+  {id:1,name:'Collection notes',type:'Text field',format:'Large',def:'Enter text here',req:false,view:ALL(),edit:['Administrator','Supervisor','Customer Service'],value:'Bins kept behind side gate'},
+  {id:2,name:'Zone',type:'Dropdown',format:'Single Selection',def:'North, South, East, West',req:true,view:ALL(),edit:['Administrator','Supervisor'],value:'North'},
+  {id:3,name:'VIP residence',type:'Checkmark',format:'',def:'Active',req:false,view:ALL(),edit:['Administrator','Supervisor','Customer Service'],value:true},
+  {id:4,name:'Metal plate in driveway',type:'Toggle',format:'',def:'Inactive',req:false,view:ALL(),edit:['Administrator','Supervisor','Customer Service','Dispatcher'],value:true},
+  {id:5,name:'Assisted collection review date',type:'Date picker',format:'Single Date',def:'12/12/2025',req:false,view:['Administrator','Supervisor','Customer Service'],edit:['Administrator','Supervisor'],value:'2026-11-30'},
+  {id:6,name:'Medical contact (GP)',type:'Text field',format:'Small',def:'Enter text here',req:false,view:['Administrator','Supervisor'],edit:['Administrator'],value:'Dr A. Example, High St Surgery'},
+  {id:7,name:'Number of bins on site',type:'Number count',format:'Integer',def:'0',req:true,view:ALL(),edit:['Administrator','Supervisor','Customer Service'],value:'3'}
+];
+let nextId = 8;
+let currentRole = 'Customer Service';
+
+const TYPES = ['Text field','Dropdown','Date picker','Checkmark','Toggle','Number count'];
+const FORMATS = {'Text field':['Small','Large'],'Dropdown':['Single Selection','Multiple Selection'],'Date picker':['Single Date','Date Range'],'Checkmark':[],'Toggle':[],'Number count':['Integer','2 Decimal Fields']};
+const DEFLABEL = {'Text field':'Default Text','Dropdown':'Default Text','Date picker':'Default Date','Checkmark':'Default State','Toggle':'Default State','Number count':'Default Number'};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const chev = '<svg class="chev" viewBox="0 0 11 6"><path d="M1 1l4.5 4L10 1" fill="none" stroke="#242833" stroke-width="1.2"/></svg>';
+const lockSvg = '<svg class="lock" viewBox="0 0 12 12" fill="currentColor"><path d="M3.5 5V3.7a2.5 2.5 0 015 0V5H9a.8.8 0 01.8.8v4.4a.8.8 0 01-.8.8H3a.8.8 0 01-.8-.8V5.8A.8.8 0 013 5h.5zm1 0h3V3.7a1.5 1.5 0 00-3 0V5z"/></svg>';
+
+function summary(list){
+  if (list.length === ROLES.length) return 'All roles';
+  if (list.length === 0) return 'No roles';
+  if (list.length <= 2) return list.join(', ');
+  return list.length + ' roles';
+}
+function toast(msg){const t=$('#mock-toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200);}
+
+function accessCell(f, kind){
+  const list = f[kind];
+  const restricted = list.length < ROLES.length;
+  const label = kind === 'view' ? 'View access' : 'Edit access';
+  const opts = ROLES.map(r => {
+    const checked = list.includes(r);
+    const forced = kind === 'view' && f.edit.includes(r);
+    return `<label class="opt${forced?' forced':''}"><input type="checkbox" class="cb" data-f="${f.id}" data-kind="${kind}" data-role="${esc(r)}" ${checked?'checked':''} ${forced?'disabled':''} id="cf-field-${f.id}-${kind}-access-${r.toLowerCase().replace(/\s+/g,'-')}-checkbox">${esc(r)}</label>`;
+  }).join('');
+  const hint = kind === 'view'
+    ? 'Greyed roles have edit access, so they keep view access.'
+    : 'Adding a role here also gives it view access.';
+  return `<div class="cell"><div class="inp acc${restricted?' restricted':''}" id="cf-field-${f.id}-${kind}-access" tabindex="0" data-pop="${f.id}-${kind}">
+      <label>${label}</label>
+      <div class="val">${restricted?lockSvg:''}<span class="sum">${esc(summary(list))}</span>${chev}</div>
+      <div class="pop" id="cf-field-${f.id}-${kind}-access-popover">
+        <h4>${label}</h4>
+        <label class="opt all"><input type="checkbox" class="cb" data-f="${f.id}" data-kind="${kind}" data-role="__all" ${list.length===ROLES.length?'checked':''} id="cf-field-${f.id}-${kind}-access-all-roles-checkbox">All roles</label>
+        ${opts}
+        <div class="hint">${hint}</div>
+      </div>
+    </div></div>`;
+}
+
+function renderRows(){
+  $('#cf-rows').innerHTML = fields.map(f => {
+    const fmts = FORMATS[f.type] || [];
+    const fmt = fmts.length
+      ? `<select id="cf-field-${f.id}-format-select" data-f="${f.id}" data-k="format">${fmts.map(o=>`<option ${o===f.format?'selected':''}>${o}</option>`).join('')}</select>`
+      : '<span>&nbsp;</span>';
+    const defCtl = (f.type==='Checkmark'||f.type==='Toggle')
+      ? `<select id="cf-field-${f.id}-default-select" data-f="${f.id}" data-k="def"><option ${f.def==='Active'?'selected':''}>Active</option><option ${f.def==='Inactive'?'selected':''}>Inactive</option></select>`
+      : f.type==='Dropdown'
+        ? `<textarea rows="1" class="grow" id="cf-field-${f.id}-default-input" data-f="${f.id}" data-k="def" placeholder="Enter choices separated by commas">${esc(f.def)}</textarea>`
+        : `<input id="cf-field-${f.id}-default-input" data-f="${f.id}" data-k="def" value="${esc(f.def)}">`;
+    return `<div class="row" id="cf-field-${f.id}-row">
+      <div class="drag" aria-hidden="true"><svg width="11" height="8" viewBox="0 0 11 8" fill="currentColor"><rect width="11" height="1.2"/><rect y="3.4" width="11" height="1.2"/><rect y="6.8" width="11" height="1.2"/></svg></div>
+      <div class="cells">
+        <div class="cell"><div class="inp"><label>Name</label><div class="val"><textarea rows="1" class="grow" id="cf-field-${f.id}-name-input" data-f="${f.id}" data-k="name" placeholder="Field name">${esc(f.name)}</textarea></div></div></div>
+        <div class="cell"><div class="inp"><label>Type</label><div class="val"><select id="cf-field-${f.id}-type-select" data-f="${f.id}" data-k="type">${TYPES.map(o=>`<option ${o===f.type?'selected':''}>${o}</option>`).join('')}</select></div></div></div>
+        <div class="cell"><div class="inp"><label>Format</label><div class="val">${fmt}</div></div></div>
+        <div class="cell"><div class="inp"><label>${DEFLABEL[f.type]}</label><div class="val">${defCtl}</div></div></div>
+        ${accessCell(f,'view')}
+        ${accessCell(f,'edit')}
+        <div class="cell req"><div class="inp"><label>Required</label><div class="val"><input type="checkbox" class="cb" id="cf-field-${f.id}-required-checkbox" data-f="${f.id}" data-k="req" ${f.req?'checked':''} aria-label="Required"></div></div></div>
+      </div>
+      <button class="del" id="cf-field-${f.id}-delete-button" type="button" aria-label="Delete field"><svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor"><path d="M4 0h4l.6 1H12v1.6H0V1h3.4zM1 3.6h10l-.8 10.4H1.8z"/></svg></button>
+    </div>`;
+  }).join('');
+  requestAnimationFrame(growAll);
+}
+
+function getField(id){return fields.find(f=>f.id===+id);}
+
+document.addEventListener('click', e => {
+  const acc = e.target.closest('.acc');
+  const inPop = e.target.closest('.pop');
+  document.querySelectorAll('.pop.open').forEach(p => { if (!acc || !acc.contains(p)) p.classList.remove('open'); });
+  if (acc && !inPop) acc.querySelector('.pop').classList.toggle('open');
+});
+
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset.kind){
+    const f = getField(el.dataset.f), kind = el.dataset.kind, role = el.dataset.role;
+    let list = f[kind];
+    if (role === '__all') list = el.checked ? ALL() : (kind==='view' ? f.edit.slice() : []);
+    else list = el.checked ? [...new Set([...list, role])] : list.filter(r => r !== role);
+    list = ROLES.filter(r => list.includes(r));
+    f[kind] = list;
+    if (kind === 'edit') f.view = ROLES.filter(r => f.view.includes(r) || f.edit.includes(r));
+    if (kind === 'view') f.edit = f.edit.filter(r => f.view.includes(r));
+    const openId = `${f.id}-${kind}`;
+    renderRows();
+    document.querySelector(`[data-pop="${openId}"] .pop`).classList.add('open');
+    return;
+  }
+  if (el.dataset.k){
+    const f = getField(el.dataset.f);
+    f[el.dataset.k] = el.type === 'checkbox' ? el.checked : el.value;
+    if (el.dataset.k === 'type'){ f.format = (FORMATS[f.type]||[])[0] || ''; f.def = (f.type==='Checkmark'||f.type==='Toggle') ? 'Inactive' : ''; renderRows(); }
+  }
+});
+function grow(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+function growAll(){document.querySelectorAll('textarea.grow').forEach(grow);}
+window.addEventListener('resize',growAll);
+document.addEventListener('input', e => { const el=e.target; if (el.dataset.k && (el.tagName==='TEXTAREA' || (el.tagName==='INPUT' && el.type!=='checkbox'))){ getField(el.dataset.f)[el.dataset.k]=el.value; if(el.tagName==='TEXTAREA') grow(el); } });
+
+$('#cf-add-field-button').onclick = () => {
+  fields.push({id:nextId++,name:'',type:'Text field',format:'Small',def:'',req:false,view:ALL(),edit:['Administrator'],value:''});
+  renderRows();
+  document.querySelector(`#cf-field-${nextId-1}-name-input`).focus();
+};
+$('#cf-rows').addEventListener('click', e => {
+  const b = e.target.closest('.del'); if (!b) return;
+  toast('Delete is shown in the Figma. SCP-4395 says custom fields cannot be deleted: decide at Three Amigos.');
+});
+$('#cf-save-button').onclick = () => { toast('Saved. Changes to view and edit access are written to the audit log.'); };
+$('#cf-modal-close-button').onclick = () => $('#cf-modal-overlay').classList.remove('open');
+$('#settings-custom-fields-edit-button').onclick = () => $('#cf-modal-overlay').classList.add('open');
+$('#cf-hidden-section-toggle').onclick = () => toast('Hidden fields: unchanged from the Figma, not mocked here.');
+
+/* ---------- Customer Details (view as role) ---------- */
+function renderCustomer(){
+  $('#customer-role-chip').innerHTML = '';
+  const visible = fields.filter(f => f.name && f.view.includes(currentRole));
+  if (!visible.length){ $('#customer-custom-fields-grid').innerHTML = `<div class="empty">No custom fields are visible to ${esc(currentRole)}.</div>`; return; }
+  $('#customer-custom-fields-grid').innerHTML = visible.map(f => {
+    const canEdit = f.edit.includes(currentRole);
+    const wide = f.type==='Text field' && f.format==='Large' ? ' wide' : '';
+    const id = `customer-cf-${f.id}`;
+    const lab = `<label>${canEdit?'':lockSvg}${esc(f.name)}${f.req&&canEdit?' *':''}</label>`;
+    let ctl;
+    if (f.type==='Checkmark') ctl = `<div class="val"><span></span><input type="checkbox" class="cb" id="${id}-checkbox" ${f.value?'checked':''} ${canEdit?'':'disabled'} aria-label="${esc(f.name)}"></div>`;
+    else if (f.type==='Toggle') ctl = `<div class="val"><span></span><button class="toggle${f.value?' on':''}" id="${id}-toggle" type="button" ${canEdit?'':'disabled'} aria-pressed="${!!f.value}" aria-label="${esc(f.name)}"></button></div>`;
+    else if (!canEdit) {
+      const v = f.type==='Date picker' && f.value ? f.value.split('-').reverse().join('/') : f.value;
+      ctl = `<div class="val" id="${id}-value">${esc(v||'-')}</div>`;
+    }
+    else if (f.type==='Dropdown') ctl = `<div class="val"><select id="${id}-select">${f.def.split(',').map(o=>o.trim()).filter(Boolean).map(o=>`<option ${o===f.value?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`;
+    else if (f.type==='Date picker') ctl = `<div class="val"><input type="date" id="${id}-input" value="${esc(f.value)}"></div>`;
+    else if (f.type==='Number count') ctl = `<div class="val"><input type="number" id="${id}-input" value="${esc(f.value)}"></div>`;
+    else ctl = `<div class="val"><input id="${id}-input" value="${esc(f.value)}"></div>`;
+    return `<div class="inp${canEdit?'':' ro'}${wide}" id="${id}" title="${canEdit?'':'Read-only for '+esc(currentRole)}">${lab}${ctl}</div>`;
+  }).join('');
+  const hidden = fields.filter(f => f.name && !f.view.includes(currentRole)).length;
+  const ro = visible.filter(f => !f.edit.includes(currentRole)).length;
+  $('#customer-role-chip').textContent = `${ro} read-only · ${hidden} not visible to ${currentRole}`;
+}
+$('#customer-custom-fields-grid').addEventListener('click', e => {
+  const t = e.target.closest('.toggle'); if (!t || t.disabled) return;
+  const f = getField(t.id.split('-')[2]); f.value = !f.value; renderCustomer();
+});
+
+const sel = $('#mock-role-select');
+sel.innerHTML = ROLES.map(r=>`<option ${r===currentRole?'selected':''}>${r}</option>`).join('');
+sel.onchange = () => { currentRole = sel.value; renderCustomer(); };
+
+function show(view){
+  const admin = view === 'admin';
+  $('#view-admin').hidden = !admin;
+  $('#view-customer').hidden = admin;
+  $('#mock-role-wrap').hidden = admin;
+  $('#cf-modal-overlay').classList.toggle('open', admin);
+  $('#nav-customers').classList.toggle('on', !admin);
+  $('#mock-view-admin').classList.toggle('on', admin);
+  $('#mock-view-customer').classList.toggle('on', !admin);
+  if (!admin) renderCustomer();
+  window.scrollTo(0,0);
+}
+$('#mock-view-admin').onclick = () => show('admin');
+$('#mock-view-customer').onclick = () => show('customer');
+
+renderRows();
+</script>
+</body>
+</html>
