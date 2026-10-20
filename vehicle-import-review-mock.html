@@ -4,6 +4,7 @@
 2026-10-20  v2  Simplified per SCP Priming Session 2026-10-08. The import no longer creates subtypes, so New Subtypes, Conflicts, near-match and the Is Add-on column are gone.
                 No review step: upload imports valid rows immediately and this modal shows the results (Imported / Errors) with the error-file download.
                 Element ID prefix changed vehicle-import-review-* -> vehicle-import-results-*. Mock control added to switch scenarios.
+2026-10-20  v2.1 Tables list every row and stop growing at 12 rows; past that the table scrolls with a fixed header. Removed the "… N more rows" line.
 -->
 <html lang="en">
 <head>
@@ -68,7 +69,9 @@ h1{font-size:28px;font-weight:600;color:var(--navy);margin:0}
 .alert.warning{background:rgba(217,119,6,.09)} .alert.warning::before{background:var(--warning)}
 .alert.error{background:rgba(220,38,38,.08)} .alert.error::before{background:var(--error)}
 /* Table */
-.table-wrap{border:1px solid var(--border);border-radius:5px;overflow-x:auto;background:#fff}
+.table-wrap{border:1px solid var(--border);border-radius:5px;overflow:auto;background:#fff;max-height:509px}
+/* 509px = 40px header + 12 rows x 39px + 1px border: the table shows 12 rows, then scrolls */
+thead th{position:sticky;top:0;background:#fff;z-index:1}
 table{width:100%;border-collapse:collapse;min-width:560px}
 th{font-size:10px;font-weight:700;text-align:left;padding:13px 10px;border-bottom:1px solid var(--border);letter-spacing:.3px;white-space:nowrap}
 td{font-size:14px;font-weight:300;padding:10px;height:39px;border-bottom:1px solid var(--border)}
@@ -150,8 +153,23 @@ tr:last-child td{border-bottom:none}
     [6,'TR-01','Roll off','Pup Trailer',true],
     [7,'TR-02','Roll off','Pup Trailer',true],
     [8,'SP-01','Snow Plow','Wing Plow',true],
-    [11,'RES-303','Residential','Grappler',false]
+    [11,'RES-303','Residential','Grappler',false],
+    [12,'RES-304','Residential','Grappler',false],
+    [13,'RES-305','Residential','Side Load',false],
+    [14,'RES-306','Residential','Batch Side Load',false],
+    [15,'RES-307','Residential','Batch Side Load',false],
+    [16,'FL-104','Front Load','Front Load',false],
+    [17,'FL-105','Front Load','Rear Loader XL',false],
+    [18,'RO-202','Roll off','Compactor',false],
+    [20,'RO-203','Roll off','Hook Lift',false],
+    [21,'TR-03','Roll off','Pup Trailer',true],
+    [22,'SP-02','Snow Plow','Front Plow',false],
+    [23,'SP-03','Snow Plow','Wing Plow',true],
+    [24,'SW-01','Street Sweeper','Mechanical Broom',false],
+    [25,'SW-02','Street Sweeper','Regenerative Air',false],
+    [26,'SW-03','Street Sweeper','Regenerative Air',false]
   ];
+  const importedAll=imported.concat([[27,'RES-308','Residential','Side Load',false],[28,'FL-106','Front Load','Front Load',false]]);
   const errors=[
     [9,'RES-301','Vehicle Subtype','"Grapler" is not a Residential subtype. Create it on Configure Vehicle Subtypes, then upload this row again.'],
     [10,'RES-302','Unavailable End Date','Must be on or after Unavailable Start Date'],
@@ -159,7 +177,7 @@ tr:last-child td{border-bottom:none}
   ];
   const scenarios={
     mixed:{imported:22,shown:imported,errors:errors,rows:25},
-    clean:{imported:24,shown:imported,errors:[],rows:24},
+    clean:{imported:24,shown:importedAll,errors:[],rows:24},
     none:{imported:0,shown:[],errors:errors,rows:3}
   };
   const $=id=>document.getElementById(id);
@@ -185,7 +203,6 @@ tr:last-child td{border-bottom:none}
     const ib=$('vehicle-import-results-imported-table').querySelector('tbody');
     ib.innerHTML=s.shown.length
       ? s.shown.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+(r[4]?'<span class="badge addon">Yes</span>':'No')+'</td></tr>').join('')
-        +(s.imported>s.shown.length?'<tr><td colspan="5" style="font-size:12px;color:var(--muted)">… '+(s.imported-s.shown.length)+' more rows</td></tr>':'')
       : '<tr><td colspan="5" class="empty">No vehicles were imported from this file.</td></tr>';
     const eb=$('vehicle-import-results-errors-table').querySelector('tbody');
     eb.innerHTML=e
