@@ -6,6 +6,7 @@
                 Element ID prefix changed vehicle-import-review-* -> vehicle-import-results-*. Mock control added to switch scenarios.
 2026-10-20  v2.1 Tables list every row and stop growing at 12 rows; past that the table scrolls with a fixed header. Removed the "… N more rows" line.
 2026-10-20  v2.2 Summary copy: "Download and review the error file." replaces "fix the rows and upload it again".
+2026-10-20  v2.3 Stat cards removed (the banner and tab labels already carry the counts). Missing-subtype error drops "then upload this row again".
 -->
 <html lang="en">
 <head>
@@ -52,13 +53,6 @@ h1{font-size:28px;font-weight:600;color:var(--navy);margin:0}
 .close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--navy-dark)}
 .modal-body{padding:24px}
 .modal-footer{display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:15px 24px;border-top:1px solid var(--border)}
-/* Stat cards */
-.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
-.stat{width:148px;height:68px;border:1px solid var(--border);border-radius:5px;background:#fff;padding:10px 12px;cursor:pointer;text-align:left;font-family:inherit}
-.stat.active{background:var(--stat-active);border-color:var(--navy)}
-.stat .lbl{font-size:10px;font-weight:700;letter-spacing:.3px;color:var(--navy-dark)}
-.stat .num{font-size:22px;font-weight:600;color:var(--navy)}
-.stat .num.err{color:var(--error)}
 /* Segmented tabs */
 .seg{display:inline-flex;background:var(--seg-bg);border-radius:20px;margin-bottom:16px;flex-wrap:wrap}
 .seg button{border:none;background:transparent;font-family:inherit;font-size:14px;padding:9px 16px;border-radius:20px;cursor:pointer;color:var(--navy-dark)}
@@ -82,7 +76,7 @@ tr:last-child td{border-bottom:none}
 .badge.addon{background:rgba(51,165,66,.12);color:#23802F}
 .empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:13px}
 .panel{display:none} .panel.active{display:block}
-@media (max-width:600px){.topnav{gap:16px;padding:0 16px}.topnav .logo{width:auto}.subnav{padding:0 16px}.page{padding:16px}.modal-body{padding:16px}.stat{width:calc(50% - 6px)}.modal-footer{flex-direction:column-reverse;align-items:stretch}}
+@media (max-width:600px){.topnav{gap:16px;padding:0 16px}.topnav .logo{width:auto}.subnav{padding:0 16px}.page{padding:16px}.modal-body{padding:16px}.modal-footer{flex-direction:column-reverse;align-items:stretch}}
 </style>
 </head>
 <body>
@@ -110,11 +104,6 @@ tr:last-child td{border-bottom:none}
 
   <div class="modal-body">
     <div class="alert" id="vehicle-import-results-summary"></div>
-
-    <div class="stats">
-      <button class="stat active" id="vehicle-import-results-stat-imported" data-tab="imported"><div class="lbl">VEHICLES IMPORTED</div><div class="num" id="vehicle-import-results-imported-count"></div></button>
-      <button class="stat" id="vehicle-import-results-stat-errors" data-tab="errors"><div class="lbl">ROWS WITH ERRORS</div><div class="num err" id="vehicle-import-results-error-count"></div></button>
-    </div>
 
     <div class="seg" role="tablist">
       <button class="active" id="vehicle-import-results-tab-imported" data-tab="imported">Imported</button>
@@ -172,7 +161,7 @@ tr:last-child td{border-bottom:none}
   ];
   const importedAll=imported.concat([[27,'RES-308','Residential','Side Load',false],[28,'FL-106','Front Load','Front Load',false]]);
   const errors=[
-    [9,'RES-301','Vehicle Subtype','"Grapler" is not a Residential subtype. Create it on Configure Vehicle Subtypes, then upload this row again.'],
+    [9,'RES-301','Vehicle Subtype','"Grapler" is not a Residential subtype. Create it on Configure Vehicle Subtypes.'],
     [10,'RES-302','Unavailable End Date','Must be on or after Unavailable Start Date'],
     [19,'—','Vehicle Name','Required when adding a new vehicle']
   ];
@@ -187,14 +176,11 @@ tr:last-child td{border-bottom:none}
     tabs.forEach(n=>{
       $('vehicle-import-results-panel-'+n).classList.toggle('active',n===t);
       $('vehicle-import-results-tab-'+n).classList.toggle('active',n===t);
-      $('vehicle-import-results-stat-'+n).classList.toggle('active',n===t);
     });
   }
   function render(key){
     const s=scenarios[key], e=s.errors.length;
     $('vehicle-import-results-file').textContent='Vehicle Upload Template.xlsx · '+s.rows+' rows';
-    $('vehicle-import-results-imported-count').textContent=s.imported;
-    $('vehicle-import-results-error-count').textContent=e;
     $('vehicle-import-results-tab-imported').textContent='Imported ('+s.imported+')';
     $('vehicle-import-results-tab-errors').textContent='Errors ('+e+')';
     const sum=$('vehicle-import-results-summary');
