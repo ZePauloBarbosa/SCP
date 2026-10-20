@@ -5,6 +5,7 @@
                 No review step: upload imports valid rows immediately and this modal shows the results (Imported / Errors) with the error-file download.
                 Element ID prefix changed vehicle-import-review-* -> vehicle-import-results-*. Mock control added to switch scenarios.
 2026-10-20  v2.1 Tables list every row and stop growing at 12 rows; past that the table scrolls with a fixed header. Removed the "… N more rows" line.
+2026-10-20  v2.2 Summary copy: "Download and review the error file." replaces "fix the rows and upload it again".
 -->
 <html lang="en">
 <head>
@@ -198,8 +199,8 @@ tr:last-child td{border-bottom:none}
     $('vehicle-import-results-tab-errors').textContent='Errors ('+e+')';
     const sum=$('vehicle-import-results-summary');
     if(s.imported&&!e){sum.className='alert success';sum.textContent=s.imported+' vehicles imported.';}
-    else if(s.imported){sum.className='alert warning';sum.textContent=s.imported+' vehicles imported. '+e+' rows weren’t imported. Download the error file, fix those rows and upload it again.';}
-    else{sum.className='alert error';sum.textContent='No vehicles imported. Download the error file, fix the rows and upload it again.';}
+    else if(s.imported){sum.className='alert warning';sum.textContent=s.imported+' vehicles imported. '+e+' rows weren’t imported. Download and review the error file.';}
+    else{sum.className='alert error';sum.textContent='No vehicles imported. Download and review the error file.';}
     const ib=$('vehicle-import-results-imported-table').querySelector('tbody');
     ib.innerHTML=s.shown.length
       ? s.shown.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+(r[4]?'<span class="badge addon">Yes</span>':'No')+'</td></tr>').join('')
