@@ -2,6 +2,7 @@
 <!-- CHANGELOG
 v1 2026-10-22 Add Job modal: inline yellow warning under the customer/location field when the selected service already has an open job. Save stays enabled.
 v2 2026-10-22 Match at location level: any service at a location with an open job on the selected date triggers the warning. Added a second location with no open job.
+v3 2026-10-23 Manage Exceptions id aligned with the live Pendo tag (#manage-exceptions-button). Add Job button id is add-job-button, matching AC5.
 -->
 <html lang="en">
 <head>
@@ -77,8 +78,8 @@ v2 2026-10-22 Match at location level: any service at a location with an open jo
   <h1>Dispatch Board</h1>
   <div class="jobs-head">
     <h2>Jobs</h2>
-    <button class="btn-secondary" id="dispatch-manage-exceptions-button">Manage Exceptions</button>
-    <button class="btn-secondary" id="dispatch-add-job-button">+ Add Job</button>
+    <button class="btn-secondary" id="manage-exceptions-button">Manage Exceptions</button>
+    <button class="btn-secondary" id="add-job-button">+ Add Job</button>
   </div>
   <div class="panel" id="dispatch-route-jobs-panel">
     <div class="route-head">RO15-S <small>02/07/2026 · <span id="job-count">7</span> Jobs</small></div>
@@ -154,7 +155,7 @@ v2 2026-10-22 Match at location level: any service at a location with an open jo
     search.value = '05630093-00'; selected = null;
     warn.classList.remove('show'); combo.classList.remove('warn');
   }
-  $('dispatch-add-job-button').onclick = e => { e.stopPropagation(); reset(); modal.classList.add('open'); search.focus(); list.classList.add('open'); };
+  $('add-job-button').onclick = e => { e.stopPropagation(); reset(); modal.classList.add('open'); search.focus(); list.classList.add('open'); };
   $('add-job-close-button').onclick = () => modal.classList.remove('open');
   modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
   search.addEventListener('focus', () => list.classList.add('open'));
