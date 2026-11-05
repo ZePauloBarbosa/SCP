@@ -7,6 +7,8 @@ v2 2026-11-04  Stops only (the builder check is stop-based: stops with Sequence 
                Save Anyway continues to the existing Save / Save & Resequence choice. "View on map" zooms to a stop.
 v2.1 2026-11-04 Address removed from the list and the map banner; stop number only.
 v2.2 2026-11-05 Warning message states what happens to the listed stops if the planner saves anyway.
+v3   2026-11-05 Adds the Travel Path Editor: same warning and stop list when the planner applies (✓) an edit that leaves stops off the path,
+                with Back To Editor / Apply Anyway. The builder list also carries stops the drive check reports it doesn't pass (moved from SCP-5254).
 -->
 <html lang="en">
 <head>
@@ -105,8 +107,9 @@ v2.2 2026-11-05 Warning message states what happens to the listed stops if the p
 
 <div class="mockbar">
   <b>Mock controls:</b>
-  <button id="mock-replay-warning">Replay: Submit with stops not on path</button>
-  <button id="mock-clean-trace">Replay: Submit with all stops on path</button>
+  <button id="mock-replay-warning">Builder: Submit with stops not on path</button>
+  <button id="mock-clean-trace">Builder: Submit with all stops on path</button>
+  <button id="mock-editor-warning">Editor: Apply edit with stops not on path</button>
   <span>Functional reference only. All visuals must match the existing SmartCity Portal.</span>
 </div>
 
@@ -115,11 +118,11 @@ v2.2 2026-11-05 Warning message states what happens to the listed stops if the p
 
 <div class="tpb-modal" id="tpb-builder-modal">
   <div class="tpb-head">
-    <span class="title">Travel Path Builder</span>
+    <span class="title" id="tpb-modal-title">Travel Path Builder</span>
     <span class="name">20 Monday Recycling JREdit 11.4</span>
     <button class="close" id="tpb-builder-close" aria-label="Close">✕</button>
   </div>
-  <div class="tpb-filters">
+  <div class="tpb-filters" id="tpb-filters">
     <div class="tpb-filter"><label>Date</label><div>11/02/2026</div></div>
     <div class="tpb-filter"><label>Route Name</label><div>20 Monday Recycling</div></div>
     <div class="tpb-filter"><label>Vehicle</label><div>Recycle Truck #22</div></div>
@@ -159,8 +162,9 @@ v2.2 2026-11-05 Warning message states what happens to the listed stops if the p
     <div class="ctl" style="top:16px;left:16px"><button class="icon-btn" id="tpb-map-layers-button" title="Map Layers">◈</button></div>
     <div class="ctl instructions" id="tpb-instructions">
       <div class="x" id="tpb-instructions-close">✕</div>
-      Use the slider to drag the red and green flags left and right
-      <ol><li>Select Start of Route (where servicing begins)</li><li>Select End of Route (where servicing ends)</li><li>Submit</li><li>Save</li></ol>
+      <div id="tpb-instructions-builder">Use the slider to drag the red and green flags left and right
+      <ol><li>Select Start of Route (where servicing begins)</li><li>Select End of Route (where servicing ends)</li><li>Submit</li><li>Save</li></ol></div>
+      <div id="tpb-instructions-editor" style="display:none">Select the start and end segments, draw the new path, then apply (✓) and save (💾).</div>
     </div>
     <div class="ctl legend-dd" id="tpb-legend">
       <div style="cursor:pointer" id="tpb-legend-toggle">Travel Path Legend ⌄</div>
@@ -179,6 +183,11 @@ v2.2 2026-11-05 Warning message states what happens to the listed stops if the p
     </div>
     <div class="ctl actions" id="tpb-actions-range" style="display:none;bottom:60px">
       <button class="btn btn-primary" id="tpb-submit-button">Submit</button>
+    </div>
+    <!-- Travel Path Editor: apply (✓) and save (💾) controls -->
+    <div class="ctl actions" id="tpe-actions" style="display:none">
+      <button class="btn btn-gray" id="tpe-apply-button" title="Apply edits">✓ Apply</button>
+      <button class="btn btn-primary" id="tpe-save-button" title="Save travel path">💾 Save</button>
     </div>
     <div class="ctl range" id="tpb-range" style="display:none"><span>06:58:12 AM</span><div class="track"></div><span>02:46:39 PM</span></div>
   </div>
@@ -223,6 +232,30 @@ const UNPLACED=[
 const $=id=>document.getElementById(id);
 const svgNS='http://www.w3.org/2000/svg';
 let tracedHasUnplaced=true;
+let mode='builder';
+const COPY={
+  builder:{title:'Travel Path Builder',back:'Back To Builder',go:'Save Anyway',
+    msg:"The stops below don't appear to be on the selected travel path. If you save anyway, these stops are left off the path: they won't appear in reports, can't be confirmed, and drivers can't navigate to them. Go back to the builder to choose a different range, or save anyway."},
+  editor:{title:'Travel Path Editor',back:'Back To Editor',go:'Apply Anyway',
+    msg:"The stops below don't appear to be on the edited travel path. If you apply this edit anyway, these stops are left off the path: they won't appear in reports, can't be confirmed, and drivers can't navigate to them. Go back to the editor to change the edit, or apply anyway."}
+};
+function setMode(m){
+  mode=m; const c=COPY[m], ed=m==='editor';
+  $('tpb-modal-title').textContent=c.title;
+  $('tpb-unplaced-stops-back-button').textContent=c.back;
+  $('tpb-unplaced-stops-save-anyway-button').textContent=c.go;
+  $('tpb-unplaced-stops-message').textContent=c.msg;
+  $('tpb-filters').style.display=ed?'none':'';
+  $('tpb-instructions-builder').style.display=ed?'none':'';
+  $('tpb-instructions-editor').style.display=ed?'':'none';
+  $('tpe-actions').style.display=ed?'flex':'none';
+  if(ed){ ['tpb-actions-traced','tpb-show-vehicle-trackings','tpb-actions-range','tpb-range'].forEach(i=>$(i).style.display='none'); $('tpb-breadcrumbs').style.display='none'; }
+  else { $('tpb-breadcrumbs').style.display=''; }
+}
+function editorApply(withUnplaced){
+  setMode('editor'); $('tpb-traced-path').style.display=''; drawUnplaced(withUnplaced); resetZoom();
+  if(withUnplaced){ renderList(); $('tpb-unplaced-stops-dialog').classList.remove('hidden'); }
+}
 
 function drawUnplaced(show){
   const g=$('tpb-unplaced-stops'), l=$('tpb-unplaced-labels'); g.innerHTML=''; l.innerHTML='';
@@ -270,13 +303,20 @@ document.addEventListener('click',e=>{
   const id=e.target.id, v=e.target.dataset.view;
   if(v) viewStop(v);
   switch(id){
-    case 'mock-replay-warning': submitTrace(true); break;
-    case 'mock-clean-trace': $('tpb-unplaced-stops-dialog').classList.add('hidden'); submitTrace(false); break;
+    case 'mock-replay-warning': setMode('builder'); submitTrace(true); break;
+    case 'mock-clean-trace': $('tpb-unplaced-stops-dialog').classList.add('hidden'); setMode('builder'); submitTrace(false); break;
+    case 'mock-editor-warning': editorApply(true); break;
+    case 'tpe-apply-button': editorApply(true); break;
+    case 'tpe-save-button': $('tpb-save-confirmation-modal').classList.remove('hidden'); break;
     case 'tpb-submit-button': submitTrace(true); break;
-    case 'tpb-unplaced-stops-back-button': $('tpb-unplaced-stops-dialog').classList.add('hidden'); setTracedState(false); break;
+    case 'tpb-unplaced-stops-back-button': $('tpb-unplaced-stops-dialog').classList.add('hidden'); if(mode==='builder') setTracedState(false); else { drawUnplaced(false); resetZoom(); } break;
     case 'tpb-back-button': setTracedState(false); break;
     case 'tpb-viewing-back-to-list': resetZoom(); $('tpb-unplaced-stops-dialog').classList.remove('hidden'); break;
-    case 'tpb-unplaced-stops-save-anyway-button': $('tpb-unplaced-stops-dialog').classList.add('hidden'); resetZoom(); $('tpb-save-confirmation-modal').classList.remove('hidden'); break;
+    case 'tpb-unplaced-stops-save-anyway-button':
+      $('tpb-unplaced-stops-dialog').classList.add('hidden'); resetZoom();
+      if(mode==='builder') $('tpb-save-confirmation-modal').classList.remove('hidden');
+      else { const t=$('tpb-toast'); t.textContent='Edit applied. Save the travel path to keep it.'; t.style.display='block'; setTimeout(()=>{t.style.display='none'; t.textContent='Travel path saved successfully.';},2500); }
+      break;
     case 'tpb-save-button': $('tpb-save-confirmation-modal').classList.remove('hidden'); break;
     case 'tpb-save-confirmation-cancel': $('tpb-save-confirmation-modal').classList.add('hidden'); break;
     case 'tpb-save-confirmation-save': case 'tpb-save-confirmation-save-resequence': $('tpb-save-confirmation-modal').classList.add('hidden'); toast(); break;
