@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<!-- CHANGELOG
+v1 2026-11-05  First mock for SCP-5254. Built on travel-path-builder-missing-segments-warning-v1.html (SCP-5306), same builder layout and dialog pattern.
+               Five "path can't be built" messages in the existing builder error dialog, plus a fallback for when no reason is given.
+               Three warnings in a non-blocking panel above Back / Save; the planner can still save.
+               The "stops not on the path" warning is not here: SCP-5306 owns it.
+               Tokens checked against Figma M09kEEo1KNu48sLPl3b2av node 1213:6778.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Travel Path Builder – Trace Messages (v1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Tokens: Figma SCP Design System (1213:6778) and vendor-portal-react theme.ts */
+  :root{
+    --brandPrimary:#20315a; --grayBase:#242833; --gray:#d9d9e1; --grayDark:#b4b4c4; --grayDarker:#76768c;
+    --grayLight:#f2f2f5; --grayLighter:#fafafc; --border:#e5e7eb; --brandSuccess:#33A542; --brandWarning:#ffa452; --brandAlert:#ff5252;
+    --brandInfo:#0066a6; --path:#1d8ea6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Montserrat,'Helvetica Neue',Helvetica,sans-serif;font-size:14px;color:var(--grayBase);background:var(--grayLighter)}
+  button{font-family:inherit}
+
+  .mockbar{position:relative;z-index:7000;background:#fff8e6;border-bottom:1px solid var(--gray);padding:8px 16px;font-size:12px}
+  .mockbar .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:3px 0}
+  .mockbar b{font-weight:600;min-width:150px}
+  .mockbar button{font-size:12px;border:1px solid var(--brandPrimary);background:#fff;color:var(--brandPrimary);border-radius:5px;padding:4px 10px;cursor:pointer}
+  .mockbar button.on{background:var(--brandPrimary);color:#fff}
+  .mockbar .note{color:var(--grayDarker)}
+
+  .subnav{height:48px;background:#fff;display:flex;gap:60px;justify-content:center;align-items:center;font-size:16px}
+  .subnav .active{color:var(--brandSuccess)}
+  .page-dim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1}
+
+  .tpb-modal{position:relative;z-index:2;width:min(1200px,calc(100% - 32px));margin:8px auto 24px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+  .tpb-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:24px 20px 12px}
+  .tpb-head .title{font-size:18px;color:#000}
+  .tpb-head .name{font-size:18px;text-align:center}
+  .tpb-head .close{justify-self:end;background:none;border:0;font-size:18px;color:var(--grayDark);cursor:pointer}
+  .tpb-filters{display:flex;gap:30px;padding:8px 20px 18px;flex-wrap:wrap}
+  .tpb-filter{width:260px}
+  .tpb-filter label{display:block;font-size:12px;color:var(--grayDarker);margin-bottom:6px}
+  .tpb-filter div{border-bottom:1px solid var(--gray);padding:0 0 6px;font-size:14px;display:flex;justify-content:space-between}
+  .tpb-filter div:after{content:'⌄';color:var(--grayDarker)}
+
+  .map{position:relative;height:70vh;min-height:520px;overflow:hidden;background:#eceee9}
+  svg.base{position:absolute;inset:0;width:100%;height:100%}
+  .ctl{position:absolute;z-index:5}
+  .icon-btn{width:36px;height:36px;border-radius:50%;background:#fff;border:0;box-shadow:0 1px 3px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--brandPrimary);font-size:15px;margin-bottom:12px}
+  .instructions{top:16px;left:70px;width:330px;background:rgba(255,255,255,.92);border-radius:5px;padding:10px 14px;font-size:12px;line-height:1.5}
+  .instructions ol{margin:4px 0 0;padding-left:18px}
+  .toggle{bottom:66px;right:16px;background:#fff;border-radius:5px;padding:6px 10px;font-size:11px;display:flex;gap:8px;align-items:center}
+  .sw{width:28px;height:16px;border-radius:8px;background:var(--brandPrimary);position:relative}
+  .sw:after{content:'';position:absolute;top:2px;right:2px;width:12px;height:12px;border-radius:50%;background:#fff}
+  .actions{bottom:16px;right:16px;display:flex;gap:8px}
+  .btn{height:34px;padding:0 30px;border-radius:5px;font-size:14px;cursor:pointer;border:1px solid transparent}
+  .btn-primary{background:var(--brandPrimary);color:#fff}
+  .btn-gray{background:var(--grayDarker);color:#fff}
+  .btn-line{background:#fff;color:var(--brandPrimary);border-color:var(--brandPrimary)}
+  .range{left:0;right:0;bottom:0;background:#fff;padding:10px 20px;display:flex;gap:14px;align-items:center;font-size:12px;color:var(--grayDarker)}
+  .range .track{flex:1;height:4px;background:var(--gray);border-radius:2px;position:relative}
+  .range .track:before{content:'';position:absolute;left:8%;right:10%;top:0;bottom:0;background:var(--brandPrimary)}
+  .toast{top:16px;left:50%;transform:translateX(-50%);background:var(--brandSuccess);color:#fff;border-radius:5px;padding:8px 16px;font-size:13px;display:none}
+  .loading{top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:5px;padding:12px 18px;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.2);display:none}
+
+  /* NEW: warnings panel. Alert/Warning pattern from the design system: 13px, 3px left border, 10% tint */
+  .warnings{right:16px;bottom:110px;width:420px;max-width:calc(100% - 32px);background:#fff;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.2);display:none}
+  .warnings .w-head{display:flex;align-items:center;gap:8px;padding:10px 12px 6px 14px;font-size:13px;font-weight:500}
+  .warnings .w-head .x{margin-left:auto;background:none;border:0;color:var(--grayDarker);font-size:14px;cursor:pointer}
+  .warn{margin:0 12px 8px;padding:8px 10px 8px 12px;border-left:3px solid var(--brandWarning);background:rgba(255,164,82,.1);font-size:13px;line-height:1.45}
+  .warn:last-child{margin-bottom:12px}
+  .ref{display:block;margin-top:2px;font-size:11px;color:var(--grayDarker)}
+
+  /* Existing builder error dialog: Confirmation / InformationPopup pattern */
+  .confirmation{position:fixed;inset:0;z-index:6003;display:flex;align-items:flex-start;justify-content:center;padding-top:16vh;background:rgba(0,0,0,.6)}
+  .confirmation.hidden{display:none}
+  .dialog{width:520px;max-width:calc(100% - 32px);background:#fff;padding:24px 0 0;box-shadow:0 2px 4px rgba(0,0,0,.1);animation:zoomIn .3s ease-out}
+  @keyframes zoomIn{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+  .c-title{display:block;margin-bottom:12px;line-height:30px;font-weight:500;font-size:22px;text-align:center;padding:0 15px}
+  .c-message{display:block;line-height:24px;font-weight:300;font-size:16px;color:rgba(0,0,0,.5);text-align:center;padding:0 30px}
+  .c-ref{display:block;text-align:center;margin-top:10px;font-size:11px;color:var(--grayDarker)}
+  .footer{display:flex;justify-content:center;gap:12px;padding:12px;margin-top:20px;box-shadow:0 -2px 4px rgba(0,0,0,.08)}
+
+  .save-dialog{width:420px;max-width:calc(100% - 32px);background:#fff;border-radius:8px;padding:30px;text-align:center;animation:zoomIn .3s ease-out}
+  .save-dialog h3{margin:0 0 16px;font-size:22px;font-weight:500}
+  .save-dialog p{margin:0 0 12px;font-size:16px;line-height:24px}
+  .save-dialog .col{display:flex;flex-direction:column;gap:16px;margin-top:20px}
+</style>
+</head>
+<body>
+
+<div class="mockbar">
+  <div class="row"><b>Path can't be built:</b>
+    <button data-error="wrongRoute">Drive isn't from this route</button>
+    <button data-error="noStops">Drive misses every stop</button>
+    <button data-error="tooFew">Too few breadcrumbs</button>
+    <button data-error="noStreets">No matching streets</button>
+    <button data-error="streetData">Street data didn't load</button>
+    <button data-error="generic">No reason given (fallback)</button>
+  </div>
+  <div class="row"><b>Path built, with warnings:</b>
+    <button data-warn="multiDay">Two days selected</button>
+    <button data-warn="offRoute">Most of the drive off the route</button>
+    <button data-warn="sparse">Breadcrumbs far apart</button>
+    <button data-warn="all">All three</button>
+    <button id="mock-clean-trace">No warnings</button>
+  </div>
+  <div class="row"><span class="note">Stops not on the path: see SCP-5306 (same warning in the builder, with the stop list). Functional reference only. All visuals must match the existing SmartCity Portal.</span></div>
+</div>
+
+<div class="subnav"><span>Route Tracker</span><span>Snow Tracker</span><span>Sweeper Tracker</span><span class="active">Route Planner</span><span>Dispatch Board</span></div>
+<div class="page-dim"></div>
+
+<div class="tpb-modal" id="tpb-builder-modal">
+  <div class="tpb-head">
+    <span class="title">Travel Path Builder</span>
+    <span class="name">20 Monday Recycling</span>
+    <button class="close" id="tpb-builder-close" aria-label="Close">✕</button>
+  </div>
+  <div class="tpb-filters">
+    <div class="tpb-filter"><label>Date</label><div>10/23/2026</div></div>
+    <div class="tpb-filter"><label>Route Name</label><div>20 Monday Recycling</div></div>
+    <div class="tpb-filter"><label>Vehicle</label><div>Recycle Truck #22</div></div>
+  </div>
+
+  <div class="map" id="tpb-map-wrapper">
+    <svg class="base" id="tpb-map" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+      <rect width="1200" height="600" fill="#eceee9"/>
+      <path d="M0 470 C200 430 300 520 470 500 S760 560 900 600" stroke="#b7d3e6" stroke-width="18" fill="none"/>
+      <g fill="#e2e6dd"><rect x="60" y="60" width="140" height="110" rx="4"/><rect x="980" y="380" width="160" height="120" rx="4"/></g>
+      <g stroke="#ffffff" stroke-width="9" fill="none" stroke-linecap="round">
+        <path d="M0 110H1200M0 230H1200M0 350H1200M0 430H1200"/>
+        <path d="M150 0V600M330 0V600M520 0V600M700 0V600M880 0V600M1050 0V600"/>
+      </g>
+      <g stroke="#f6d48a" stroke-width="7" fill="none"><path d="M0 290 L1200 260"/></g>
+      <path id="tpb-traced-path" d="M520 520 L520 350 L700 350 L700 230 L880 230 L880 110 L1050 110" stroke="var(--path)" stroke-width="5" fill="none" stroke-linejoin="round"/>
+      <g id="tpb-breadcrumbs" fill="#3a7bd5" opacity=".55">
+        <circle cx="520" cy="500" r="3"/><circle cx="520" cy="430" r="3"/><circle cx="560" cy="350" r="3"/><circle cx="640" cy="350" r="3"/><circle cx="700" cy="290" r="3"/><circle cx="760" cy="230" r="3"/><circle cx="840" cy="230" r="3"/><circle cx="880" cy="170" r="3"/><circle cx="960" cy="110" r="3"/>
+      </g>
+      <g font-size="22"><text x="508" y="532">🚩</text><text x="1040" y="104">🏁</text></g>
+      <g fill="var(--brandPrimary)" stroke="#fff" stroke-width="2">
+        <circle cx="520" cy="470" r="7"/><circle cx="600" cy="350" r="7"/><circle cx="700" cy="300" r="7"/><circle cx="800" cy="230" r="7"/><circle cx="880" cy="160" r="7"/><circle cx="990" cy="110" r="7"/>
+      </g>
+    </svg>
+
+    <div class="ctl" style="top:16px;left:16px"><button class="icon-btn" id="tpb-map-layers-button" title="Map Layers">◈</button></div>
+    <div class="ctl instructions" id="tpb-instructions">
+      Use the slider to drag the red and green flags left and right
+      <ol><li>Select Start of Route (where servicing begins)</li><li>Select End of Route (where servicing ends)</li><li>Submit</li><li>Save</li></ol>
+    </div>
+    <div class="ctl" style="bottom:70px;left:16px"><button class="icon-btn">＋</button><button class="icon-btn">－</button></div>
+    <div class="ctl loading" id="tpb-trace-loading">Building the travel path…</div>
+    <div class="ctl toast" id="tpb-toast">Travel path saved successfully.</div>
+
+    <!-- NEW: warnings after a successful trace. The planner can still save. -->
+    <div class="ctl warnings" id="tpb-trace-warnings-panel" role="status">
+      <div class="w-head">Check this travel path before saving
+        <button class="x" id="tpb-trace-warnings-dismiss" aria-label="Dismiss warnings">✕</button>
+      </div>
+      <div id="tpb-trace-warnings-list"></div>
+    </div>
+
+    <div class="ctl toggle" id="tpb-show-vehicle-trackings"><div class="sw"></div>Show Vehicle Trackings</div>
+    <div class="ctl actions" id="tpb-actions-traced">
+      <button class="btn btn-gray" id="tpb-back-button">Back</button>
+      <button class="btn btn-primary" id="tpb-save-button">Save</button>
+    </div>
+    <div class="ctl actions" id="tpb-actions-range" style="display:none;bottom:60px">
+      <button class="btn btn-primary" id="tpb-submit-button">Submit</button>
+    </div>
+    <div class="ctl range" id="tpb-range" style="display:none"><span>05:40:51 AM</span><div class="track"></div><span>07:39:01 AM</span></div>
+  </div>
+</div>
+
+<!-- CHANGED: builder error dialog. Today it always says "An error occurred while tracing the path. Please try again." -->
+<div class="confirmation hidden" id="tpb-trace-error-dialog">
+  <div class="dialog" role="alertdialog" aria-labelledby="tpb-trace-error-title" aria-describedby="tpb-trace-error-message">
+    <span class="c-title" id="tpb-trace-error-title"></span>
+    <span class="c-message" id="tpb-trace-error-message"></span>
+    <span class="c-ref" id="tpb-trace-error-ref"></span>
+    <div class="footer">
+      <button class="btn btn-line" id="tpb-trace-error-back-button">Back To Builder</button>
+      <button class="btn btn-primary" id="tpb-trace-error-retry-button" style="display:none">Try Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXISTING: save choice, unchanged -->
+<div class="confirmation hidden" id="tpb-save-confirmation-modal" style="padding-top:20vh">
+  <div class="save-dialog">
+    <h3>Save Travel Path</h3>
+    <p>Choose how to save the travel path.</p>
+    <div class="col">
+      <button class="btn btn-line" id="tpb-save-confirmation-cancel">Cancel</button>
+      <button class="btn btn-primary" id="tpb-save-confirmation-save">Save Travel Path</button>
+      <button class="btn btn-primary" id="tpb-save-confirmation-save-resequence">Save &amp; Resequence</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Path can't be built. The planner goes back to the builder to pick something else.
+const ERRORS={
+  wrongRoute:{title:"This drive isn't from this route",msg:"Its breadcrumbs are 12,639 km from the route's stops. Choose a different date or vehicle.",ref:"S55020"},
+  noStops:{title:"This drive doesn't pass any stops",msg:"The vehicle was in the area but didn't pass any of this route's stops. Choose a drive where the vehicle serviced this route.",ref:"S55021"},
+  tooFew:{title:"Not enough breadcrumbs",msg:"There aren't enough breadcrumbs in this time window to build a path (0 found, 120 needed). Widen the start and end times or choose another drive.",ref:"S55018"},
+  noStreets:{title:"No matching streets",msg:"This drive doesn't match any streets in the route's network. Choose another drive, or contact Support if the streets are missing from the network.",ref:"E65010"},
+  streetData:{title:"Street data didn't load",msg:"We couldn't load the street data. Try again in a minute.",ref:"",retry:true},
+  generic:{title:"We couldn't build the travel path",msg:"Something went wrong while building the path. Try again, or contact Support if it keeps happening.",ref:"",retry:true}
+};
+// Path built. The planner sees these above Save and can still save.
+const WARNINGS={
+  multiDay:{msg:"This selection covers 2 days (Oct 23–24). Narrow it to one day so the path comes from a single drive.",ref:"S55024"},
+  offRoute:{msg:"Less than half of this drive is on the route. Check the path before saving.",ref:"S55022"},
+  sparse:{msg:"The breadcrumbs are far apart, so short streets may be missed. Check the path before saving.",ref:"S55025"}
+};
+const $=id=>document.getElementById(id);
+
+function setTracedState(traced){
+  $('tpb-actions-traced').style.display=traced?'flex':'none';
+  $('tpb-show-vehicle-trackings').style.display=traced?'flex':'none';
+  $('tpb-actions-range').style.display=traced?'none':'flex';
+  $('tpb-range').style.display=traced?'none':'flex';
+  $('tpb-traced-path').style.display=traced?'':'none';
+  if(!traced) $('tpb-trace-warnings-panel').style.display='none';
+}
+function withLoading(fn){
+  $('tpb-trace-loading').style.display='block';
+  setTimeout(()=>{ $('tpb-trace-loading').style.display='none'; fn(); },600);
+}
+function showError(key){
+  const e=ERRORS[key];
+  setTracedState(false);
+  withLoading(()=>{
+    $('tpb-trace-error-title').textContent=e.title;
+    $('tpb-trace-error-message').textContent=e.msg;
+    $('tpb-trace-error-ref').textContent=e.ref?('Ref '+e.ref):'';
+    $('tpb-trace-error-retry-button').style.display=e.retry?'':'none';
+    $('tpb-trace-error-dialog').classList.remove('hidden');
+  });
+}
+function showWarnings(keys){
+  setTracedState(false);
+  withLoading(()=>{
+    setTracedState(true);
+    const list=$('tpb-trace-warnings-list'); list.innerHTML='';
+    keys.forEach(k=>{
+      const w=WARNINGS[k], d=document.createElement('div');
+      d.className='warn'; d.id='tpb-trace-warning-'+w.ref.toLowerCase();
+      d.innerHTML=`${w.msg}<span class="ref">Ref ${w.ref}</span>`;
+      list.appendChild(d);
+    });
+    $('tpb-trace-warnings-panel').style.display=keys.length?'block':'none';
+  });
+}
+function mark(btn){ document.querySelectorAll('.mockbar button').forEach(b=>b.classList.remove('on')); if(btn) btn.classList.add('on'); }
+function toast(){ const t=$('tpb-toast'); t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+
+document.addEventListener('click',ev=>{
+  const t=ev.target, err=t.dataset.error, warn=t.dataset.warn;
+  if(err){ mark(t); showError(err); return; }
+  if(warn){ mark(t); showWarnings(warn==='all'?['multiDay','offRoute','sparse']:[warn]); return; }
+  switch(t.id){
+    case 'mock-clean-trace': mark(t); showWarnings([]); break;
+    case 'tpb-submit-button': showWarnings(['multiDay']); break;
+    case 'tpb-back-button': setTracedState(false); break;
+    case 'tpb-trace-error-back-button': $('tpb-trace-error-dialog').classList.add('hidden'); break;
+    case 'tpb-trace-error-retry-button': $('tpb-trace-error-dialog').classList.add('hidden'); showWarnings([]); break;
+    case 'tpb-trace-warnings-dismiss': $('tpb-trace-warnings-panel').style.display='none'; break;
+    case 'tpb-save-button': $('tpb-save-confirmation-modal').classList.remove('hidden'); break;
+    case 'tpb-save-confirmation-cancel': $('tpb-save-confirmation-modal').classList.add('hidden'); break;
+    case 'tpb-save-confirmation-save': case 'tpb-save-confirmation-save-resequence':
+      $('tpb-save-confirmation-modal').classList.add('hidden'); $('tpb-trace-warnings-panel').style.display='none'; toast(); break;
+  }
+});
+mark(document.querySelector('[data-error="wrongRoute"]')); showError('wrongRoute');
+</script>
+</body>
+</html>
