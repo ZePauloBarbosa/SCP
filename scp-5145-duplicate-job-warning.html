@@ -3,6 +3,8 @@
 v1 2026-10-22 Add Job modal: inline yellow warning under the customer/location field when the selected service already has an open job. Save stays enabled.
 v2 2026-10-22 Match at location level: any service at a location with an open job on the selected date triggers the warning. Added a second location with no open job.
 v3 2026-10-23 Manage Exceptions id aligned with the live Pendo tag (#manage-exceptions-button). Add Job button id is add-job-button, matching AC5.
+v4 2026-11-11 Match at service level (Paulo, 9 Nov): only the selected service's own jobs on the selected date trigger the warning. The warning is one sentence that says whether the existing job is assigned (on a route) or unassigned, and lists each job. Date change shows a loading indicator while the check runs. Added scenarios: assigned only, unassigned only, both, same location with no job, other location.
+v4.1 2026-11-11 Dispatch Board layout matches the live portal (checked 2026-11-11): Jobs and Routes side by side; in Jobs, Unassigned jobs is the first row and routes follow; clicking a row opens its job list with a back arrow. Route jobs show a drag handle, stop number, pickup type and status badge; unassigned jobs show a checkbox, number, pickup type and job date, no status.
 -->
 <html lang="en">
 <head>
@@ -11,7 +13,8 @@ v3 2026-10-23 Manage Exceptions id aligned with the live Pendo tag (#manage-exce
 <title>SCP-5145 Duplicate Job Warning</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* Tokens read from Figma M09kEEo1KNu48sLPl3b2av, node 1213:6778 */
+  /* Tokens read from Figma M09kEEo1KNu48sLPl3b2av, node 1213:6778 (checked 2026-11-11).
+     Alert / Warning: 13px Montserrat, 3px left border, background 8-10% of the status colour. */
   :root{
     --navy:#20315A; --navy-dark:#242833; --green:#33A542; --page:#FAFAFC; --white:#FFFFFF;
     --border:#E5E7EB; --scheduled:#0066A6; --label:#888888;
@@ -19,7 +22,8 @@ v3 2026-10-23 Manage Exceptions id aligned with the live Pendo tag (#manage-exce
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:Montserrat,sans-serif;background:var(--page);color:var(--navy-dark)}
-  .note{max-width:1100px;margin:16px auto 0;padding:10px 16px;font-size:12px;color:#555;border-left:3px solid var(--navy);background:#EEF1F8;border-radius:5px}
+  .note{max-width:1100px;margin:16px auto 0;padding:10px 16px;font-size:12px;color:#555;border-left:3px solid var(--navy);background:#EEF1F8;border-radius:5px;line-height:1.6}
+  .note ul{margin:6px 0 0 18px;padding:0}
   .subnav{display:flex;justify-content:center;gap:48px;background:var(--white);height:48px;align-items:center;border-bottom:1px solid var(--border)}
   .subnav a{font-size:16px;color:var(--navy-dark);text-decoration:none}
   .subnav a.active{color:var(--green)}
@@ -29,13 +33,30 @@ v3 2026-10-23 Manage Exceptions id aligned with the live Pendo tag (#manage-exce
   .jobs-head h2{font-weight:400;font-size:26px;margin:0 auto 0 0}
   .btn-secondary{background:transparent;border:1px solid var(--navy);color:var(--navy);border-radius:5px;padding:8px 30px;font:400 14px Montserrat,sans-serif;cursor:pointer}
   .btn-primary{background:var(--navy);border:1px solid var(--navy);color:#fff;border-radius:5px;padding:10px 50px;font:500 16px Montserrat,sans-serif;cursor:pointer}
-  .panel{background:var(--white);border:1px solid var(--border);border-radius:5px;max-width:520px}
-  .route-head{padding:14px 18px;border-bottom:1px solid var(--border);font-size:20px}
-  .route-head small{display:block;font-size:13px;color:var(--label);margin-top:4px}
-  .job{display:flex;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);font-size:14px}
-  .job .addr{font-weight:300;color:#999;font-size:13px}
+  .board{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+  .col .jobs-head h2{font-size:28px}
+  .panel{background:var(--white);border:1px solid var(--border);border-radius:5px}
+  .filters{display:flex;gap:32px;padding:14px 18px;border-bottom:1px solid var(--border);font-size:14px}
+  .filters small{display:block;font-size:11px;font-weight:300;color:#aaa;margin-bottom:4px}
+  .lrow{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 18px;border-bottom:1px solid var(--border);cursor:pointer}
+  .lrow:hover{background:#F8F9FB}
+  .lname{font-size:16px}
+  .lsub{font-size:13px;margin-top:6px}
+  .lright{text-align:right}
+  .lright small{display:block;font-size:11px;color:#aaa;margin-bottom:6px}
+  .dhead{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:auto 1fr auto;column-gap:10px;align-items:center;font-size:18px}
+  .dhead small{font-size:11px;color:#aaa}
+  .dhead .lsub{grid-column:2/4;margin-top:4px}
+  .back{background:none;border:0;font-size:20px;color:var(--navy-dark);cursor:pointer;padding:0}
+  .job{display:grid;grid-template-columns:28px 22px 1fr auto;gap:8px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--border);font-size:14px}
+  .job .loc{font-size:13px}
+  .job .addr{font-weight:300;color:#999;font-size:12px}
+  .job .right{text-align:right;font-size:13px}
+  .handle{color:#bbb;font-size:16px}
   .badge{display:inline-block;font-size:12px;font-weight:300;color:var(--scheduled);background:rgba(0,102,166,0.08);padding:2px 8px;border-radius:4px;margin-top:4px}
+  .badge.prog{color:var(--green);background:rgba(51,165,66,0.08)}
   .job.new{background:#F3FAF4}
+  .jdate{display:inline-block;font-size:12px;margin-top:4px;color:var(--navy-dark)}
 
   /* Modal */
   .overlay{position:fixed;inset:0;background:rgba(36,40,51,0.35);display:none;align-items:flex-start;justify-content:center;padding:32px 16px;overflow:auto}
@@ -52,42 +73,72 @@ v3 2026-10-23 Manage Exceptions id aligned with the live Pendo tag (#manage-exce
   .combo{position:relative}
   .combo input{border-bottom:2px solid #999;padding-right:28px}
   .combo.warn input{border-bottom-color:var(--warn)}
-  .list{position:absolute;left:0;right:0;top:100%;background:var(--white);box-shadow:0 6px 18px rgba(0,0,0,0.12);z-index:5;display:none;max-height:260px;overflow:auto}
+  .list{position:absolute;left:0;right:0;top:100%;background:var(--white);box-shadow:0 6px 18px rgba(0,0,0,0.12);z-index:5;display:none;max-height:300px;overflow:auto}
   .list.open{display:block}
   .grp{font-size:12px;font-weight:600;text-transform:uppercase;background:#F3F4F6;padding:10px 14px;display:flex;justify-content:space-between}
-  .opt{padding:12px 20px;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+  .opt{padding:12px 20px;font-size:14px;cursor:pointer}
   .opt:hover{background:#F5F6FA}
-  .opt .tag{font-size:11px;color:var(--warn-text)}
-  .warning{display:none;margin-top:8px;background:var(--warn-bg);border-radius:5px;position:relative;padding:10px 14px 10px 16px;font-size:12px;color:var(--warn-text);line-height:1.5}
+  .opt .hint{display:block;font-size:11px;font-weight:300;color:#999;margin-top:2px}
+  .warning{display:none;margin-top:8px;background:var(--warn-bg);border-radius:5px;position:relative;padding:10px 14px 10px 16px;font-size:13px;color:var(--warn-text);line-height:1.5}
   .warning::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--warn);border-radius:5px}
   .warning.show{display:block}
   .warning strong{font-weight:600}
+  .loading{display:none;margin-top:8px;font-size:13px;font-weight:300;color:var(--label);align-items:center;gap:8px}
+  .loading.show{display:flex}
+  .spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
   .footer{text-align:center;margin-top:36px}
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy-dark);color:#fff;padding:10px 18px;border-radius:5px;font-size:13px;display:none}
   .toast.show{display:block}
-  @media (max-width:640px){.grid{grid-template-columns:1fr}.modal{padding:24px 16px}.modal h3{font-size:28px}}
+  @media (max-width:640px){.board{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.modal{padding:24px 16px}.modal h3{font-size:28px}}
 </style>
 </head>
 <body>
 
-<div class="note">Functional reference only. All visuals must match the existing SmartCity Portal look and feel. SCP-5145 — any container at <b>260 W Mulberry St</b> warns, because 030-317 already has an open job there on 02/07/2026. The container at 1200 E McKinney St doesn't.</div>
+<div class="note">Functional reference only. All visuals must match the existing SmartCity Portal look and feel. SCP-5145: the warning checks the <b>selected service</b> on the <b>selected date</b>, not the whole location. Open <b>+ Add Job</b> and try, on 02/07/2026:
+  <ul>
+    <li>030-317: one assigned job (on RO15-S)</li>
+    <li>030-319: one unassigned job</li>
+    <li>030-267: one assigned job and one unassigned job</li>
+    <li>030-320: same location, no job, so no warning</li>
+    <li>030-401: another location, no job, so no warning</li>
+  </ul>
+  Change the date to 02/08/2026 to see the loading indicator and the warning clear. The same warning appears wherever Add Job opens: Dispatch Board, Customers list, Service History and Route Tracker.</div>
 
 <nav class="subnav"><a href="#">Route Tracker</a><a href="#">Route Planner</a><a href="#" class="active">Dispatch Board</a></nav>
 
 <main class="wrap">
   <h1>Dispatch Board</h1>
-  <div class="jobs-head">
-    <h2>Jobs</h2>
-    <button class="btn-secondary" id="manage-exceptions-button">Manage Exceptions</button>
-    <button class="btn-secondary" id="add-job-button">+ Add Job</button>
-  </div>
-  <div class="panel" id="dispatch-route-jobs-panel">
-    <div class="route-head">RO15-S <small>02/07/2026 · <span id="job-count">7</span> Jobs</small></div>
-    <div id="job-list">
-      <div class="job"><div>1&nbsp;&nbsp;WASTE MANAGEMENT FOR LOWES<div class="addr">421 S Western Blvd, Denton, TX 76207</div></div><div>Empty &amp; Return<br><span class="badge">Scheduled</span></div></div>
-      <div class="job"><div>2&nbsp;&nbsp;DISCOVERY PARK (04520063-01)<div class="addr">3925 N Elm St, Denton, TX 76207</div></div><div>Empty &amp; Return<br><span class="badge">Scheduled</span></div></div>
-      <div class="job"><div>3&nbsp;&nbsp;U ALVZ PAINTING (05630093-00)<div class="addr">260 W Mulberry St · 030-317</div></div><div>Empty &amp; Return<br><span class="badge">Scheduled</span></div></div>
-    </div>
+  <div class="board">
+    <section class="col">
+      <div class="jobs-head">
+        <h2>Jobs</h2>
+        <button class="btn-secondary" id="manage-exceptions-button">Manage Exceptions</button>
+        <button class="btn-secondary" id="add-job-button">+ Add Job</button>
+      </div>
+      <div class="panel" id="dispatch-jobs-panel">
+        <!-- List view: Unassigned jobs is the first row, routes follow -->
+        <div id="jobs-list-view">
+          <div class="filters"><div><small>Date</small>02/07/2026</div><div><small>Route Status</small>All Route Statuses</div></div>
+          <div class="lrow" data-open="unassigned"><div><div class="lname">Unassigned jobs</div><div class="lsub"><span id="count-unassigned">2</span> Jobs</div></div></div>
+          <div class="lrow" data-open="RO15-S"><div><div class="lname">RO15-S</div><div class="lsub"><span id="count-RO15-S">3</span> Jobs</div></div><div class="lright"><small>02/07/2026</small><span class="badge">Scheduled - 0%</span></div></div>
+          <div class="lrow" data-open="RO44-E"><div><div class="lname">RO44-E</div><div class="lsub"><span id="count-RO44-E">1</span> Job</div></div><div class="lright"><small>02/07/2026</small><span class="badge prog">In Progress - 0%</span></div></div>
+        </div>
+        <!-- Detail view: opened by clicking a row -->
+        <div id="jobs-detail-view" hidden>
+          <div class="dhead"><button class="back" id="jobs-detail-back-button" aria-label="Back">&larr;</button><span id="detail-title"></span><small id="detail-date">02/07/2026</small><div class="lsub" id="detail-count"></div></div>
+          <div id="detail-rows"></div>
+        </div>
+      </div>
+    </section>
+    <section class="col">
+      <div class="jobs-head"><h2>Routes</h2><button class="btn-secondary">More</button><button class="btn-secondary">+ Add Route</button></div>
+      <div class="panel">
+        <div class="filters"><div><small>Date</small>02/07/2026</div><div><small>Route Status</small>All Route Statuses</div></div>
+        <div class="lrow"><div><div class="lname">RO15-S</div><div class="lsub">3 Jobs</div></div><div class="lright"><small>02/07/2026</small><span class="badge">Scheduled - 0%</span></div></div>
+        <div class="lrow"><div><div class="lname">RO44-E</div><div class="lsub">1 Job</div></div><div class="lright"><small>02/07/2026</small><span class="badge prog">In Progress - 0%</span></div></div>
+      </div>
+    </section>
   </div>
 </main>
 
@@ -99,30 +150,28 @@ v3 2026-10-23 Manage Exceptions id aligned with the live Pendo tag (#manage-exce
       <div class="field"><label for="add-job-vehicle-type-select">Vehicle Type</label>
         <select id="add-job-vehicle-type-select"><option>Roll Off</option></select></div>
       <div class="field"><label for="add-job-date-input">Date</label>
-        <select id="add-job-date-input"><option>02/07/2026</option></select></div>
+        <select id="add-job-date-input"><option>02/07/2026</option><option>02/08/2026</option></select></div>
 
       <div class="field full">
         <label for="add-job-service-search">Customer / Location</label>
         <div class="combo" id="add-job-service-combo">
           <input id="add-job-service-search" autocomplete="off" placeholder="Search account # or address" value="05630093-00">
           <div class="list" id="add-job-service-list" role="listbox">
-            <div class="grp"><span>U ALVZ PAINTING &gt; U ALVZ PAINTING &gt; 260 W Mulberry St</span><span>3</span></div>
-            <div class="opt" role="option" id="add-job-service-option-030-319" data-loc="U ALVZ PAINTING|260 W Mulberry St" data-svc="30YD - OT - Trash - MSW (030-319)" data-open="030-317|RO15-S|02/07/2026|Empty &amp; Return|Scheduled">30YD - OT - Trash - MSW (030-319)</div>
-            <div class="opt" role="option" id="add-job-service-option-030-267" data-loc="U ALVZ PAINTING|260 W Mulberry St" data-svc="30YD - OT - Trash - MSW (030-267)" data-open="030-317|RO15-S|02/07/2026|Empty &amp; Return|Scheduled">30YD - OT - Trash - MSW (030-267)</div>
-            <div class="opt" role="option" id="add-job-service-option-030-317" data-loc="U ALVZ PAINTING|260 W Mulberry St" data-svc="30YD - OT - Trash - MSW (030-317)" data-open="030-317|RO15-S|02/07/2026|Empty &amp; Return|Scheduled">30YD - OT - Trash - MSW (030-317)</div>
+            <div class="grp"><span>U ALVZ PAINTING &gt; U ALVZ PAINTING &gt; 260 W Mulberry St</span><span>4</span></div>
+            <div class="opt" role="option" id="add-job-service-option-030-317" data-svc="030-317" data-loc="260 W Mulberry St" data-name="30YD - OT - Trash - MSW (030-317)">30YD - OT - Trash - MSW (030-317)<span class="hint">Mock: one assigned job</span></div>
+            <div class="opt" role="option" id="add-job-service-option-030-319" data-svc="030-319" data-loc="260 W Mulberry St" data-name="30YD - OT - Trash - MSW (030-319)">30YD - OT - Trash - MSW (030-319)<span class="hint">Mock: one unassigned job</span></div>
+            <div class="opt" role="option" id="add-job-service-option-030-267" data-svc="030-267" data-loc="260 W Mulberry St" data-name="30YD - OT - Trash - MSW (030-267)">30YD - OT - Trash - MSW (030-267)<span class="hint">Mock: one assigned and one unassigned job</span></div>
+            <div class="opt" role="option" id="add-job-service-option-030-320" data-svc="030-320" data-loc="260 W Mulberry St" data-name="20YD - OT - C&amp;D (030-320)">20YD - OT - C&amp;D (030-320)<span class="hint">Mock: no job, same location</span></div>
             <div class="grp"><span>U ALVZ PAINTING &gt; U ALVZ PAINTING &gt; 1200 E McKinney St</span><span>1</span></div>
-            <div class="opt" role="option" id="add-job-service-option-030-401" data-loc="U ALVZ PAINTING|1200 E McKinney St" data-svc="20YD - OT - C&amp;D (030-401)">20YD - OT - C&amp;D (030-401)</div>
+            <div class="opt" role="option" id="add-job-service-option-030-401" data-svc="030-401" data-loc="1200 E McKinney St" data-name="20YD - OT - C&amp;D (030-401)">20YD - OT - C&amp;D (030-401)<span class="hint">Mock: no job</span></div>
           </div>
         </div>
-        <div class="warning" id="add-job-duplicate-warning" role="status" aria-live="polite">
-          <strong>This location already has a job scheduled.</strong>
-          <span id="add-job-duplicate-warning-detail"></span>
-          You can still save to add another job.
-        </div>
+        <div class="loading" id="add-job-duplicate-check-loading" role="status" aria-live="polite"><span class="spinner"></span>Checking for existing jobs…</div>
+        <div class="warning" id="add-job-duplicate-warning" role="status" aria-live="polite"></div>
       </div>
 
       <div class="field"><label for="add-job-route-select">Route</label>
-        <select id="add-job-route-select"><option>RO15-S</option><option>RO13-W</option><option>RO14-W</option></select></div>
+        <select id="add-job-route-select"><option>RO15-S</option><option>RO44-E</option><option>RO13-W</option></select></div>
       <div class="field"><label for="add-job-pickup-type-select">Pickup Type</label>
         <select id="add-job-pickup-type-select"><option>Empty &amp; Return</option><option>Delivery</option><option>Removal</option></select></div>
       <div class="field"><label for="add-job-material-type-select">Material Type</label>
@@ -143,43 +192,110 @@ v3 2026-10-23 Manage Exceptions id aligned with the live Pendo tag (#manage-exce
   </div>
 </div>
 
-<div class="toast" id="add-job-saved-toast">Job added to RO15-S</div>
+<div class="toast" id="add-job-saved-toast">Job added</div>
 
 <script>
+  // Existing jobs per service and date. Assigned jobs have a route; unassigned jobs don't.
+  const JOBS = {
+    '030-317|02/07/2026': [{route:'RO15-S', type:'Empty & Return', status:'Scheduled'}],
+    '030-319|02/07/2026': [{route:null, type:'Delivery'}],
+    '030-267|02/07/2026': [{route:'RO44-E', type:'Delivery', status:'In Progress'}, {route:null, type:'Removal'}]
+  };
+
   const $ = id => document.getElementById(id);
   const modal = $('add-job-modal'), search = $('add-job-service-search'), list = $('add-job-service-list');
-  const combo = $('add-job-service-combo'), warn = $('add-job-duplicate-warning'), detail = $('add-job-duplicate-warning-detail');
-  let selected = null;
+  const combo = $('add-job-service-combo'), warn = $('add-job-duplicate-warning'), loading = $('add-job-duplicate-check-loading');
+  const dateSel = $('add-job-date-input');
+  let selected = null, timer = null;
 
-  function reset(){
-    search.value = '05630093-00'; selected = null;
-    warn.classList.remove('show'); combo.classList.remove('warn');
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const n = (count, word) => count === 1 ? `an ${word} job` : `${count} ${word} jobs`;
+  const assignedText = j => `${j.route} - ${j.type} - ${j.status}`;
+
+  // One sentence: says whether each existing job is assigned or unassigned.
+  function sentence(jobs, date){
+    const a = jobs.filter(j => j.route), u = jobs.filter(j => !j.route);
+    const aList = a.map(assignedText).join('; '), uList = u.map(j => j.type).join('; ');
+    let lead, rest;
+    if (a.length && u.length){
+      lead = `This service already has ${jobs.length} jobs on ${date}:`;
+      rest = ` ${a.length} assigned (${aList}) and ${u.length} unassigned (${uList})`;
+    } else if (a.length){
+      lead = `This service already has ${n(a.length,'assigned')} on ${date}`;
+      rest = ` (${aList})`;
+    } else {
+      lead = `This service already has ${n(u.length,'unassigned')} on ${date}`;
+      rest = ` (${uList})`;
+    }
+    return `<strong>${esc(lead)}</strong>${esc(rest)}; you can still save to add another job.`;
   }
+
+  function hide(){ warn.classList.remove('show'); combo.classList.remove('warn'); loading.classList.remove('show'); clearTimeout(timer); }
+
+  function check(withDelay){
+    hide();
+    if (!selected) return;
+    const run = () => {
+      loading.classList.remove('show');
+      const jobs = JOBS[`${selected.dataset.svc}|${dateSel.value}`];
+      if (jobs && jobs.length){ warn.innerHTML = sentence(jobs, dateSel.value); warn.classList.add('show'); combo.classList.add('warn'); }
+    };
+    if (withDelay){ loading.classList.add('show'); timer = setTimeout(run, 1200); } else run();
+  }
+
+  function reset(){ search.value = '05630093-00'; selected = null; dateSel.value = '02/07/2026'; hide(); }
   $('add-job-button').onclick = e => { e.stopPropagation(); reset(); modal.classList.add('open'); search.focus(); list.classList.add('open'); };
   $('add-job-close-button').onclick = () => modal.classList.remove('open');
   modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
   search.addEventListener('focus', () => list.classList.add('open'));
-  search.addEventListener('input', () => { list.classList.add('open'); warn.classList.remove('show'); combo.classList.remove('warn'); selected = null; });
+  search.addEventListener('input', () => { list.classList.add('open'); selected = null; hide(); });
   document.addEventListener('click', e => { if (!combo.contains(e.target)) list.classList.remove('open'); });
+  dateSel.addEventListener('change', () => check(true));
 
   list.querySelectorAll('.opt').forEach(o => o.addEventListener('click', () => {
-    selected = o; search.value = o.dataset.svc; list.classList.remove('open');
-    if (o.dataset.open){
-      const [svc, route, date, type, status] = o.dataset.open.split('|');
-      detail.textContent = `${svc} on ${route} · ${date} · ${type} · ${status}.`;
-      warn.classList.add('show'); combo.classList.add('warn');
-    } else { warn.classList.remove('show'); combo.classList.remove('warn'); }
+    selected = o; search.value = o.dataset.name; list.classList.remove('open'); check(false);
   }));
+
+  // Board rows, shaped like the live Dispatch Board (checked in the portal 2026-11-11).
+  const BOARD = {
+    'unassigned': [
+      {cust:'U ALVZ PAINTING', loc:'U ALVZ PAINTING', addr:'260 W Mulberry St, Denton, TX 76201', type:'Delivery', svc:'030-319'},
+      {cust:'U ALVZ PAINTING', loc:'U ALVZ PAINTING', addr:'260 W Mulberry St, Denton, TX 76201', type:'Removal', svc:'030-267'}
+    ],
+    'RO15-S': [
+      {cust:'WASTE MANAGEMENT FOR LOWES', loc:'LOWES DENTON', addr:'421 S Western Blvd, Denton, TX 76207', type:'Empty & Return', status:'Scheduled'},
+      {cust:'DISCOVERY PARK', loc:'DISCOVERY PARK', addr:'3925 N Elm St, Denton, TX 76207', type:'Empty & Return', status:'Scheduled'},
+      {cust:'U ALVZ PAINTING', loc:'U ALVZ PAINTING', addr:'260 W Mulberry St, Denton, TX 76201', type:'Empty & Return', status:'Scheduled', svc:'030-317'}
+    ],
+    'RO44-E': [
+      {cust:'U ALVZ PAINTING', loc:'U ALVZ PAINTING', addr:'260 W Mulberry St, Denton, TX 76201', type:'Delivery', status:'In Progress', svc:'030-267'}
+    ]
+  };
+  let openList = null;
+  function renderDetail(key){
+    openList = key;
+    const rows = BOARD[key], un = key === 'unassigned';
+    $('detail-title').textContent = un ? 'Unassigned jobs' : key;
+    $('detail-count').textContent = `${rows.length} ${rows.length === 1 ? 'Job' : 'Jobs'}`;
+    $('detail-rows').innerHTML = rows.map((r, i) => `<div class="job${r.isNew ? ' new' : ''}">
+      <span class="handle">${un ? '&#9744;' : '&#9776;'}</span><span>${i + 1}</span>
+      <div><div>${esc(r.cust)}</div><div class="loc">${esc(r.loc)}</div><div class="addr">${esc(r.addr)}</div></div>
+      <div class="right">${esc(r.type)}<br>${un ? '<span class="jdate">02/07/2026</span>' : `<span class="badge${r.status === 'In Progress' ? ' prog' : ''}">${r.status}</span>`}</div></div>`).join('');
+    $('jobs-list-view').hidden = true; $('jobs-detail-view').hidden = false;
+  }
+  document.querySelectorAll('#jobs-list-view .lrow').forEach(r => r.onclick = () => renderDetail(r.dataset.open));
+  $('jobs-detail-back-button').onclick = () => { openList = null; $('jobs-detail-view').hidden = true; $('jobs-list-view').hidden = false; };
 
   $('add-job-save-button').onclick = () => {
     if (!selected){ search.focus(); list.classList.add('open'); return; }
-    const n = $('job-list').children.length + 1, svc = selected.dataset.svc.match(/\((.*)\)/)[1];
-    const row = document.createElement('div'); row.className = 'job new';
-    row.innerHTML = `<div>${n}&nbsp;&nbsp;${selected.dataset.loc.split('|')[0]} (05630093-00)<div class="addr">${selected.dataset.loc.split('|')[1]} · ${svc}</div></div><div>${$('add-job-pickup-type-select').value}<br><span class="badge">Scheduled</span></div>`;
-    $('job-list').appendChild(row);
-    $('job-count').textContent = +$('job-count').textContent + 1;
+    const route = $('add-job-route-select').value, key = BOARD[route] ? route : null;
+    if (key){
+      BOARD[key].push({cust:'U ALVZ PAINTING', loc:'U ALVZ PAINTING', addr:selected.dataset.loc + ', Denton, TX', type:$('add-job-pickup-type-select').value, status:'Scheduled', svc:selected.dataset.svc, isNew:true});
+      const c = $('count-' + key); if (c) c.textContent = BOARD[key].length;
+      if (openList === key) renderDetail(key);
+    }
     modal.classList.remove('open');
-    const t = $('add-job-saved-toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200);
+    const t = $('add-job-saved-toast'); t.textContent = `Job added to ${route}`; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200);
   };
 </script>
 </body>
