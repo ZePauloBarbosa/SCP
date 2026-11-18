@@ -9,6 +9,10 @@ v2.1 2026-11-04 Address removed from the list and the map banner; stop number on
 v2.2 2026-11-05 Warning message states what happens to the listed stops if the planner saves anyway.
 v3   2026-11-05 Adds the Travel Path Editor: same warning and stop list when the planner applies (✓) an edit that leaves stops off the path,
                 with Back To Editor / Apply Anyway. The builder list also carries stops the drive check reports it doesn't pass (moved from SCP-5254).
+v4   2026-11-18 Copy corrected after review with Heather: stops off the path can't be navigated to, and route
+                refresh leaves them out until the route is resequenced. Reports line removed pending confirmation. The Save Travel Path
+                modal now repeats this when the planner continued past the warning (builder Save Anyway or editor Apply Anyway), so the
+                resequence choice is explicit at both entry points.
 -->
 <html lang="en">
 <head>
@@ -100,6 +104,7 @@ v3   2026-11-05 Adds the Travel Path Editor: same warning and stop list when the
   .save-dialog h3{margin:0 0 16px;font-size:22px;font-weight:500}
   .save-dialog p{margin:0 0 12px;font-size:16px;line-height:24px}
   .save-dialog .col{display:flex;flex-direction:column;gap:16px;margin-top:20px}
+  .save-dialog p.left-off{font-size:14px;line-height:20px;background:#fff8e1;border:1px solid #f6d48a;border-radius:4px;padding:8px 10px;text-align:left}
   .note{font-size:11px;color:var(--grayDarker);font-style:italic}
 </style>
 </head>
@@ -197,7 +202,11 @@ v3   2026-11-05 Adds the Travel Path Editor: same warning and stop list when the
 <div class="confirmation hidden" id="tpb-unplaced-stops-dialog">
   <div class="dialog" role="dialog" aria-labelledby="tpb-unplaced-stops-title">
     <span class="c-title" id="tpb-unplaced-stops-title">Some stops may not be on this travel path</span>
-    <span class="c-message" id="tpb-unplaced-stops-message">The stops below don't appear to be on the selected travel path. If you save anyway, these stops are left off the path: they won't appear in reports, can't be confirmed, and drivers can't navigate to them. Go back to the builder to choose a different range, or save anyway.</span>
+    <span class="c-message" id="tpb-unplaced-stops-message" style="white-space:pre-line">The stops below don't appear to be on the selected breadcrumbs path.
+
+If you save anyway, these stops stay off the path until you resequence the route, drivers can't navigate to them, and route refresh will leave them out.
+
+Go back to the builder to choose a different breadcrumb record or save anyway.</span>
     <div class="stops" id="tpb-unplaced-stops-list">
       <div class="hdr"><span>Stops not on the path</span><span id="tpb-unplaced-stops-count">3</span></div>
     </div>
@@ -213,7 +222,8 @@ v3   2026-11-05 Adds the Travel Path Editor: same warning and stop list when the
   <div class="save-dialog">
     <h3>Save Travel Path</h3>
     <p>Choose how to save the travel path.</p>
-    <p class="note">Existing modal, copy from translations (routes.travelPath.alertMessages.saveTravelPath / saveTravelPathOptions) – unchanged.</p>
+    <p class="left-off" id="tpb-save-confirmation-left-off-message" style="display:none"><span id="tpb-save-confirmation-left-off-count">3</span> stops aren't on this travel path. Save &amp; Resequence puts them back on the path. Save Travel Path leaves them off until you resequence the route.</p>
+    <p class="note">NEW: the stops line shows only when the planner continued past the stops warning (Save Anyway or Apply Anyway). The rest is the existing modal, copy from translations (routes.travelPath.alertMessages.saveTravelPath / saveTravelPathOptions), unchanged.</p>
     <div class="col">
       <button class="btn btn-line" id="tpb-save-confirmation-cancel">Cancel</button>
       <button class="btn btn-primary" id="tpb-save-confirmation-save">Save Travel Path</button>
@@ -233,11 +243,12 @@ const $=id=>document.getElementById(id);
 const svgNS='http://www.w3.org/2000/svg';
 let tracedHasUnplaced=true;
 let mode='builder';
+let leftOff=false; // true once the planner continues past the stops warning
 const COPY={
   builder:{title:'Travel Path Builder',back:'Back To Builder',go:'Save Anyway',
-    msg:"The stops below don't appear to be on the selected travel path. If you save anyway, these stops are left off the path: they won't appear in reports, can't be confirmed, and drivers can't navigate to them. Go back to the builder to choose a different range, or save anyway."},
+    msg:"The stops below don't appear to be on the selected breadcrumbs path.\n\nIf you save anyway, these stops stay off the path until you resequence the route, drivers can't navigate to them, and route refresh will leave them out.\n\nGo back to the builder to choose a different breadcrumb record or save anyway."},
   editor:{title:'Travel Path Editor',back:'Back To Editor',go:'Apply Anyway',
-    msg:"The stops below don't appear to be on the edited travel path. If you apply this edit anyway, these stops are left off the path: they won't appear in reports, can't be confirmed, and drivers can't navigate to them. Go back to the editor to change the edit, or apply anyway."}
+    msg:"The stops below don't appear to be on the edited travel path.\n\nIf you apply this edit anyway, these stops stay off the path until you resequence the route, drivers can't navigate to them, and route refresh will leave them out.\n\nGo back to the editor to include the missing segments or apply anyway."}
 };
 function setMode(m){
   mode=m; const c=COPY[m], ed=m==='editor';
@@ -253,6 +264,7 @@ function setMode(m){
   else { $('tpb-breadcrumbs').style.display=''; }
 }
 function editorApply(withUnplaced){
+  leftOff=false;
   setMode('editor'); $('tpb-traced-path').style.display=''; drawUnplaced(withUnplaced); resetZoom();
   if(withUnplaced){ renderList(); $('tpb-unplaced-stops-dialog').classList.remove('hidden'); }
 }
@@ -286,6 +298,7 @@ function setTracedState(traced){
 }
 function resetZoom(){ $('tpb-map').style.transform=''; $('tpb-viewing-banner').style.display='none'; }
 function submitTrace(withUnplaced){
+  leftOff=false;
   tracedHasUnplaced=withUnplaced; setTracedState(true);
   if(withUnplaced){ renderList(); $('tpb-unplaced-stops-dialog').classList.remove('hidden'); }
 }
@@ -297,6 +310,11 @@ function viewStop(num){
   $('tpb-viewing-banner').style.display='flex';
   const c=document.querySelector(`#tpb-unplaced-stops [data-stop="${num}"]`); c.classList.remove('pulse'); void c.getBBox(); c.classList.add('pulse');
 }
+function openSave(){
+  $('tpb-save-confirmation-left-off-count').textContent=UNPLACED.length;
+  $('tpb-save-confirmation-left-off-message').style.display=leftOff?'':'none';
+  $('tpb-save-confirmation-modal').classList.remove('hidden');
+}
 function toast(){ const t=$('tpb-toast'); t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
 
 document.addEventListener('click',e=>{
@@ -307,17 +325,18 @@ document.addEventListener('click',e=>{
     case 'mock-clean-trace': $('tpb-unplaced-stops-dialog').classList.add('hidden'); setMode('builder'); submitTrace(false); break;
     case 'mock-editor-warning': editorApply(true); break;
     case 'tpe-apply-button': editorApply(true); break;
-    case 'tpe-save-button': $('tpb-save-confirmation-modal').classList.remove('hidden'); break;
+    case 'tpe-save-button': openSave(); break;
     case 'tpb-submit-button': submitTrace(true); break;
-    case 'tpb-unplaced-stops-back-button': $('tpb-unplaced-stops-dialog').classList.add('hidden'); if(mode==='builder') setTracedState(false); else { drawUnplaced(false); resetZoom(); } break;
+    case 'tpb-unplaced-stops-back-button': leftOff=false; $('tpb-unplaced-stops-dialog').classList.add('hidden'); if(mode==='builder') setTracedState(false); else { drawUnplaced(false); resetZoom(); } break;
     case 'tpb-back-button': setTracedState(false); break;
     case 'tpb-viewing-back-to-list': resetZoom(); $('tpb-unplaced-stops-dialog').classList.remove('hidden'); break;
     case 'tpb-unplaced-stops-save-anyway-button':
       $('tpb-unplaced-stops-dialog').classList.add('hidden'); resetZoom();
-      if(mode==='builder') $('tpb-save-confirmation-modal').classList.remove('hidden');
+      leftOff=true;
+      if(mode==='builder') openSave();
       else { const t=$('tpb-toast'); t.textContent='Edit applied. Save the travel path to keep it.'; t.style.display='block'; setTimeout(()=>{t.style.display='none'; t.textContent='Travel path saved successfully.';},2500); }
       break;
-    case 'tpb-save-button': $('tpb-save-confirmation-modal').classList.remove('hidden'); break;
+    case 'tpb-save-button': openSave(); break;
     case 'tpb-save-confirmation-cancel': $('tpb-save-confirmation-modal').classList.add('hidden'); break;
     case 'tpb-save-confirmation-save': case 'tpb-save-confirmation-save-resequence': $('tpb-save-confirmation-modal').classList.add('hidden'); toast(); break;
     case 'tpb-instructions-close': $('tpb-instructions').style.display='none'; break;
