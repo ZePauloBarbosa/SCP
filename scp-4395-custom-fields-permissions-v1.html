@@ -7,6 +7,14 @@
 2026-10-19 v2 — Modal widened to 1640px (fits viewport). More spacing between columns and rows.
               Name, dropdown choices and access summaries wrap onto extra lines instead of cutting off (as Figma wraps long names).
 2026-10-19 v3 — Roles replaced with the live SmartCity Edit User roles: Admin, Manager, View Only, Support.
+2026-11-19 v4 — Column placement (Digital Depot parity). New "Column" cell per field: a three-column icon, pick left, centre or right (one only).
+              A new field defaults to the column with the fewest fields; ties go to the leftmost. From empty this fills left, centre, right, left...
+              Customer Details now shows custom fields in three columns with no visible dividers, each column in configuration order.
+              Large text no longer spans two columns. Drag handle is still not wired in the mock.
+2026-11-19 v5 — Scope per the 5 Nov priming: Customer and Location. Each field belongs to one of them; the Entity selector switches the list.
+              Location fields show in the existing Edit Location modal (pencil on a location row on Customer Details), below Location Notes.
+              Delete replaced by Hide: a hidden field moves to Hidden Custom Fields at the bottom of the admin modal, drops off the
+              Customer page or Edit Location modal, keeps its data, and can be restored. Hidden fields do not count toward the column default.
 -->
 <html lang="en">
 <head>
@@ -96,7 +104,7 @@
   .rows{width:100%;padding:8px 18px 0}
   .row{display:flex;align-items:flex-start}
   .drag{width:44px;align-self:stretch;display:flex;align-items:center;color:#c9c9d6;cursor:grab}
-  .cells{flex:1;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1.05fr) minmax(0,1.15fr) minmax(0,1.35fr) minmax(0,1.35fr) minmax(0,1.35fr) 72px;column-gap:40px}
+  .cells{flex:1;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1.05fr) minmax(0,1.15fr) minmax(0,1.35fr) 118px minmax(0,1.35fr) minmax(0,1.35fr) 72px;column-gap:36px}
   .cell{padding-bottom:24px}
   .req .val{justify-content:flex-end;padding-top:8px}
   .del{width:44px;margin-left:12px;display:flex;align-items:center;justify-content:center;padding-top:30px;color:#B4B4C4;background:none;border:0;cursor:pointer}
@@ -117,6 +125,18 @@
   .pop .hint{margin:6px 14px 0;font-size:11px;color:var(--muted);line-height:15px;border-top:1px solid var(--line);padding-top:8px}
   .pop .all{border-bottom:1px solid var(--line);margin-bottom:4px;padding-bottom:9px}
 
+  /* Column placement picker: Segmented Tabs pattern (1213:6778) */
+  .colpick{display:inline-flex;gap:3px;background:#E0E1E8;border-radius:5px;padding:3px;margin:6px 0 4px}
+  .colpick button{width:14px;height:22px;border:0;border-radius:3px;background:#fff;cursor:pointer;padding:0;outline-offset:2px}
+  .colpick button:hover{background:#D9D9E1}
+  .colpick button[aria-checked="true"]{background:var(--navy)}
+  .colpick-label{font-size:11px;font-weight:400;color:var(--muted);margin-left:8px;vertical-align:top;line-height:34px}
+  .hidebtn{width:44px;margin-left:12px;display:flex;align-items:center;justify-content:center;padding-top:30px;color:#B4B4C4;background:none;border:0;cursor:pointer}
+  .hidebtn:hover{color:var(--navy)}
+  .hrows{width:100%;padding:4px 18px 8px}
+  .hrow{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 120px;gap:30px;align-items:center;padding:12px 0 12px 44px;border-bottom:1px solid var(--line);font-size:14px}
+  .hrow .muted{color:var(--muted);font-size:13px;font-weight:400}
+  .hempty{padding:16px 0 16px 44px;color:var(--muted);font-size:13px;font-weight:400}
   .colnote{width:100%;display:flex;gap:8px;align-items:center;background:rgba(0,102,166,.08);border-left:3px solid #0066A6;padding:11px 14px;font-size:13px;font-weight:400;margin:4px 0 6px}
   .actions{width:100%;display:flex;justify-content:flex-end;gap:10px;padding:30px 0}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--nav);color:#fff;padding:10px 18px;border-radius:5px;font-size:13px;font-weight:400;opacity:0;transition:opacity .2s;z-index:200;pointer-events:none}
@@ -127,8 +147,8 @@
   .kv{display:grid;grid-template-columns:repeat(5,1fr);padding:22px 12px 30px}
   .kv label{display:block;font-size:12px;color:var(--label);font-weight:400;margin-bottom:12px}
   .kv div{font-size:13px;font-weight:400}
-  .cfgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px 30px;padding:30px 22px 40px}
-  .cfgrid .wide{grid-column:span 2}
+  .cfgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 40px;padding:30px 22px 40px;align-items:start}
+  .cfcol{display:flex;flex-direction:column;gap:22px;min-width:0}
   .ro .val{color:var(--text)}
   .ro{border-bottom-color:transparent}
   .ro > label{display:flex;align-items:center;gap:5px}
@@ -151,11 +171,12 @@
   <div class="seg">
     <button id="mock-view-admin" class="on" type="button">1 · Configure fields (admin)</button>
     <button id="mock-view-customer" type="button">2 · Customer Details</button>
+    <button id="mock-view-location" type="button">3 · Edit Location</button>
   </div>
   <label id="mock-role-wrap" hidden>Viewing as
     <select id="mock-role-select"></select>
   </label>
-  <span class="note">Roles match the SmartCity Edit User modal: Admin, Manager, View Only, Support.</span>
+  <span class="note">v5: switch Customer / Location with the Entity selector. The eye icon hides a field; restore it from Hidden Custom Fields.</span>
 </div>
 
 <header class="topnav">
@@ -217,13 +238,13 @@
     <button class="closex" id="cf-modal-close-button" type="button" aria-label="Close"><svg width="10" height="10" viewBox="0 0 10 10" stroke="currentColor" stroke-width="1.4"><path d="M1 1l8 8M9 1l-8 8"/></svg></button>
     <div class="mtitle" id="cf-modal-title">Customer / Location Custom Fields</div>
     <div class="inp entity">
-      <div class="val"><select id="cf-entity-select" aria-label="Entity"><option>Location</option><option>Customer</option></select></div>
+      <div class="val"><select id="cf-entity-select" aria-label="Entity"><option>Customer</option><option>Location</option></select></div>
     </div>
 
     <div class="sect" id="cf-active-section-toggle"><span>ACTIVE CUSTOM FIELDS</span><svg width="12" height="8" viewBox="0 0 12 8" fill="#76768C"><path d="M6 0l6 8H0z"/></svg></div>
     <div class="colnote" id="cf-access-note">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#0066A6" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><path d="M8 7v4M8 4.6v.1"/></svg>
-      <span><b style="font-weight:700">View access</b> decides who sees a field. <b style="font-weight:700">Edit access</b> decides who can change its value. Anyone with edit access also gets view access.</span>
+      <span><b style="font-weight:700">View access</b> decides who sees a field. <b style="font-weight:700">Edit access</b> decides who can change its value. Anyone with edit access also gets view access. <b style="font-weight:700">Column</b> places the field on the left, centre or right of Customer Details or Edit Location, in the order listed here.</span>
     </div>
     <div class="rows" id="cf-rows"></div>
 
@@ -231,12 +252,35 @@
       <button class="btn" id="cf-add-field-button" type="button">Add Custom Field</button>
       <button class="btn" id="cf-save-button" type="button">Save</button>
     </div>
-    <div class="sect" id="cf-hidden-section-toggle"><span>HIDDEN CUSTOM FIELDS</span><svg width="12" height="8" viewBox="0 0 12 8" fill="#76768C"><path d="M6 8L0 0h12z"/></svg></div>
+    <div class="sect" id="cf-hidden-section-toggle" aria-expanded="false"><span id="cf-hidden-section-label">HIDDEN CUSTOM FIELDS</span><svg id="cf-hidden-section-arrow" width="12" height="8" viewBox="0 0 12 8" fill="#76768C"><path d="M6 8L0 0h12z"/></svg></div>
+    <div class="hrows" id="cf-hidden-rows" hidden></div>
   </div>
 </div>
 
-<!-- ============ VIEW 2: Customer Details ============ -->
-<main id="view-customer" hidden>
+<style>
+  .locrow{display:grid;grid-template-columns:1fr 2fr 1fr 24px;gap:20px;align-items:center;padding:18px 12px 26px}
+  .locrow label{display:block;font-size:12px;color:var(--label);font-weight:400;margin-bottom:10px}
+  .locrow div div{font-size:13px;font-weight:400}
+  .lmodal{background:#fff;width:1700px;max-width:calc(100vw - 48px);height:calc(100vh - 120px);display:flex;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+  .lform{width:50%;display:flex;flex-direction:column;min-width:0}
+  .lscroll{flex:1;overflow:auto;padding:30px 42px 20px}
+  .lf{margin-bottom:22px}
+  .lf .val{min-height:33px}
+  .lf .ph{color:var(--label);font-size:16px}
+  .lchecks{display:flex;gap:80px;margin:6px 0 28px;font-size:14px}
+  .lchecks label{display:flex;align-items:center;gap:12px}
+  .lchecks .dim{color:#9a9aae}
+  .lalerts{text-align:center;padding:30px 0 40px;font-size:15px}
+  .lcf-h{display:flex;justify-content:space-between;align-items:center;font-size:16px;padding:6px 0 0;border-top:1px solid var(--line);margin-top:8px}
+  .lgrid{padding:22px 0 30px;gap:0 28px}
+  .lfoot{display:flex;align-items:center;gap:20px;padding:22px 42px;background:var(--page);border-top:1px solid var(--line)}
+  .lfoot-l{flex:1;display:flex;align-items:center;gap:12px;font-size:15px}
+  .btn.grey{background:#EBEBF0;border-color:#EBEBF0;color:var(--muted)}
+  .lmap{width:50%;background:linear-gradient(180deg,#E9EAEC,#E3E4E7);position:relative}
+  .lmap span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px;color:#76768C;font-weight:400}
+</style>
+<!-- ============ VIEW 2/3: Customer Details, and the Edit Location modal opened from a location's pencil ============ -->
+<main id="view-details" hidden>
   <nav class="subnav"><span>Customers</span><span>Suspended Locations</span><span>Service Network</span></nav>
   <div class="wrap">
     <div class="pagehead">
@@ -256,28 +300,75 @@
         <span class="rolechip" id="customer-role-chip"></span>
       </div>
       <div class="cfgrid" id="customer-custom-fields-grid"></div>
+      <div class="card-h"><span>Locations</span></div>
+      <div class="locrow" id="customer-location-1-row">
+        <div><label>Location Name</label><div>0 CONNOR CT</div></div>
+        <div><label>Address</label><div>0 CONNOR CT, ATLANTA, GA 30319, US</div></div>
+        <div><label>Account Number</label><div>153588</div></div>
+        <button class="pencil" id="customer-location-1-edit-button" type="button" aria-label="Edit location"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 11.5V14h2.5l7.4-7.4-2.5-2.5L2 11.5zm11.8-6.8a.7.7 0 000-1L12.3 2.2a.7.7 0 00-1 0l-1.2 1.2 2.5 2.5 1.2-1.2z"/></svg></button>
+      </div>
       <div class="map"><span>Map</span></div>
     </section>
   </div>
 </main>
+
+<!-- Edit Location modal (existing SmartCity modal; custom fields section added below Location Notes) -->
+<div class="overlay" id="location-modal-overlay">
+  <div class="lmodal" id="location-modal" role="dialog" aria-modal="true" aria-labelledby="location-modal-title">
+    <div class="lform">
+      <div class="lscroll">
+        <div class="mtitle" id="location-modal-title" style="text-align:center">Edit Location</div>
+        <div class="inp lf"><label>Location Name</label><div class="val">0 CONNOR CT</div></div>
+        <div class="inp lf"><label>Address</label><div class="val">0 CONNOR CT CT, ATLANTA, GA 30319, US</div></div>
+        <div class="lchecks"><label><input type="checkbox" class="cb"> Temporary Address</label><label class="dim"><input type="checkbox" class="cb" disabled> Locked Address</label></div>
+        <div class="inp lf"><div class="val ph">Email</div></div>
+        <div class="inp lf"><div class="val ph">Main Phone</div></div>
+        <div class="inp lf"><div class="val ph">Text Notifications Phone #S</div></div>
+        <div class="inp lf"><label>Account Number</label><div class="val">153588</div></div>
+        <div class="lalerts">No location alerts found.<br><button class="btn" type="button" style="margin-top:18px">Add New</button></div>
+        <div class="inp lf"><div class="val ph" style="min-height:90px;align-items:flex-start">Location Notes</div></div>
+        <div class="lcf-h"><span>Custom Fields</span><span class="rolechip" id="location-role-chip"></span></div>
+        <div class="cfgrid lgrid" id="location-custom-fields-grid"></div>
+        <div class="inp lf" style="width:50%"><label>Account Status</label><div class="val">Active </div></div>
+      </div>
+      <div class="lfoot">
+        <span class="lfoot-l"><span class="toggle"></span> Update Tracker Route</span>
+        <button class="btn" id="location-modal-save-button" type="button">Save</button>
+        <button class="btn grey" id="location-modal-cancel-button" type="button">Cancel</button>
+      </div>
+    </div>
+    <div class="lmap"><span>Map</span></div>
+  </div>
+</div>
 
 <div class="toast" id="mock-toast"></div>
 
 <script>
 const ROLES = ['Admin','Manager','Support','View Only'];
 const ALL = () => ROLES.slice();
+const COLS = ['left','centre','right'];
+const cap = s => s[0].toUpperCase() + s.slice(1);
 
 let fields = [
-  {id:1,name:'Collection notes',type:'Text field',format:'Large',def:'Enter text here',req:false,view:ALL(),edit:['Admin','Manager','Support'],value:'Bins kept behind side gate'},
-  {id:2,name:'Zone',type:'Dropdown',format:'Single Selection',def:'North, South, East, West',req:true,view:ALL(),edit:['Admin','Manager'],value:'North'},
-  {id:3,name:'VIP residence',type:'Checkmark',format:'',def:'Active',req:false,view:ALL(),edit:['Admin','Manager','Support'],value:true},
-  {id:4,name:'Metal plate in driveway',type:'Toggle',format:'',def:'Inactive',req:false,view:ALL(),edit:['Admin','Manager','Support'],value:true},
-  {id:5,name:'Assisted collection review date',type:'Date picker',format:'Single Date',def:'12/12/2025',req:false,view:['Admin','Manager','Support'],edit:['Admin','Manager'],value:'2026-11-30'},
-  {id:6,name:'Medical contact (GP)',type:'Text field',format:'Small',def:'Enter text here',req:false,view:['Admin','Manager'],edit:['Admin'],value:'Dr A. Example, High St Surgery'},
-  {id:7,name:'Number of bins on site',type:'Number count',format:'Integer',def:'0',req:true,view:ALL(),edit:['Admin','Manager','Support'],value:'3'}
+  /* Customer fields */
+  {id:1,entity:'Customer',name:'Preferred contact method',type:'Dropdown',format:'Single Selection',def:'Email, Phone, Letter',req:true,view:ALL(),edit:['Admin','Manager','Support'],value:'Email',col:0,hidden:false},
+  {id:2,entity:'Customer',name:'VIP residence',type:'Checkmark',format:'',def:'Inactive',req:false,view:ALL(),edit:['Admin','Manager'],value:true,col:1,hidden:false},
+  {id:3,entity:'Customer',name:'Medical contact (GP)',type:'Text field',format:'Small',def:'',req:false,view:['Admin','Manager'],edit:['Admin'],value:'Dr A. Example, High St Surgery',col:2,hidden:false},
+  {id:4,entity:'Customer',name:'Assisted collection review date',type:'Date picker',format:'Single Date',def:'',req:false,view:['Admin','Manager','Support'],edit:['Admin','Manager'],value:'2026-11-30',col:0,hidden:false},
+  {id:5,entity:'Customer',name:'Account notes',type:'Text field',format:'Large',def:'',req:false,view:ALL(),edit:['Admin','Manager','Support'],value:'Prefers calls after 2pm',col:1,hidden:false},
+  {id:6,entity:'Customer',name:'Legacy reference',type:'Text field',format:'Small',def:'',req:false,view:ALL(),edit:['Admin'],value:'DD-00412',col:2,hidden:true},
+  /* Location fields */
+  {id:7,entity:'Location',name:'Collection notes',type:'Text field',format:'Large',def:'',req:false,view:ALL(),edit:['Admin','Manager','Support'],value:'Bins kept behind side gate',col:0,hidden:false},
+  {id:8,entity:'Location',name:'Bin position',type:'Dropdown',format:'Single Selection',def:'Front, Side gate, Back door',req:true,view:ALL(),edit:['Admin','Manager','Support'],value:'Side gate',col:1,hidden:false},
+  {id:9,entity:'Location',name:'Metal plate in driveway',type:'Toggle',format:'',def:'Inactive',req:false,view:ALL(),edit:['Admin','Manager','Support'],value:true,col:2,hidden:false},
+  {id:10,entity:'Location',name:'Number of bins on site',type:'Number count',format:'Integer',def:'0',req:true,view:ALL(),edit:['Admin','Manager','Support'],value:'3',col:0,hidden:false},
+  {id:11,entity:'Location',name:'Gate code',type:'Text field',format:'Small',def:'',req:false,view:['Admin','Manager','Support'],edit:['Admin','Manager'],value:'4471',col:1,hidden:false},
+  {id:12,entity:'Location',name:'Old round code',type:'Text field',format:'Small',def:'',req:false,view:ALL(),edit:['Admin'],value:'R14-TUE',col:0,hidden:true}
 ];
-let nextId = 8;
+let nextId = 13;
 let currentRole = 'Support';
+let currentEntity = 'Customer';
+let hiddenOpen = false;
 
 const TYPES = ['Text field','Dropdown','Date picker','Checkmark','Toggle','Number count'];
 const FORMATS = {'Text field':['Small','Large'],'Dropdown':['Single Selection','Multiple Selection'],'Date picker':['Single Date','Date Range'],'Checkmark':[],'Toggle':[],'Number count':['Integer','2 Decimal Fields']};
@@ -287,14 +378,30 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const chev = '<svg class="chev" viewBox="0 0 11 6"><path d="M1 1l4.5 4L10 1" fill="none" stroke="#242833" stroke-width="1.2"/></svg>';
 const lockSvg = '<svg class="lock" viewBox="0 0 12 12" fill="currentColor"><path d="M3.5 5V3.7a2.5 2.5 0 015 0V5H9a.8.8 0 01.8.8v4.4a.8.8 0 01-.8.8H3a.8.8 0 01-.8-.8V5.8A.8.8 0 013 5h.5zm1 0h3V3.7a1.5 1.5 0 00-3 0V5z"/></svg>';
+const eyeOff = '<svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 7s2.6-5 7-5 7 5 7 5-2.6 5-7 5-7-5-7-5z"/><circle cx="8" cy="7" r="2.2"/><path d="M2 1l12 12"/></svg>';
 
+const active = () => fields.filter(f => f.entity === currentEntity && !f.hidden);
+const hiddenList = () => fields.filter(f => f.entity === currentEntity && f.hidden);
+
+/* Default column for a new field: the column with the fewest active fields on this entity; ties go to the leftmost.
+   From empty this gives left, centre, right, left, ... Hidden fields do not count. */
+function defaultColumn(){
+  const n = [0,0,0];
+  active().forEach(f => n[f.col]++);
+  return n.indexOf(Math.min(...n));
+}
+function columnCell(f){
+  const btns = COLS.map((c,i) => `<button type="button" role="radio" aria-checked="${f.col===i}" aria-label="${cap(c)} column" title="${cap(c)} column" id="cf-field-${f.id}-column-${c}-button" data-f="${f.id}" data-col="${i}"></button>`).join('');
+  return `<div class="cell"><div class="inp" style="border-bottom-color:transparent"><label>Column</label>
+    <div><span class="colpick" role="radiogroup" aria-label="Column on details page" id="cf-field-${f.id}-column-picker">${btns}</span><span class="colpick-label" id="cf-field-${f.id}-column-label">${cap(COLS[f.col])}</span></div></div></div>`;
+}
 function summary(list){
   if (list.length === ROLES.length) return 'All roles';
   if (list.length === 0) return 'No roles';
   if (list.length <= 2) return list.join(', ');
   return list.length + ' roles';
 }
-function toast(msg){const t=$('#mock-toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200);}
+function toast(msg){const t=$('#mock-toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 function accessCell(f, kind){
   const list = f[kind];
@@ -305,9 +412,7 @@ function accessCell(f, kind){
     const forced = kind === 'view' && f.edit.includes(r);
     return `<label class="opt${forced?' forced':''}"><input type="checkbox" class="cb" data-f="${f.id}" data-kind="${kind}" data-role="${esc(r)}" ${checked?'checked':''} ${forced?'disabled':''} id="cf-field-${f.id}-${kind}-access-${r.toLowerCase().replace(/\s+/g,'-')}-checkbox">${esc(r)}</label>`;
   }).join('');
-  const hint = kind === 'view'
-    ? 'Greyed roles have edit access, so they keep view access.'
-    : 'Adding a role here also gives it view access.';
+  const hint = kind === 'view' ? 'Greyed roles have edit access, so they keep view access.' : 'Adding a role here also gives it view access.';
   return `<div class="cell"><div class="inp acc${restricted?' restricted':''}" id="cf-field-${f.id}-${kind}-access" tabindex="0" data-pop="${f.id}-${kind}">
       <label>${label}</label>
       <div class="val">${restricted?lockSvg:''}<span class="sum">${esc(summary(list))}</span>${chev}</div>
@@ -321,7 +426,7 @@ function accessCell(f, kind){
 }
 
 function renderRows(){
-  $('#cf-rows').innerHTML = fields.map(f => {
+  $('#cf-rows').innerHTML = active().map(f => {
     const fmts = FORMATS[f.type] || [];
     const fmt = fmts.length
       ? `<select id="cf-field-${f.id}-format-select" data-f="${f.id}" data-k="format">${fmts.map(o=>`<option ${o===f.format?'selected':''}>${o}</option>`).join('')}</select>`
@@ -330,7 +435,7 @@ function renderRows(){
       ? `<select id="cf-field-${f.id}-default-select" data-f="${f.id}" data-k="def"><option ${f.def==='Active'?'selected':''}>Active</option><option ${f.def==='Inactive'?'selected':''}>Inactive</option></select>`
       : f.type==='Dropdown'
         ? `<textarea rows="1" class="grow" id="cf-field-${f.id}-default-input" data-f="${f.id}" data-k="def" placeholder="Enter choices separated by commas">${esc(f.def)}</textarea>`
-        : `<input id="cf-field-${f.id}-default-input" data-f="${f.id}" data-k="def" value="${esc(f.def)}">`;
+        : `<input id="cf-field-${f.id}-default-input" data-f="${f.id}" data-k="def" value="${esc(f.def)}" placeholder="Optional">`;
     return `<div class="row" id="cf-field-${f.id}-row">
       <div class="drag" aria-hidden="true"><svg width="11" height="8" viewBox="0 0 11 8" fill="currentColor"><rect width="11" height="1.2"/><rect y="3.4" width="11" height="1.2"/><rect y="6.8" width="11" height="1.2"/></svg></div>
       <div class="cells">
@@ -338,14 +443,33 @@ function renderRows(){
         <div class="cell"><div class="inp"><label>Type</label><div class="val"><select id="cf-field-${f.id}-type-select" data-f="${f.id}" data-k="type">${TYPES.map(o=>`<option ${o===f.type?'selected':''}>${o}</option>`).join('')}</select></div></div></div>
         <div class="cell"><div class="inp"><label>Format</label><div class="val">${fmt}</div></div></div>
         <div class="cell"><div class="inp"><label>${DEFLABEL[f.type]}</label><div class="val">${defCtl}</div></div></div>
+        ${columnCell(f)}
         ${accessCell(f,'view')}
         ${accessCell(f,'edit')}
         <div class="cell req"><div class="inp"><label>Required</label><div class="val"><input type="checkbox" class="cb" id="cf-field-${f.id}-required-checkbox" data-f="${f.id}" data-k="req" ${f.req?'checked':''} aria-label="Required"></div></div></div>
       </div>
-      <button class="del" id="cf-field-${f.id}-delete-button" type="button" aria-label="Delete field"><svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor"><path d="M4 0h4l.6 1H12v1.6H0V1h3.4zM1 3.6h10l-.8 10.4H1.8z"/></svg></button>
+      <button class="hidebtn" id="cf-field-${f.id}-hide-button" data-f="${f.id}" type="button" aria-label="Hide field" title="Hide field">${eyeOff}</button>
     </div>`;
-  }).join('');
+  }).join('') || `<div class="hempty">No active ${currentEntity.toLowerCase()} fields. Add one below.</div>`;
+  renderHidden();
   requestAnimationFrame(growAll);
+}
+
+function renderHidden(){
+  const list = hiddenList();
+  $('#cf-hidden-section-label').textContent = `HIDDEN CUSTOM FIELDS (${list.length})`;
+  $('#cf-hidden-section-toggle').setAttribute('aria-expanded', hiddenOpen);
+  $('#cf-hidden-section-arrow').innerHTML = hiddenOpen ? '<path d="M6 0l6 8H0z"/>' : '<path d="M6 8L0 0h12z"/>';
+  $('#cf-hidden-rows').hidden = !hiddenOpen;
+  $('#cf-hidden-rows').innerHTML = list.length
+    ? list.map(f => `<div class="hrow" id="cf-hidden-field-${f.id}-row">
+        <span>${esc(f.name || 'Untitled field')}</span>
+        <span class="muted">${esc(f.type)}</span>
+        <span class="muted">${cap(COLS[f.col])} column</span>
+        <span class="muted">Data kept</span>
+        <button class="btn sec" id="cf-hidden-field-${f.id}-restore-button" data-f="${f.id}" type="button">Restore</button>
+      </div>`).join('')
+    : '<div class="hempty">No hidden fields.</div>';
 }
 
 function getField(id){return fields.find(f=>f.id===+id);}
@@ -384,33 +508,46 @@ function growAll(){document.querySelectorAll('textarea.grow').forEach(grow);}
 window.addEventListener('resize',growAll);
 document.addEventListener('input', e => { const el=e.target; if (el.dataset.k && (el.tagName==='TEXTAREA' || (el.tagName==='INPUT' && el.type!=='checkbox'))){ getField(el.dataset.f)[el.dataset.k]=el.value; if(el.tagName==='TEXTAREA') grow(el); } });
 
+$('#cf-entity-select').onchange = e => { currentEntity = e.target.value; renderRows(); };
+
 $('#cf-add-field-button').onclick = () => {
-  fields.push({id:nextId++,name:'',type:'Text field',format:'Small',def:'',req:false,view:ALL(),edit:['Admin'],value:''});
+  const col = defaultColumn();
+  fields.push({id:nextId++,entity:currentEntity,name:'',type:'Text field',format:'Small',def:'',req:false,view:ALL(),edit:['Admin'],value:'',col,hidden:false});
   renderRows();
   document.querySelector(`#cf-field-${nextId-1}-name-input`).focus();
+  toast(`New ${currentEntity.toLowerCase()} field placed in the ${COLS[col]} column (fewest fields).`);
 };
 $('#cf-rows').addEventListener('click', e => {
-  const b = e.target.closest('.del'); if (!b) return;
-  toast('Delete is shown in the Figma. SCP-4395 says custom fields cannot be deleted: decide at Three Amigos.');
+  const cp = e.target.closest('.colpick button');
+  if (cp){ const f = getField(cp.dataset.f); f.col = +cp.dataset.col; renderRows(); document.getElementById(cp.id).focus(); return; }
+  const h = e.target.closest('.hidebtn'); if (!h) return;
+  const f = getField(h.dataset.f); f.hidden = true; hiddenOpen = true; renderRows();
+  toast(`"${f.name || 'Untitled field'}" hidden. It is off the ${currentEntity==='Customer'?'Customer Details page':'Edit Location modal'} and its data is kept.`);
 });
-$('#cf-save-button').onclick = () => { toast('Saved. Changes to view and edit access are written to the audit log.'); };
+$('#cf-hidden-rows').addEventListener('click', e => {
+  const b = e.target.closest('button[data-f]'); if (!b) return;
+  const f = getField(b.dataset.f); f.hidden = false;
+  fields = fields.filter(x => x !== f).concat(f); /* restored field goes to the end of the active list */
+  renderRows();
+  toast(`"${f.name}" restored to the ${COLS[f.col]} column.`);
+});
+$('#cf-hidden-section-toggle').onclick = () => { hiddenOpen = !hiddenOpen; renderHidden(); };
+$('#cf-save-button').onclick = () => { toast('Saved. Field changes, hide and restore are written to the audit log.'); };
 $('#cf-modal-close-button').onclick = () => $('#cf-modal-overlay').classList.remove('open');
 $('#settings-custom-fields-edit-button').onclick = () => $('#cf-modal-overlay').classList.add('open');
-$('#cf-hidden-section-toggle').onclick = () => toast('Hidden fields: unchanged from the Figma, not mocked here.');
 
-/* ---------- Customer Details (view as role) ---------- */
-function renderCustomer(){
-  $('#customer-role-chip').innerHTML = '';
-  const visible = fields.filter(f => f.name && f.view.includes(currentRole));
-  if (!visible.length){ $('#customer-custom-fields-grid').innerHTML = `<div class="empty">No custom fields are visible to ${esc(currentRole)}.</div>`; return; }
-  $('#customer-custom-fields-grid').innerHTML = visible.map(f => {
+/* ---------- Customer Details and Edit Location modal (view as role) ---------- */
+function renderGrid(entity, grid, prefix, chip){
+  const mine = fields.filter(f => f.entity === entity && !f.hidden && f.name);
+  const visible = mine.filter(f => f.view.includes(currentRole));
+  if (!visible.length){ grid.innerHTML = `<div class="empty">No custom fields are visible to ${esc(currentRole)}.</div>`; chip.textContent=''; return; }
+  const cell = f => {
     const canEdit = f.edit.includes(currentRole);
-    const wide = f.type==='Text field' && f.format==='Large' ? ' wide' : '';
-    const id = `customer-cf-${f.id}`;
+    const id = `${prefix}-cf-${f.id}`;
     const lab = `<label>${canEdit?'':lockSvg}${esc(f.name)}${f.req&&canEdit?' *':''}</label>`;
     let ctl;
     if (f.type==='Checkmark') ctl = `<div class="val"><span></span><input type="checkbox" class="cb" id="${id}-checkbox" ${f.value?'checked':''} ${canEdit?'':'disabled'} aria-label="${esc(f.name)}"></div>`;
-    else if (f.type==='Toggle') ctl = `<div class="val"><span></span><button class="toggle${f.value?' on':''}" id="${id}-toggle" type="button" ${canEdit?'':'disabled'} aria-pressed="${!!f.value}" aria-label="${esc(f.name)}"></button></div>`;
+    else if (f.type==='Toggle') ctl = `<div class="val"><span></span><button class="toggle${f.value?' on':''}" id="${id}-toggle" data-f="${f.id}" type="button" ${canEdit?'':'disabled'} aria-pressed="${!!f.value}" aria-label="${esc(f.name)}"></button></div>`;
     else if (!canEdit) {
       const v = f.type==='Date picker' && f.value ? f.value.split('-').reverse().join('/') : f.value;
       ctl = `<div class="val" id="${id}-value">${esc(v||'-')}</div>`;
@@ -419,35 +556,47 @@ function renderCustomer(){
     else if (f.type==='Date picker') ctl = `<div class="val"><input type="date" id="${id}-input" value="${esc(f.value)}"></div>`;
     else if (f.type==='Number count') ctl = `<div class="val"><input type="number" id="${id}-input" value="${esc(f.value)}"></div>`;
     else ctl = `<div class="val"><input id="${id}-input" value="${esc(f.value)}"></div>`;
-    return `<div class="inp${canEdit?'':' ro'}${wide}" id="${id}" title="${canEdit?'':'Read-only for '+esc(currentRole)}">${lab}${ctl}</div>`;
-  }).join('');
-  const hidden = fields.filter(f => f.name && !f.view.includes(currentRole)).length;
+    return `<div class="inp${canEdit?'':' ro'}" id="${id}" title="${canEdit?'':'Read-only for '+esc(currentRole)}">${lab}${ctl}</div>`;
+  };
+  grid.innerHTML = COLS.map((c,i) =>
+    `<div class="cfcol" id="${prefix}-cf-column-${c}">${visible.filter(f => f.col===i).map(cell).join('')}</div>`).join('');
   const ro = visible.filter(f => !f.edit.includes(currentRole)).length;
-  $('#customer-role-chip').textContent = `${ro} read-only · ${hidden} not visible to ${currentRole}`;
+  chip.textContent = `${ro} read-only · ${mine.length - visible.length} not visible to ${currentRole}`;
 }
-$('#customer-custom-fields-grid').addEventListener('click', e => {
-  const t = e.target.closest('.toggle'); if (!t || t.disabled) return;
-  const f = getField(t.id.split('-')[2]); f.value = !f.value; renderCustomer();
+function renderDetails(){
+  renderGrid('Customer', $('#customer-custom-fields-grid'), 'customer', $('#customer-role-chip'));
+  renderGrid('Location', $('#location-custom-fields-grid'), 'location', $('#location-role-chip'));
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('.cfgrid .toggle'); if (!t || t.disabled) return;
+  const f = getField(t.dataset.f); f.value = !f.value; renderDetails();
 });
+const openLocation = () => { renderDetails(); $('#location-modal-overlay').classList.add('open'); };
+const closeLocation = () => $('#location-modal-overlay').classList.remove('open');
+$('#customer-location-1-edit-button').onclick = () => { openLocation(); setTab('location'); };
+$('#location-modal-cancel-button').onclick = () => { closeLocation(); setTab('customer'); };
+$('#location-modal-save-button').onclick = () => { closeLocation(); setTab('customer'); toast('Location saved.'); };
 
 const sel = $('#mock-role-select');
 sel.innerHTML = ROLES.map(r=>`<option ${r===currentRole?'selected':''}>${r}</option>`).join('');
-sel.onchange = () => { currentRole = sel.value; renderCustomer(); };
+sel.onchange = () => { currentRole = sel.value; renderDetails(); };
+function setTab(view){ ['admin','customer','location'].forEach(v => $(`#mock-view-${v}`).classList.toggle('on', v===view)); }
 
 function show(view){
   const admin = view === 'admin';
   $('#view-admin').hidden = !admin;
-  $('#view-customer').hidden = admin;
+  $('#view-details').hidden = admin;
   $('#mock-role-wrap').hidden = admin;
   $('#cf-modal-overlay').classList.toggle('open', admin);
   $('#nav-customers').classList.toggle('on', !admin);
-  $('#mock-view-admin').classList.toggle('on', admin);
-  $('#mock-view-customer').classList.toggle('on', !admin);
-  if (!admin) renderCustomer();
+  setTab(view);
+  if (!admin) renderDetails();
+  if (view === 'location') openLocation(); else closeLocation();
   window.scrollTo(0,0);
 }
 $('#mock-view-admin').onclick = () => show('admin');
 $('#mock-view-customer').onclick = () => show('customer');
+$('#mock-view-location').onclick = () => show('location');
 
 renderRows();
 </script>
